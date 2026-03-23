@@ -81,5 +81,11 @@ struct WineRuntimesSetupView: View {
             }
         }
         .frame(width: 520, height: 420)
+        .onAppear {
+            // Default behavior: start downloading Wine 11.0 DXMT on first run.
+            if !vm.isInstalled("11.0-dxmt-signed") {
+                vm.download(runtimeId: "11.0-dxmt-signed")
+            }
+        }
     }
 }
