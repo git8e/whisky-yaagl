@@ -76,13 +76,17 @@ final class WineRuntimeDownloadsVM: ObservableObject {
                 WineRuntimes.all.map(\.id).filter { self.items[$0]?.selected == true }
             }
             for id in ids {
+                let skip = await MainActor.run { self.isInstalled(id) || (self.items[id]?.isBusy == true) }
+                if skip {
+                    continue
+                }
+
                 await MainActor.run {
-                    if self.isInstalled(id) || (self.items[id]?.isBusy == true) { return }
                     self.download(runtimeId: id)
                 }
 
                 // Wait until the current download finishes before moving to next.
-                while await MainActor.run({ self.items[id]?.isBusy == true }) {
+                while await MainActor.run { self.items[id]?.isBusy == true } {
                     try? await Task.sleep(nanoseconds: 200_000_000)
                 }
             }
