@@ -74,7 +74,17 @@ public enum WineRuntimeManager {
             )
 
             status?("Installing WhiskyWine")
-            WhiskyWineInstaller.install(from: archive)
+            let tempCopy = WhiskyWineInstaller.applicationFolder
+                .appending(path: "Temp", directoryHint: .isDirectory)
+                .appending(path: "WhiskyWineInstall-\(UUID().uuidString).tar.gz")
+            if !fm.fileExists(atPath: tempCopy.deletingLastPathComponent().path(percentEncoded: false)) {
+                try? fm.createDirectory(at: tempCopy.deletingLastPathComponent(), withIntermediateDirectories: true)
+            }
+            if fm.fileExists(atPath: tempCopy.path(percentEncoded: false)) {
+                try? fm.removeItem(at: tempCopy)
+            }
+            try fm.copyItem(at: archive, to: tempCopy)
+            WhiskyWineInstaller.install(from: tempCopy)
 
             removeQuarantineRecursively(path: wineRoot(runtimeId: runtimeId).path(percentEncoded: false))
 
