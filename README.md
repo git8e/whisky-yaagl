@@ -95,7 +95,9 @@ Important: this fork does NOT patch/revert on every launch.
 
 ### SteamPatch Runtime Assets
 
-SteamPatch automatically downloads the required `protonextras` from the latest YAAGL release and caches it locally.
+SteamPatch automatically downloads the required `protonextras` from the YAAGL repository (only the 4 required files) and caches it locally.
+
+If the repository download is unavailable, it falls back to downloading the latest YAAGL app tarball and extracting `sidecar/protonextras`.
 
 Optional override:
 
