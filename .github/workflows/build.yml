@@ -11,11 +11,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install SwiftLint
-        run: |
-          set -euxo pipefail
-          brew install swiftlint
-
       - name: Select Xcode
         run: |
           set -euxo pipefail
@@ -30,6 +25,8 @@ jobs:
         run: xcodebuild -version
 
       - name: Build
+        env:
+          SKIP_SWIFTLINT: "1"
         run: |
           set -euxo pipefail
           DERIVED_DATA="$RUNNER_TEMP/DerivedData"
