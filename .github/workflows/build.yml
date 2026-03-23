@@ -1,0 +1,42 @@
+name: Build (macOS)
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode Version
+        run: xcodebuild -version
+
+      - name: Build
+        run: |
+          set -euxo pipefail
+          xcodebuild \
+            -project "Whisky.xcodeproj" \
+            -scheme "Whisky" \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package
+        run: |
+          set -euxo pipefail
+          APP="build/DerivedData/Build/Products/Release/Whisky.app"
+          test -d "$APP"
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "Whisky.app.zip"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Whisky.app
+          path: Whisky.app.zip
