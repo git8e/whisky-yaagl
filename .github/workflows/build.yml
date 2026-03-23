@@ -46,6 +46,11 @@ jobs:
           set -euxo pipefail
           APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/Whisky.app"
           test -d "$APP"
+
+          # Ad-hoc sign so macOS will run it after quarantine removal.
+          /usr/bin/codesign --force --deep --sign - "$APP"
+          /usr/bin/codesign --verify --deep --strict --verbose=2 "$APP"
+
           ditto -c -k --sequesterRsrc --keepParent "$APP" "Whisky.app.zip"
 
       - name: Upload Artifact
