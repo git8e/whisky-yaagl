@@ -19,7 +19,7 @@
 import Foundation
 
 public enum WineRuntimeManager {
-    private static let fm = FileManager.default
+    private static var fm: FileManager { FileManager.default }
 
     private static var versionsFolder: URL {
         WhiskyWineInstaller.libraryFolder.appending(path: "WineVersions", directoryHint: .isDirectory)

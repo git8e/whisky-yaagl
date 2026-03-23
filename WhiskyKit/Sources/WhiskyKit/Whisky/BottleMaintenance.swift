@@ -19,7 +19,7 @@
 import Foundation
 
 public enum BottleMaintenance {
-    private static let fm = FileManager.default
+    private static var fm: FileManager { FileManager.default }
 
     public static func cleanHK4eTweaks(bottle: Bottle) async {
         do {

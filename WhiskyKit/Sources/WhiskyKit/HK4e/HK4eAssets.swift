@@ -19,7 +19,7 @@
 import Foundation
 
 public enum HK4eAssets {
-    private static let fm = FileManager.default
+    private static var fm: FileManager { FileManager.default }
 
     public static func runtimeRootURL() throws -> URL {
         if let env = ProcessInfo.processInfo.environment["HK4E_RUNTIME_ROOT"], !env.isEmpty {
