@@ -22,6 +22,8 @@ import WhiskyKit
 struct BottleCreationView: View {
     @Binding var newlyCreatedBottleURL: URL?
 
+    @ObservedObject private var bottleVM = BottleVM.shared
+
     @State private var newBottleName: String = ""
     @State private var newBottleVersion: WinVersion = .win10
     @State private var wineRuntimeId: String = WineRuntimes.whiskyDefaultId
@@ -145,17 +147,51 @@ struct BottleCreationView: View {
                         dismiss()
                     }
                     .keyboardShortcut(.cancelAction)
+                    .disabled(bottleVM.isCreatingBottle)
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button("create.create") {
                         submit()
                     }
                     .keyboardShortcut(.defaultAction)
-                    .disabled(!nameValid)
+                    .disabled(!nameValid || bottleVM.isCreatingBottle)
                 }
             }
             .onSubmit {
                 submit()
+            }
+            .overlay(alignment: .bottom) {
+                if bottleVM.isCreatingBottle {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(bottleVM.createBottleStatus)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        if let progress = bottleVM.createBottleProgress {
+                            ProgressView(value: progress)
+                        } else {
+                            ProgressView()
+                        }
+                    }
+                    .padding(12)
+                }
+            }
+            .alert(
+                "Create Bottle Failed",
+                isPresented: Binding(
+                    get: { bottleVM.createBottleErrorMessage != nil },
+                    set: { presenting in
+                        if !presenting { bottleVM.createBottleErrorMessage = nil }
+                    }
+                )
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(bottleVM.createBottleErrorMessage ?? "Unknown error")
+            }
+            .onChange(of: bottleVM.createdBottleURL) { _, url in
+                guard let url else { return }
+                newlyCreatedBottleURL = url
+                dismiss()
             }
         }
         .fixedSize(horizontal: false, vertical: true)
@@ -163,19 +199,20 @@ struct BottleCreationView: View {
     }
 
     func submit() {
-        newlyCreatedBottleURL = BottleVM.shared.createNewBottle(bottleName: newBottleName,
-                                                                 winVersion: newBottleVersion,
-                                                                 bottleURL: newBottleURL,
-                                                                 wineRuntimeId: wineRuntimeId,
-                                                                 wineArchiveURL: wineArchiveURL,
-                                                                 initialMetalHud: initialMetalHud,
-                                                                 initialRetinaMode: initialRetinaMode,
-                                                                 initialSteamPatch: initialSteamPatch,
-                                                                 initialCustomResolutionEnabled: initialCustomResolutionEnabled,
-                                                                 initialCustomResolutionWidth: initialCustomResolutionWidth,
-                                                                 initialCustomResolutionHeight: initialCustomResolutionHeight,
-                                                                 pinProgramURL: pinProgramURL)
-        dismiss()
+        _ = bottleVM.createNewBottle(
+            bottleName: newBottleName,
+            winVersion: newBottleVersion,
+            bottleURL: newBottleURL,
+            wineRuntimeId: wineRuntimeId,
+            wineArchiveURL: wineArchiveURL,
+            initialMetalHud: initialMetalHud,
+            initialRetinaMode: initialRetinaMode,
+            initialSteamPatch: initialSteamPatch,
+            initialCustomResolutionEnabled: initialCustomResolutionEnabled,
+            initialCustomResolutionWidth: initialCustomResolutionWidth,
+            initialCustomResolutionHeight: initialCustomResolutionHeight,
+            pinProgramURL: pinProgramURL
+        )
     }
 }
 
