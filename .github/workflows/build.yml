@@ -32,12 +32,13 @@ jobs:
       - name: Build
         run: |
           set -euxo pipefail
+          DERIVED_DATA="$RUNNER_TEMP/DerivedData"
           xcodebuild \
             -project "Whisky.xcodeproj" \
             -scheme "Whisky" \
             -configuration Release \
             -destination 'platform=macOS' \
-            -derivedDataPath build/DerivedData \
+            -derivedDataPath "$DERIVED_DATA" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
@@ -46,7 +47,7 @@ jobs:
       - name: Package
         run: |
           set -euxo pipefail
-          APP="build/DerivedData/Build/Products/Release/Whisky.app"
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/Whisky.app"
           test -d "$APP"
           ditto -c -k --sequesterRsrc --keepParent "$APP" "Whisky.app.zip"
 
