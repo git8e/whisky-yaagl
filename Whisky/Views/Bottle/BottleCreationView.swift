@@ -26,7 +26,7 @@ struct BottleCreationView: View {
 
     @State private var newBottleName: String = ""
     @State private var newBottleVersion: WinVersion = .win10
-    @State private var wineRuntimeId: String = WineRuntimes.whiskyDefaultId
+    @State private var wineRuntimeId: String = "11.0-dxmt-signed"
     @State private var wineArchiveURL: URL?
     @State private var initialMetalHud: Bool = false
     @State private var initialRetinaMode: Bool = false
@@ -70,7 +70,7 @@ struct BottleCreationView: View {
 
                 if wineRuntimeId != WineRuntimes.whiskyDefaultId {
                     ActionView(
-                        text: "Wine Archive",
+                        text: "Wine Archive (Optional)",
                         subtitle: wineArchiveURL?.path(percentEncoded: false) ?? "Auto download on create",
                         actionName: "Browse"
                     ) {
@@ -138,6 +138,18 @@ struct BottleCreationView: View {
                         }
                     }
                 }
+
+                if bottleVM.isCreatingBottle {
+                    Section("Creating") {
+                        Text(bottleVM.createBottleStatus)
+                            .foregroundStyle(.secondary)
+                        if let progress = bottleVM.createBottleProgress {
+                            ProgressView(value: progress)
+                        } else {
+                            ProgressView()
+                        }
+                    }
+                }
             }
             .formStyle(.grouped)
             .navigationTitle("create.title")
@@ -159,21 +171,6 @@ struct BottleCreationView: View {
             }
             .onSubmit {
                 submit()
-            }
-            .overlay(alignment: .bottom) {
-                if bottleVM.isCreatingBottle {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(bottleVM.createBottleStatus)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        if let progress = bottleVM.createBottleProgress {
-                            ProgressView(value: progress)
-                        } else {
-                            ProgressView()
-                        }
-                    }
-                    .padding(12)
-                }
             }
             .alert(
                 "Create Bottle Failed",

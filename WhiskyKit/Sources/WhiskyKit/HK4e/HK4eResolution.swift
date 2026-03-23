@@ -51,67 +51,53 @@ public enum HK4eResolution {
 
         let keys: [String] = [
             #"HKEY_CURRENT_USER\\Software\\miHoYo\\Genshin Impact"#,
+            #"HKEY_CURRENT_USER\\Software\\miHoYo\\GenshinImpact"#,
             #"HKEY_CURRENT_USER\\Software\\miHoYo\\原神"#
         ]
 
-        var lines: [String] = [
-            "Windows Registry Editor Version 5.00",
-            ""
-        ]
-
+        // Use `reg add` so the key is created if missing.
         for key in keys {
-            lines.append("[\(key)]")
-            lines.append(#"\"Screenmanager Is Fullscreen mode_h3981298716\"=dword:00000000"#)
-            lines.append(String(format: "\"Screenmanager Resolution Width_h182942802\"=dword:%08x", width))
-            lines.append(String(format: "\"Screenmanager Resolution Height_h2627697771\"=dword:%08x", height))
-            lines.append("")
+            try await runRegAddDword(bottle: bottle, key: key, name: "Screenmanager Is Fullscreen mode_h3981298716", value: 0)
+            try await runRegAddDword(bottle: bottle, key: key, name: "Screenmanager Resolution Width_h182942802", value: width)
+            try await runRegAddDword(bottle: bottle, key: key, name: "Screenmanager Resolution Height_h2627697771", value: height)
         }
-
-        let dir = try hk4eWorkDir(bottle: bottle)
-        let regURL = dir.appendingPathComponent("hk4e_resolution.reg", isDirectory: false)
-        try writeUTF16LEFile(url: regURL, text: lines.joined(separator: "\r\n"))
-        defer { try? fm.removeItem(at: regURL) }
-
-        let regWinePath = toWinePath(regURL.path(percentEncoded: false))
-        _ = try await Wine.runWine(["regedit", regWinePath], bottle: bottle)
     }
 
     public static func revert(bottle: Bottle) async throws {
         let keys: [String] = [
             #"HKEY_CURRENT_USER\\Software\\miHoYo\\Genshin Impact"#,
+            #"HKEY_CURRENT_USER\\Software\\miHoYo\\GenshinImpact"#,
             #"HKEY_CURRENT_USER\\Software\\miHoYo\\原神"#
         ]
 
-        var lines: [String] = [
-            "Windows Registry Editor Version 5.00",
-            ""
-        ]
-
         for key in keys {
-            lines.append("[\(key)]")
-            lines.append(#"\"Screenmanager Is Fullscreen mode_h3981298716\"=-"#)
-            lines.append(#"\"Screenmanager Resolution Width_h182942802\"=-"#)
-            lines.append(#"\"Screenmanager Resolution Height_h2627697771\"=-"#)
-            lines.append("")
+            _ = try await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Is Fullscreen mode_h3981298716", "-f"], bottle: bottle)
+            _ = try await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Resolution Width_h182942802", "-f"], bottle: bottle)
+            _ = try await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Resolution Height_h2627697771", "-f"], bottle: bottle)
         }
+    }
 
-        let dir = try hk4eWorkDir(bottle: bottle)
-        let regURL = dir.appendingPathComponent("hk4e_resolution_revert.reg", isDirectory: false)
-        try writeUTF16LEFile(url: regURL, text: lines.joined(separator: "\r\n"))
-        defer { try? fm.removeItem(at: regURL) }
-
-        let regWinePath = toWinePath(regURL.path(percentEncoded: false))
-        _ = try await Wine.runWine(["regedit", regWinePath], bottle: bottle)
+    private static func runRegAddDword(bottle: Bottle, key: String, name: String, value: Int) async throws {
+        let output = try await Wine.runWine(
+            ["reg", "add", key, "-v", name, "-t", "REG_DWORD", "-d", String(value), "-f"],
+            bottle: bottle
+        )
+        if output.localizedCaseInsensitiveContains("error") {
+            throw HK4eResolutionError.registryWriteFailed(message: output.trimmingCharacters(in: .whitespacesAndNewlines))
+        }
     }
 }
 
 public enum HK4eResolutionError: LocalizedError {
     case invalidSize(width: Int, height: Int)
+    case registryWriteFailed(message: String)
 
     public var errorDescription: String? {
         switch self {
         case .invalidSize(let width, let height):
             return "Invalid resolution: \(width)x\(height)"
+        case .registryWriteFailed(let message):
+            return message
         }
     }
 }

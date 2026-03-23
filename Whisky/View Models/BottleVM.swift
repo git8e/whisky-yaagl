@@ -147,6 +147,16 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 }
 
                 if initialCustomResolutionEnabled {
+                    await MainActor.run {
+                        self.createBottleStatus = "Waiting for wineserver"
+                        self.createBottleProgress = nil
+                    }
+                    do {
+                        for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
+                    } catch {
+                        // best-effort
+                    }
+
                     await MainActor.run { self.createBottleStatus = "Applying custom resolution" }
                     try await HK4eResolution.apply(
                         bottle: bottle,
