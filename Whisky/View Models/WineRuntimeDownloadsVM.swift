@@ -4,7 +4,6 @@ import WhiskyKit
 @MainActor
 final class WineRuntimeDownloadsVM: ObservableObject {
     struct ItemState {
-        var selected: Bool = false
         var isBusy: Bool = false
         var status: String = ""
         var progress: Double? = nil
@@ -16,19 +15,12 @@ final class WineRuntimeDownloadsVM: ObservableObject {
     init() {
         for runtime in WineRuntimes.all {
             var state = ItemState()
-            if runtime.id == "11.0-dxmt-signed" {
-                state.selected = true
-            }
             items[runtime.id] = state
         }
     }
 
     func isInstalled(_ runtimeId: String) -> Bool {
         WineRuntimeManager.isInstalled(runtimeId: runtimeId)
-    }
-
-    func toggleSelected(_ runtimeId: String) {
-        items[runtimeId, default: ItemState()].selected.toggle()
     }
 
     func download(runtimeId: String) {
@@ -70,26 +62,4 @@ final class WineRuntimeDownloadsVM: ObservableObject {
         }
     }
 
-    func downloadSelected() {
-        Task.detached(priority: .userInitiated) {
-            let ids = await MainActor.run {
-                WineRuntimes.all.map(\.id).filter { self.items[$0]?.selected == true }
-            }
-            for id in ids {
-                let skip = await MainActor.run { self.isInstalled(id) || (self.items[id]?.isBusy == true) }
-                if skip {
-                    continue
-                }
-
-                await MainActor.run {
-                    self.download(runtimeId: id)
-                }
-
-                // Wait until the current download finishes before moving to next.
-                while await MainActor.run { self.items[id]?.isBusy == true } {
-                    try? await Task.sleep(nanoseconds: 200_000_000)
-                }
-            }
-        }
-    }
 }

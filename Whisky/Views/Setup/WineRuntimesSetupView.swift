@@ -22,24 +22,26 @@ struct WineRuntimesSetupView: View {
             Form {
                 ForEach(WineRuntimes.all, id: \.id) { runtime in
                     let state = vm.items[runtime.id] ?? WineRuntimeDownloadsVM.ItemState()
-                    HStack {
-                        Toggle(isOn: Binding(
-                            get: { vm.items[runtime.id]?.selected ?? false },
-                            set: { _ in vm.toggleSelected(runtime.id) }
-                        )) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(runtime.displayName)
-                                Text(vm.isInstalled(runtime.id) ? "Installed" : "Not Installed")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
+                    HStack(alignment: .center) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(runtime.displayName)
+                            Text(vm.isInstalled(runtime.id) ? "Installed" : "Not Installed")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-
                         Spacer()
-
-                        Button(vm.isInstalled(runtime.id) ? "Downloaded" : "Download") {
-                            vm.download(runtimeId: runtime.id)
-                        }
+                        Toggle(
+                            "Download",
+                            isOn: Binding(
+                                get: { vm.isInstalled(runtime.id) || state.isBusy },
+                                set: { newValue in
+                                    if newValue {
+                                        vm.download(runtimeId: runtime.id)
+                                    }
+                                }
+                            )
+                        )
+                        .labelsHidden()
                         .disabled(vm.isInstalled(runtime.id) || state.isBusy)
                     }
 
@@ -67,13 +69,6 @@ struct WineRuntimesSetupView: View {
             Spacer()
 
             HStack {
-                Button("Download Selected") {
-                    vm.downloadSelected()
-                }
-                .keyboardShortcut(.defaultAction)
-
-                Spacer()
-
                 Button("Done") {
                     showSetup = false
                 }
