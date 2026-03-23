@@ -6,10 +6,20 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          set -euxo pipefail
+          ls -1 /Applications | grep -E '^Xcode' || true
+          CANDIDATE="$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -n 1 || true)"
+          if [ -n "${CANDIDATE}" ] && [ -d "${CANDIDATE}/Contents/Developer" ]; then
+            echo "Using ${CANDIDATE}"
+            echo "DEVELOPER_DIR=${CANDIDATE}/Contents/Developer" >> "$GITHUB_ENV"
+          fi
 
       - name: Show Xcode Version
         run: xcodebuild -version
