@@ -20,17 +20,20 @@ import Foundation
 import SemanticVersion
 
 public struct BottleData: Codable {
-    public static let containerDir = FileManager.default.homeDirectoryForCurrentUser
-        .appending(path: "Library")
-        .appending(path: "Containers")
-        .appending(path: Bundle.whiskyBundleIdentifier)
+    public static var containerDir: URL {
+        migrateLegacyLayoutIfNeeded()
+        return WhiskyPaths.applicationSupportRoot
+    }
 
-    public static let bottleEntriesDir = containerDir
-        .appending(path: "BottleVM")
-        .appendingPathExtension("plist")
+    public static var bottleEntriesDir: URL {
+        containerDir
+            .appending(path: "BottleVM", directoryHint: .notDirectory)
+            .appendingPathExtension("plist")
+    }
 
-    public static let defaultBottleDir = containerDir
-        .appending(path: "Bottles")
+    public static var defaultBottleDir: URL {
+        containerDir.appending(path: "Bottles", directoryHint: .isDirectory)
+    }
 
     static let currentVersion = SemanticVersion(1, 0, 0)
 
@@ -44,8 +47,42 @@ public struct BottleData: Codable {
     public init() {
         fileVersion = Self.currentVersion
 
+        Self.migrateLegacyLayoutIfNeeded()
+
         if !decode() {
             encode()
+        }
+    }
+
+    private static func migrateLegacyLayoutIfNeeded() {
+        let fm = FileManager.default
+
+        let targetRoot = WhiskyPaths.applicationSupportRoot
+        let legacyRoots: [URL] = [WhiskyPaths.legacyContainersRoot]
+
+        if !fm.fileExists(atPath: targetRoot.path(percentEncoded: false)) {
+            try? fm.createDirectory(at: targetRoot, withIntermediateDirectories: true)
+        }
+
+        // Move Bottles/ and BottleVM.plist from legacy container if present.
+        for legacyRoot in legacyRoots {
+            let legacyBottles = legacyRoot.appending(path: "Bottles", directoryHint: .isDirectory)
+            let legacyPlist = legacyRoot.appending(path: "BottleVM").appendingPathExtension("plist")
+
+            let targetBottles = targetRoot.appending(path: "Bottles", directoryHint: .isDirectory)
+            let targetPlist = targetRoot.appending(path: "BottleVM").appendingPathExtension("plist")
+
+            if fm.fileExists(atPath: legacyBottles.path(percentEncoded: false)),
+               !fm.fileExists(atPath: targetBottles.path(percentEncoded: false))
+            {
+                try? fm.moveItem(at: legacyBottles, to: targetBottles)
+            }
+
+            if fm.fileExists(atPath: legacyPlist.path(percentEncoded: false)),
+               !fm.fileExists(atPath: targetPlist.path(percentEncoded: false))
+            {
+                try? fm.moveItem(at: legacyPlist, to: targetPlist)
+            }
         }
     }
 
