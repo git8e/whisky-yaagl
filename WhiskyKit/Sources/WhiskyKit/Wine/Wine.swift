@@ -301,9 +301,7 @@ enum RegistryType: String {
 }
 
 extension Wine {
-    public static let logsFolder = FileManager.default.urls(
-        for: .libraryDirectory, in: .userDomainMask
-    )[0].appending(path: "Logs").appending(path: Bundle.whiskyBundleIdentifier)
+    public static let logsFolder = WhiskyPaths.logsRoot
 
     public static func makeFileHandle() throws -> FileHandle {
         if !FileManager.default.fileExists(atPath: Self.logsFolder.path) {

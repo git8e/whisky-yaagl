@@ -22,6 +22,6 @@ import os.log
 public extension Logger {
   /// A global logger for WineKit
   static let wineKit = Logger(
-      subsystem: Bundle.whiskyBundleIdentifier, category: "WineKit"
+      subsystem: WhiskyPaths.storageRootName, category: "WineKit"
   )
 }

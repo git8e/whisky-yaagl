@@ -96,7 +96,7 @@ struct BottleCreationView: View {
                     panel.canChooseDirectories = true
                     panel.allowsMultipleSelection = false
                     panel.canCreateDirectories = true
-                    panel.directoryURL = BottleData.containerDir
+                    panel.directoryURL = BottleData.defaultBottleDir
                     panel.begin { result in
                         if result == .OK, let url = panel.urls.first {
                             newBottleURL = url

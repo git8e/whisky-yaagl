@@ -21,15 +21,46 @@ import SemanticVersion
 
 public class WhiskyWineInstaller {
     /// The Whisky application folder
-    public static let applicationFolder = FileManager.default.urls(
-        for: .applicationSupportDirectory, in: .userDomainMask
-        )[0].appending(path: Bundle.whiskyBundleIdentifier)
+    public static var applicationFolder: URL {
+        migrateLegacyLayoutIfNeeded()
+        return WhiskyPaths.applicationSupportRoot
+    }
 
     /// The folder of all the libfrary files
-    public static let libraryFolder = applicationFolder.appending(path: "Libraries")
+    public static var libraryFolder: URL {
+        applicationFolder.appending(path: "Libraries", directoryHint: .isDirectory)
+    }
 
     /// URL to the installed `wine` `bin` directory
-    public static let binFolder: URL = libraryFolder.appending(path: "Wine").appending(path: "bin")
+    public static var binFolder: URL {
+        libraryFolder.appending(path: "Wine", directoryHint: .isDirectory).appending(path: "bin", directoryHint: .isDirectory)
+    }
+
+    private static func migrateLegacyLayoutIfNeeded() {
+        let fm = FileManager.default
+        let legacy = WhiskyPaths.legacyApplicationSupportRoot
+        let target = WhiskyPaths.applicationSupportRoot
+
+        guard fm.fileExists(atPath: legacy.path(percentEncoded: false)) else { return }
+        guard !fm.fileExists(atPath: target.path(percentEncoded: false)) else { return }
+
+        do {
+            try fm.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try fm.moveItem(at: legacy, to: target)
+        } catch {
+            // If move fails (different volumes/permissions), fall back to copy best-effort.
+            do {
+                try fm.createDirectory(at: target, withIntermediateDirectories: true)
+                let entries = try fm.contentsOfDirectory(at: legacy, includingPropertiesForKeys: nil)
+                for entry in entries {
+                    let dst = target.appendingPathComponent(entry.lastPathComponent, isDirectory: entry.hasDirectoryPath)
+                    try? fm.copyItem(at: entry, to: dst)
+                }
+            } catch {
+                // ignore
+            }
+        }
+    }
 
     public static func isWhiskyWineInstalled() -> Bool {
         return whiskyWineVersion() != nil
