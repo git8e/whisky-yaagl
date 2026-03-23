@@ -103,7 +103,7 @@ public class Tar {
         guard process.terminationStatus == 0 else {
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             let output = String(data: data, encoding: .utf8) ?? ""
-            throw TarError.tarFailed(output)
+            throw output
         }
     }
 }

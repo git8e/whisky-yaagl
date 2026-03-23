@@ -67,7 +67,7 @@ public enum BottleMaintenance {
         }
 
         if bottle.settings.hk4eSteamPatch {
-            try SteamPatch.apply(prefixURL: bottle.url)
+            try await SteamPatch.apply(prefixURL: bottle.url)
         }
 
         if bottle.settings.hk4eCustomResolutionEnabled {

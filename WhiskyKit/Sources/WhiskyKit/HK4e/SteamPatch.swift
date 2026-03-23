@@ -41,12 +41,7 @@ public enum SteamPatch {
         return required.allSatisfy { fm.fileExists(atPath: $0.path(percentEncoded: false)) }
     }
 
-    public static func apply(prefixURL: URL) throws {
-        // Ensure protonextras exists (downloaded/cached) before copying.
-        // This is synchronous API; callers should prefer the async overload.
-        if !HK4eProtonExtras.isInstalled() {
-            throw HK4eAssetsError.protonExtrasMissing
-        }
+    private static func applyCopy(prefixURL: URL) throws {
         if isInstalled(prefixURL: prefixURL) {
             return
         }
@@ -75,7 +70,7 @@ public enum SteamPatch {
         if !HK4eProtonExtras.isInstalled() {
             try await HK4eProtonExtras.ensureInstalled(status: status, progress: progress)
         }
-        try apply(prefixURL: prefixURL)
+        try applyCopy(prefixURL: prefixURL)
     }
 
     public static func remove(prefixURL: URL) throws {
