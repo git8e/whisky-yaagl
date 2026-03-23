@@ -21,6 +21,10 @@ import Foundation
 public enum HK4eResolution {
     private static let fm = FileManager.default
 
+    private static func toWinePath(_ absPath: String) -> String {
+        return "Z:" + absPath.replacingOccurrences(of: "/", with: "\\")
+    }
+
     private static func hk4eWorkDir(bottle: Bottle) throws -> URL {
         let dir = bottle.url.appendingPathComponent("HK4e", isDirectory: true)
         if !fm.fileExists(atPath: dir.path(percentEncoded: false)) {
@@ -111,6 +115,3 @@ public enum HK4eResolutionError: LocalizedError {
         }
     }
 }
-    private static func toWinePath(_ absPath: String) -> String {
-        return "Z:" + absPath.replacingOccurrences(of: "/", with: "\\")
-    }
