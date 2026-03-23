@@ -19,7 +19,7 @@
 import Foundation
 
 public enum HK4eResolution {
-    private static let fm = FileManager.default
+    private static var fm: FileManager { FileManager.default }
 
     private static func toWinePath(_ absPath: String) -> String {
         return "Z:" + absPath.replacingOccurrences(of: "/", with: "\\")

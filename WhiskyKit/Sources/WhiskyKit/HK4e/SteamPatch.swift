@@ -19,7 +19,7 @@
 import Foundation
 
 public enum SteamPatch {
-    private static let fm = FileManager.default
+    private static var fm: FileManager { FileManager.default }
 
     private static func system32(prefixURL: URL) -> URL {
         prefixURL.appendingPathComponent("drive_c/windows/system32", isDirectory: true)
