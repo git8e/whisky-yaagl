@@ -21,6 +21,8 @@ import Foundation
 public enum WineRuntimeManager {
     private static var fm: FileManager { FileManager.default }
 
+    private static let whiskyWineLibrariesURL = URL(string: "https://data.getwhisky.app/Wine/Libraries.tar.gz")!
+
     private static var versionsFolder: URL {
         WhiskyWineInstaller.libraryFolder.appending(path: "WineVersions", directoryHint: .isDirectory)
     }
@@ -60,7 +62,22 @@ public enum WineRuntimeManager {
         progress: (@Sendable (Double) -> Void)? = nil
     ) async throws {
         if runtimeId == WineRuntimes.whiskyDefaultId {
-            // WhiskyWine is managed by the regular setup flow.
+            if isInstalled(runtimeId: runtimeId) {
+                return
+            }
+
+            status?("Downloading WhiskyWine")
+            let archive = try await downloadOnce(
+                runtimeId: runtimeId,
+                url: whiskyWineLibrariesURL,
+                progress: progress
+            )
+
+            status?("Installing WhiskyWine")
+            WhiskyWineInstaller.install(from: archive)
+
+            removeQuarantineRecursively(path: wineRoot(runtimeId: runtimeId).path(percentEncoded: false))
+
             guard isInstalled(runtimeId: runtimeId) else {
                 throw WineRuntimeManagerError.whiskyWineMissing
             }

@@ -21,7 +21,7 @@ import WhiskyKit
 
 struct WelcomeView: View {
     @State var rosettaInstalled: Bool?
-    @State var whiskyWineInstalled: Bool?
+    @State var wine11Installed: Bool?
     @State var shouldCheckInstallStatus: Bool = false
     @Binding var path: [SetupStage]
     @Binding var showSetup: Bool
@@ -52,10 +52,10 @@ struct WelcomeView: View {
                 InstallStatusView(isInstalled: $rosettaInstalled,
                                   shouldCheckInstallStatus: $shouldCheckInstallStatus,
                                   name: "Rosetta")
-                InstallStatusView(isInstalled: $whiskyWineInstalled,
+                InstallStatusView(isInstalled: $wine11Installed,
                                   shouldCheckInstallStatus: $shouldCheckInstallStatus,
-                                  showUninstall: true,
-                                  name: "WhiskyWine")
+                                  showUninstall: false,
+                                  name: "Wine 11.0 DXMT")
             }
             .formStyle(.grouped)
             .scrollDisabled(true)
@@ -68,22 +68,22 @@ struct WelcomeView: View {
             Spacer()
             HStack {
                 if let rosettaInstalled = rosettaInstalled,
-                   let whiskyWineInstalled = whiskyWineInstalled {
-                    if !rosettaInstalled || !whiskyWineInstalled {
+                   let wine11Installed = wine11Installed {
+                    if !rosettaInstalled || !wine11Installed {
                         Button("setup.quit") {
                             exit(0)
                         }
                         .keyboardShortcut(.cancelAction)
                     }
                     Spacer()
-                    Button(rosettaInstalled && whiskyWineInstalled ? "setup.done" : "setup.next") {
+                    Button(rosettaInstalled && wine11Installed ? "setup.done" : "setup.next") {
                         if !rosettaInstalled {
                             path.append(.rosetta)
                             return
                         }
 
-                        if !whiskyWineInstalled {
-                            path.append(.whiskyWineDownload)
+                        if !wine11Installed {
+                            path.append(.wineRuntimes)
                             return
                         }
 
@@ -98,7 +98,7 @@ struct WelcomeView: View {
 
     func checkInstallStatus() {
         rosettaInstalled = Rosetta2.isRosettaInstalled
-        whiskyWineInstalled = WhiskyWineInstaller.isWhiskyWineInstalled()
+        wine11Installed = WineRuntimeManager.isInstalled(runtimeId: "11.0-dxmt-signed")
     }
 }
 
@@ -145,10 +145,6 @@ struct InstallStatusView: View {
     }
 
     func uninstall() {
-        if name == "WhiskyWine" {
-            WhiskyWineInstaller.uninstall()
-        }
-
         shouldCheckInstallStatus.toggle()
     }
 }
