@@ -99,8 +99,11 @@ public enum HK4eProtonExtras {
         }
         let totalSize = sizes.values.reduce(0, +)
 
+        let count = max(urls.count, 1)
         var completedBytes: Int64 = 0
-        for (name, url) in urls {
+        for (index, pair) in urls.enumerated() {
+            let name = pair.0
+            let url = pair.1
             let dst = destDir.appending(path: name)
             if fm.fileExists(atPath: dst.path(percentEncoded: false)) {
                 if let s = sizes[name] {
@@ -111,19 +114,20 @@ public enum HK4eProtonExtras {
 
             status?("Downloading protonextras: \(name)")
             let fileSize = sizes[name]
+            let startingCompletedBytes = completedBytes
+            let base = Double(index) / Double(count)
+            let step = 1.0 / Double(count)
 
-            let perFileProgress: (@Sendable (Double) -> Void)? = progress.map { progressCb in
-                return { frac in
+            var perFileProgress: (@Sendable (Double) -> Void)?
+            if let progressCb = progress {
+                perFileProgress = { frac in
+                    let clampedFrac = min(max(frac, 0.0), 1.0)
                     if totalSize > 0, let fileSize {
-                        let overall = Double(completedBytes) / Double(totalSize)
-                            + (Double(fileSize) / Double(totalSize)) * frac
+                        let overall = Double(startingCompletedBytes) / Double(totalSize)
+                            + (Double(fileSize) / Double(totalSize)) * clampedFrac
                         progressCb(min(max(overall, 0.0), 1.0))
                     } else {
-                        // Fallback: even split across files.
-                        let idx = Double(requiredFiles.firstIndex(of: name) ?? 0)
-                        let base = idx / Double(max(requiredFiles.count, 1))
-                        let step = 1.0 / Double(max(requiredFiles.count, 1))
-                        progressCb(min(max(base + step * frac, 0.0), 1.0))
+                        progressCb(min(max(base + step * clampedFrac, 0.0), 1.0))
                     }
                 }
             }
