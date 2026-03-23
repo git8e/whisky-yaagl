@@ -21,7 +21,14 @@ import Foundation
 public enum HK4eProtonExtras {
     private static var fm: FileManager { FileManager.default }
 
-    private static let owner = "3shain"
+    // Prefer downloading only the required files directly from the YAAGL repository.
+    // This avoids downloading the whole app sidecar tarball.
+    private static let rawBaseURL = URL(
+        string: "https://raw.githubusercontent.com/yaagl/yet-another-anime-game-launcher/main/sidecar/protonextras/"
+    )!
+
+    // Fallback: download YAAGL app tarball and extract protonextras.
+    private static let owner = "yaagl"
     private static let repo = "yet-another-anime-game-launcher"
 
     public static var protonExtrasDir: URL {
@@ -52,18 +59,112 @@ public enum HK4eProtonExtras {
             return
         }
 
-        status?("Fetching YAAGL sidecar")
-        let sidecarURL = try await latestSidecarURL()
-
-        let archive = try await downloadOnce(url: sidecarURL, status: status, progress: progress)
-
-        status?("Extracting protonextras")
-        try extractProtonExtras(from: archive)
+        do {
+            try await downloadRawProtonExtras(status: status, progress: progress)
+        } catch {
+            // Fall back to YAAGL sidecar extraction if raw download is unavailable.
+            status?("Fetching YAAGL sidecar")
+            let sidecarURL = try await latestSidecarURL()
+            let archive = try await downloadOnce(url: sidecarURL, status: status, progress: progress)
+            status?("Extracting protonextras")
+            try extractProtonExtras(from: archive)
+        }
 
         removeQuarantineRecursively(path: protonExtrasDir.path(percentEncoded: false))
 
         guard isInstalled() else {
             throw HK4eProtonExtrasError.installFailed
+        }
+    }
+
+    private static func downloadRawProtonExtras(
+        status: (@Sendable (String) -> Void)?,
+        progress: (@Sendable (Double) -> Void)?
+    ) async throws {
+        let destDir = protonExtrasDir
+        if !fm.fileExists(atPath: destDir.path(percentEncoded: false)) {
+            try fm.createDirectory(at: destDir, withIntermediateDirectories: true)
+        }
+
+        let urls = requiredFiles.map { name in
+            (name, rawBaseURL.appending(path: name))
+        }
+
+        // Best-effort total size for overall progress.
+        var sizes: [String: Int64] = [:]
+        for (name, url) in urls {
+            if let size = try? await contentLength(url: url) {
+                sizes[name] = size
+            }
+        }
+        let totalSize = sizes.values.reduce(0, +)
+
+        var completedBytes: Int64 = 0
+        for (name, url) in urls {
+            let dst = destDir.appending(path: name)
+            if fm.fileExists(atPath: dst.path(percentEncoded: false)) {
+                if let s = sizes[name] {
+                    completedBytes += s
+                }
+                continue
+            }
+
+            status?("Downloading protonextras: \(name)")
+            let fileSize = sizes[name]
+
+            let perFileProgress: (@Sendable (Double) -> Void)? = progress.map { progressCb in
+                return { frac in
+                    if totalSize > 0, let fileSize {
+                        let overall = Double(completedBytes) / Double(totalSize)
+                            + (Double(fileSize) / Double(totalSize)) * frac
+                        progressCb(min(max(overall, 0.0), 1.0))
+                    } else {
+                        // Fallback: even split across files.
+                        let idx = Double(requiredFiles.firstIndex(of: name) ?? 0)
+                        let base = idx / Double(max(requiredFiles.count, 1))
+                        let step = 1.0 / Double(max(requiredFiles.count, 1))
+                        progressCb(min(max(base + step * frac, 0.0), 1.0))
+                    }
+                }
+            }
+
+            _ = try await downloadFile(url: url, to: dst, progress: perFileProgress)
+
+            if let fileSize {
+                completedBytes += fileSize
+            }
+        }
+    }
+
+    private static func contentLength(url: URL) async throws -> Int64 {
+        var req = URLRequest(url: url)
+        req.httpMethod = "HEAD"
+        let (_, resp) = try await URLSession(configuration: .ephemeral).data(for: req)
+        guard let http = resp as? HTTPURLResponse,
+              let value = http.value(forHTTPHeaderField: "Content-Length"),
+              let size = Int64(value) else {
+            throw HK4eProtonExtrasError.missingContentLength
+        }
+        return size
+    }
+
+    private static func downloadFile(
+        url: URL,
+        to destination: URL,
+        progress: (@Sendable (Double) -> Void)?
+    ) async throws -> URL {
+        if fm.fileExists(atPath: destination.path(percentEncoded: false)) {
+            return destination
+        }
+
+        let delegate = DownloadDelegate(destination: destination, progress: progress)
+        let session = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: nil)
+        defer { session.invalidateAndCancel() }
+
+        let task = session.downloadTask(with: url)
+        return try await withCheckedThrowingContinuation { cont in
+            delegate.continuation = cont
+            task.resume()
         }
     }
 
@@ -217,12 +318,15 @@ public enum HK4eProtonExtras {
 
 public enum HK4eProtonExtrasError: LocalizedError {
     case noSidecarAsset
+    case missingContentLength
     case installFailed
 
     public var errorDescription: String? {
         switch self {
         case .noSidecarAsset:
             return "Cannot find a YAAGL app tarball asset containing sidecar/protonextras."
+        case .missingContentLength:
+            return "Missing Content-Length while downloading protonextras."
         case .installFailed:
             return "Failed to install protonextras."
         }
