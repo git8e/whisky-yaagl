@@ -28,6 +28,12 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
     var bottlesList = BottleData()
     @Published var bottles: [Bottle] = []
 
+    @Published var isCreatingBottle: Bool = false
+    @Published var createBottleStatus: String = ""
+    @Published var createBottleProgress: Double? = nil
+    @Published var createBottleErrorMessage: String? = nil
+    @Published var createdBottleURL: URL? = nil
+
     @MainActor
     func loadBottles() {
         bottles = bottlesList.loadBottles()
@@ -53,9 +59,20 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
     ) -> URL {
         let newBottleDir = bottleURL.appending(path: UUID().uuidString)
 
+        Task { @MainActor in
+            self.isCreatingBottle = true
+            self.createBottleStatus = "Preparing bottle"
+            self.createBottleProgress = nil
+            self.createBottleErrorMessage = nil
+            self.createdBottleURL = nil
+        }
+
         Task.detached {
             var bottleId: Bottle?
             do {
+                await MainActor.run {
+                    self.createBottleStatus = "Creating bottle directory"
+                }
                 try FileManager.default.createDirectory(atPath: newBottleDir.path(percentEncoded: false),
                                                         withIntermediateDirectories: true)
                 let bottle = Bottle(bottleUrl: newBottleDir, inFlight: true)
@@ -66,7 +83,25 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 }
 
                 bottle.settings.wineRuntimeId = wineRuntimeId
-                try await WineRuntimeManager.ensureInstalled(runtimeId: wineRuntimeId, localArchive: wineArchiveURL)
+                try await WineRuntimeManager.ensureInstalled(
+                    runtimeId: wineRuntimeId,
+                    localArchive: wineArchiveURL,
+                    status: { message in
+                        Task { @MainActor in
+                            self.createBottleStatus = message
+                            if message.lowercased().contains("download") {
+                                self.createBottleProgress = 0
+                            } else {
+                                self.createBottleProgress = nil
+                            }
+                        }
+                    },
+                    progress: { frac in
+                        Task { @MainActor in
+                            self.createBottleProgress = frac
+                        }
+                    }
+                )
 
                 bottle.settings.windowsVersion = winVersion
                 bottle.settings.name = bottleName
@@ -78,19 +113,26 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.hk4eCustomResolutionWidth = initialCustomResolutionWidth
                 bottle.settings.hk4eCustomResolutionHeight = initialCustomResolutionHeight
 
+                await MainActor.run {
+                    self.createBottleStatus = "Initializing Wine prefix"
+                    self.createBottleProgress = nil
+                }
                 try await Wine.changeWinVersion(bottle: bottle, win: winVersion)
                 let wineVer = try await Wine.wineVersion(bottle: bottle)
                 bottle.settings.wineVersion = SemanticVersion(wineVer) ?? SemanticVersion(0, 0, 0)
 
                 if initialRetinaMode {
+                    await MainActor.run { self.createBottleStatus = "Applying Retina mode" }
                     try await Wine.changeRetinaMode(bottle: bottle, retinaMode: true)
                 }
 
                 if initialSteamPatch {
+                    await MainActor.run { self.createBottleStatus = "Applying SteamPatch" }
                     try SteamPatch.apply(prefixURL: bottle.url)
                 }
 
                 if initialCustomResolutionEnabled {
+                    await MainActor.run { self.createBottleStatus = "Applying custom resolution" }
                     try await HK4eResolution.apply(
                         bottle: bottle,
                         width: initialCustomResolutionWidth,
@@ -107,8 +149,11 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
 
                 // Add record
                 await MainActor.run {
+                    self.createBottleStatus = "Finalizing"
                     self.bottlesList.paths.append(newBottleDir)
                     self.loadBottles()
+                    self.createdBottleURL = newBottleDir
+                    self.isCreatingBottle = false
                 }
             } catch {
                 print("Failed to create new bottle: \(error)")
@@ -118,6 +163,13 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                             self.bottles.remove(at: index)
                         }
                     }
+                }
+
+                await MainActor.run {
+                    self.createBottleErrorMessage = error.localizedDescription
+                    self.isCreatingBottle = false
+                    self.createBottleProgress = nil
+                    self.createBottleStatus = "Failed"
                 }
             }
         }

@@ -53,7 +53,12 @@ public enum WineRuntimeManager {
         return fm.fileExists(atPath: wineBinary(runtimeId: runtimeId).path(percentEncoded: false))
     }
 
-    public static func ensureInstalled(runtimeId: String, localArchive: URL? = nil) async throws {
+    public static func ensureInstalled(
+        runtimeId: String,
+        localArchive: URL? = nil,
+        status: (@Sendable (String) -> Void)? = nil,
+        progress: (@Sendable (Double) -> Void)? = nil
+    ) async throws {
         if runtimeId == WineRuntimes.whiskyDefaultId {
             // WhiskyWine is managed by the regular setup flow.
             guard isInstalled(runtimeId: runtimeId) else {
@@ -71,6 +76,7 @@ public enum WineRuntimeManager {
         }
 
         if let localArchive {
+            status?("Installing Wine from local archive")
             try install(runtime: runtime, fromArchive: localArchive)
             return
         }
@@ -79,7 +85,9 @@ public enum WineRuntimeManager {
             throw WineRuntimeManagerError.missingRemoteURL(runtimeId)
         }
 
-        let archive = try await downloadOnce(runtimeId: runtimeId, url: remoteURL)
+        status?("Downloading Wine runtime")
+        let archive = try await downloadOnce(runtimeId: runtimeId, url: remoteURL, progress: progress)
+        status?("Installing Wine runtime")
         try install(runtime: runtime, fromArchive: archive)
     }
 
@@ -91,7 +99,11 @@ public enum WineRuntimeManager {
         return url
     }
 
-    private static func downloadOnce(runtimeId: String, url: URL) async throws -> URL {
+    private static func downloadOnce(
+        runtimeId: String,
+        url: URL,
+        progress: (@Sendable (Double) -> Void)?
+    ) async throws -> URL {
         let downloads = try downloadsFolder()
         let fileName = (url.lastPathComponent.isEmpty ? "wine-\(runtimeId).tar" : url.lastPathComponent)
         let destination = downloads.appending(path: "\(runtimeId)-\(fileName)")
@@ -100,12 +112,65 @@ public enum WineRuntimeManager {
             return destination
         }
 
-        let (tempURL, _) = try await URLSession(configuration: .ephemeral).download(from: url)
-        if fm.fileExists(atPath: destination.path(percentEncoded: false)) {
-            return destination
+        let delegate = DownloadDelegate(destination: destination, progress: progress)
+        let config = URLSessionConfiguration.ephemeral
+        let session = URLSession(configuration: config, delegate: delegate, delegateQueue: nil)
+        defer { session.invalidateAndCancel() }
+
+        let task = session.downloadTask(with: url)
+        return try await withCheckedThrowingContinuation { cont in
+            delegate.continuation = cont
+            task.resume()
         }
-        try fm.moveItem(at: tempURL, to: destination)
-        return destination
+    }
+
+    private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
+        let destination: URL
+        let progress: (@Sendable (Double) -> Void)?
+        var continuation: CheckedContinuation<URL, Error>?
+
+        init(destination: URL, progress: (@Sendable (Double) -> Void)?) {
+            self.destination = destination
+            self.progress = progress
+        }
+
+        func urlSession(
+            _ session: URLSession,
+            downloadTask: URLSessionDownloadTask,
+            didWriteData bytesWritten: Int64,
+            totalBytesWritten: Int64,
+            totalBytesExpectedToWrite: Int64
+        ) {
+            guard totalBytesExpectedToWrite > 0 else { return }
+            let frac = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+            progress?(min(max(frac, 0.0), 1.0))
+        }
+
+        func urlSession(
+            _ session: URLSession,
+            downloadTask: URLSessionDownloadTask,
+            didFinishDownloadingTo location: URL
+        ) {
+            do {
+                if WineRuntimeManager.fm.fileExists(atPath: destination.path(percentEncoded: false)) {
+                    continuation?.resume(returning: destination)
+                    continuation = nil
+                    return
+                }
+                try WineRuntimeManager.fm.moveItem(at: location, to: destination)
+                continuation?.resume(returning: destination)
+                continuation = nil
+            } catch {
+                continuation?.resume(throwing: error)
+                continuation = nil
+            }
+        }
+
+        func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+            guard let error else { return }
+            continuation?.resume(throwing: error)
+            continuation = nil
+        }
     }
 
     private static func install(runtime: WineRuntime, fromArchive archiveURL: URL) throws {
