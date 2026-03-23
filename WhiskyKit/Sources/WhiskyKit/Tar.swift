@@ -21,6 +21,17 @@ import Foundation
 public class Tar {
     static let tarBinary: URL = URL(fileURLWithPath: "/usr/bin/tar")
 
+    private static func extractFlag(for tarBall: URL) -> String {
+        let path = tarBall.path.lowercased()
+        if path.hasSuffix(".tar.gz") || path.hasSuffix(".tgz") {
+            return "-xzf"
+        }
+        if path.hasSuffix(".tar.xz") || path.hasSuffix(".txz") {
+            return "-xJf"
+        }
+        return "-xf"
+    }
+
     public static func tar(folder: URL, toURL: URL) throws {
         let process = Process()
         let pipe = Pipe()
@@ -47,14 +58,7 @@ public class Tar {
         let pipe = Pipe()
 
         process.executableURL = tarBinary
-        let path = tarBall.path.lowercased()
-        if path.hasSuffix(".tar.gz") || path.hasSuffix(".tgz") {
-            process.arguments = ["-xzf", "\(tarBall.path)", "-C", "\(toURL.path)"]
-        } else if path.hasSuffix(".tar.xz") || path.hasSuffix(".txz") {
-            process.arguments = ["-xJf", "\(tarBall.path)", "-C", "\(toURL.path)"]
-        } else {
-            process.arguments = ["-xf", "\(tarBall.path)", "-C", "\(toURL.path)"]
-        }
+        process.arguments = [extractFlag(for: tarBall), "\(tarBall.path)", "-C", "\(toURL.path)"]
         process.standardOutput = pipe
         process.standardError = pipe
 
@@ -67,6 +71,39 @@ public class Tar {
             if status != 0 {
                 throw outputString
             }
+        }
+    }
+
+    public static func extract(
+        tarBall: URL,
+        toURL: URL,
+        paths: [String],
+        stripComponents: Int? = nil,
+        useWildcards: Bool = false
+    ) throws {
+        let process = Process()
+        let pipe = Pipe()
+
+        process.executableURL = tarBinary
+        var args = [extractFlag(for: tarBall), "\(tarBall.path)", "-C", "\(toURL.path)"]
+        if let stripComponents {
+            args.append("--strip-components=\(stripComponents)")
+        }
+        if useWildcards {
+            args.append("--wildcards")
+        }
+        args.append(contentsOf: paths)
+        process.arguments = args
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        try process.run()
+        process.waitUntilExit()
+
+        guard process.terminationStatus == 0 else {
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8) ?? ""
+            throw TarError.tarFailed(output)
         }
     }
 }

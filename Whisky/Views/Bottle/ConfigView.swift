@@ -185,7 +185,7 @@ struct ConfigView: View {
                         Task(priority: .userInitiated) {
                             maintenanceBusy = true
                             do {
-                                try SteamPatch.apply(prefixURL: bottle.url)
+                                try await SteamPatch.apply(prefixURL: bottle.url)
                                 await MainActor.run {
                                     steamPatchInstalled = SteamPatch.isInstalled(prefixURL: bottle.url)
                                 }

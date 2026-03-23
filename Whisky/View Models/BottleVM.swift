@@ -127,8 +127,23 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 }
 
                 if initialSteamPatch {
-                    await MainActor.run { self.createBottleStatus = "Applying SteamPatch" }
-                    try SteamPatch.apply(prefixURL: bottle.url)
+                    await MainActor.run {
+                        self.createBottleStatus = "Applying SteamPatch"
+                        self.createBottleProgress = nil
+                    }
+                    try await SteamPatch.apply(
+                        prefixURL: bottle.url,
+                        status: { message in
+                            Task { @MainActor in
+                                self.createBottleStatus = message
+                            }
+                        },
+                        progress: { frac in
+                            Task { @MainActor in
+                                self.createBottleProgress = frac
+                            }
+                        }
+                    )
                 }
 
                 if initialCustomResolutionEnabled {

@@ -36,6 +36,11 @@ public enum HK4eAssets {
     }
 
     public static func protonExtrasDir() throws -> URL {
+        let cached = HK4eProtonExtras.protonExtrasDir
+        if fm.fileExists(atPath: cached.path(percentEncoded: false)) {
+            return cached
+        }
+
         let root = try runtimeRootURL()
 
         let direct = root.appending(path: "protonextras", directoryHint: .isDirectory)

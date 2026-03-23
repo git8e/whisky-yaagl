@@ -95,14 +95,11 @@ Important: this fork does NOT patch/revert on every launch.
 
 ### SteamPatch Runtime Assets
 
-SteamPatch needs the Proton extras files. Provide them via:
+SteamPatch automatically downloads the required `protonextras` from the latest YAAGL release and caches it locally.
 
-- Environment variable: `HK4E_RUNTIME_ROOT=/path/to/yaaglwdos`
+Optional override:
 
-Expected layout (either):
-
-- `HK4E_RUNTIME_ROOT/sidecar/protonextras/steam64.exe` etc
-- `HK4E_RUNTIME_ROOT/protonextras/steam64.exe` etc
+- You can still provide your own `protonextras` via `HK4E_RUNTIME_ROOT=/path/to/yaaglwdos`.
 
 ## Security / Networking
 

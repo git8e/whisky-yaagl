@@ -48,14 +48,9 @@ open "Whisky.app"
 
 ### SteamPatch 资源（protonextras）
 
-SteamPatch 需要 protonextras 文件。提供方式：
+SteamPatch 会自动从最新 YAAGL release 下载所需的 `protonextras` 并缓存到本机（只下载一次）。
 
-- 通过环境变量：`HK4E_RUNTIME_ROOT=/path/to/yaaglwdos`
-
-目录结构支持两种：
-
-- `HK4E_RUNTIME_ROOT/sidecar/protonextras/steam64.exe` 等
-- `HK4E_RUNTIME_ROOT/protonextras/steam64.exe` 等
+可选：你仍然可以用环境变量覆盖资源路径：`HK4E_RUNTIME_ROOT=/path/to/yaaglwdos`。
 
 ## 安全说明
 

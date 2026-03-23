@@ -42,6 +42,11 @@ public enum SteamPatch {
     }
 
     public static func apply(prefixURL: URL) throws {
+        // Ensure protonextras exists (downloaded/cached) before copying.
+        // This is synchronous API; callers should prefer the async overload.
+        if !HK4eProtonExtras.isInstalled() {
+            throw HK4eAssetsError.protonExtrasMissing
+        }
         if isInstalled(prefixURL: prefixURL) {
             return
         }
@@ -60,6 +65,17 @@ public enum SteamPatch {
             from: extras.appendingPathComponent("lsteamclient32.dll"),
             to: sw64.appendingPathComponent("lsteamclient.dll")
         )
+    }
+
+    public static func apply(
+        prefixURL: URL,
+        status: (@Sendable (String) -> Void)? = nil,
+        progress: (@Sendable (Double) -> Void)? = nil
+    ) async throws {
+        if !HK4eProtonExtras.isInstalled() {
+            try await HK4eProtonExtras.ensureInstalled(status: status, progress: progress)
+        }
+        try apply(prefixURL: prefixURL)
     }
 
     public static func remove(prefixURL: URL) throws {
