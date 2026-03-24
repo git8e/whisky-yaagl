@@ -59,10 +59,14 @@ struct PinView: View {
             if isLaunching {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(.ultraThinMaterial)
+                        .fill(.black.opacity(0.22))
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(.ultraThinMaterial.opacity(0.85))
                     ProgressView()
-                        .controlSize(.small)
+                        .controlSize(.large)
+                        .scaleEffect(1.5)
                 }
+                .padding(2)
             } else {
                 HStack {
                     Spacer()

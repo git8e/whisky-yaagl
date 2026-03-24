@@ -77,8 +77,8 @@ public enum HK4ePatch {
         let exeURL = URL(fileURLWithPath: state.executablePath, isDirectory: false)
         let info = HK4eGame.detect(executableURL: exeURL)
 
-        if state.resolution {
-            try? await HK4eResolution.revert(bottle: bottle)
+        if state.hdr {
+            await HK4eHDR.revert(bottle: bottle, executableName: info.executableName)
         }
         if state.dxmt {
             HK4eDXMT.revertPrefix(prefixURL: prefixURL)
@@ -99,7 +99,7 @@ public enum HK4ePatch {
 
         await revertIfNeeded(bottle: bottle, prefixURL: prefixURL)
 
-        try? await HK4eTweaks.setLeftCommandIsCtrl(bottle: bottle, enabled: bottle.settings.hk4eLeftCommandIsCtrl)
+        try await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
 
         try await HK4eDXMT.ensureInstalled()
         HK4eDXMT.applyToRuntime(runtimeId: bottle.settings.wineRuntimeId)
@@ -111,13 +111,8 @@ public enum HK4ePatch {
 
         patchRemovedFiles(gameDir: gameDir, removed: HK4eGame.removedFiles(for: info))
 
-        if bottle.settings.hk4eCustomResolutionEnabled {
-            try? await HK4eResolution.apply(
-                bottle: bottle,
-                width: bottle.settings.hk4eCustomResolutionWidth,
-                height: bottle.settings.hk4eCustomResolutionHeight,
-                executableName: info.executableName
-            )
+        if bottle.settings.hk4eEnableHDR {
+            try? await HK4eHDR.apply(bottle: bottle, executableName: info.executableName)
         }
 
         let state = HK4ePatchState(
@@ -128,8 +123,8 @@ public enum HK4ePatch {
             dxmt: true,
             dxvk: false,
             reshade: false,
-            hdr: false,
-            resolution: bottle.settings.hk4eCustomResolutionEnabled
+            hdr: bottle.settings.hk4eEnableHDR,
+            resolution: false
         )
         saveState(bottle: bottle, state: state)
 
@@ -178,12 +173,12 @@ public enum HK4ePatch {
             }
         } catch {
             await waitUntilServerOff(bottle: bottle)
-            await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL)
+            await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL, hdrApplied: state.hdr)
             throw error
         }
 
         await waitUntilServerOff(bottle: bottle)
-        await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL)
+        await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL, hdrApplied: state.hdr)
         try? fm.removeItem(at: batURL)
 
         if exitCode != 0 {
@@ -191,9 +186,15 @@ public enum HK4ePatch {
         }
     }
 
-    private static func postRevert(bottle: Bottle, info: HK4eGame.Info, gameDir: URL, prefixURL: URL) async {
-        if bottle.settings.hk4eCustomResolutionEnabled {
-            try? await HK4eResolution.revert(bottle: bottle)
+    private static func postRevert(
+        bottle: Bottle,
+        info: HK4eGame.Info,
+        gameDir: URL,
+        prefixURL: URL,
+        hdrApplied: Bool
+    ) async {
+        if hdrApplied {
+            await HK4eHDR.revert(bottle: bottle, executableName: info.executableName)
         }
         HK4eDXMT.revertPrefix(prefixURL: prefixURL)
         revertRemovedFiles(gameDir: gameDir, removed: HK4eGame.removedFiles(for: info))

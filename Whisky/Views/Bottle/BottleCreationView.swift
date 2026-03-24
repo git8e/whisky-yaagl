@@ -27,6 +27,7 @@ struct BottleCreationView: View {
     @State private var newBottleName: String = ""
     @State private var newBottleVersion: WinVersion = .win10
     @State private var wineRuntimeId: String = "11.0-dxmt-signed"
+    @State private var initialRetinaMode: Bool = false
     @State private var initialSteamPatch: Bool = true
     @State private var initialCustomResolutionEnabled: Bool = false
     @State private var initialCustomResolutionWidth: Int = 1920
@@ -52,7 +53,7 @@ struct BottleCreationView: View {
                     }
                 }
 
-                Picker("Wine", selection: $wineRuntimeId) {
+                Picker("create.wineRuntime", selection: $wineRuntimeId) {
                     ForEach(WineRuntimes.all, id: \.id) { runtime in
                         let installed = WineRuntimeManager.isInstalled(runtimeId: runtime.id)
                         Text(installed ? "\(runtime.displayName)" : "\(runtime.displayName) (Not Installed)")
@@ -78,26 +79,29 @@ struct BottleCreationView: View {
                     }
                 }
 
-                Toggle("SteamPatch", isOn: $initialSteamPatch)
+                Toggle("config.retinaMode", isOn: $initialRetinaMode)
 
-                Toggle("Custom resolution", isOn: $initialCustomResolutionEnabled)
+                Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
+
+                Toggle("hk4e.customResolution", isOn: $initialCustomResolutionEnabled)
                 if initialCustomResolutionEnabled {
-                    HStack {
-                        TextField("Width", value: $initialCustomResolutionWidth, formatter: NumberFormatter())
+                    HStack(alignment: .center) {
+                        TextField("hk4e.width", value: $initialCustomResolutionWidth, formatter: NumberFormatter())
                             .textFieldStyle(.roundedBorder)
                             .frame(width: 90)
                         Text("x")
+                            .frame(width: 12, height: 28, alignment: .center)
                             .foregroundStyle(.secondary)
-                        TextField("Height", value: $initialCustomResolutionHeight, formatter: NumberFormatter())
+                        TextField("hk4e.height", value: $initialCustomResolutionHeight, formatter: NumberFormatter())
                             .textFieldStyle(.roundedBorder)
                             .frame(width: 90)
                     }
                 }
 
                 ActionView(
-                    text: "Game Executable (Optional)",
-                    subtitle: pinProgramURL?.path(percentEncoded: false) ?? "Not selected",
-                    actionName: "Browse"
+                    text: "hk4e.gameExecutableOptional",
+                    subtitle: pinProgramURL?.path(percentEncoded: false) ?? String(localized: "hk4e.notSelected"),
+                    actionName: "create.browse"
                 ) {
                     let panel = NSOpenPanel()
                     panel.canChooseFiles = true
@@ -111,7 +115,7 @@ struct BottleCreationView: View {
                 }
 
                 if bottleVM.isCreatingBottle {
-                    Section("Creating") {
+                    Section("create.progress.title") {
                         Text(bottleVM.createBottleStatus)
                             .foregroundStyle(.secondary)
                         if let progress = bottleVM.createBottleProgress {
@@ -144,7 +148,7 @@ struct BottleCreationView: View {
                 submit()
             }
             .alert(
-                "Create Bottle Failed",
+                "create.error.title",
                 isPresented: Binding(
                     get: { bottleVM.createBottleErrorMessage != nil },
                     set: { presenting in
@@ -152,9 +156,9 @@ struct BottleCreationView: View {
                     }
                 )
             ) {
-                Button("OK", role: .cancel) {}
+                Button("button.ok", role: .cancel) {}
             } message: {
-                Text(bottleVM.createBottleErrorMessage ?? "Unknown error")
+                Text(bottleVM.createBottleErrorMessage ?? String(localized: "create.error.unknown"))
             }
             .onChange(of: bottleVM.createdBottleURL) { _, url in
                 guard let url else { return }
@@ -172,6 +176,7 @@ struct BottleCreationView: View {
             winVersion: newBottleVersion,
             bottleURL: newBottleURL,
             wineRuntimeId: wineRuntimeId,
+            initialRetinaMode: initialRetinaMode,
             initialSteamPatch: initialSteamPatch,
             initialCustomResolutionEnabled: initialCustomResolutionEnabled,
             initialCustomResolutionWidth: initialCustomResolutionWidth,
