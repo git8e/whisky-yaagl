@@ -14,8 +14,10 @@ public enum HK4eWineCertificates {
     private static let markerBegin = "; YAAGL_WINE_INF_CERT_BEGIN"
     private static let markerEnd = "; YAAGL_WINE_INF_CERT_END"
 
-    private static let secretURL = URL(
-        string: "https://raw.githubusercontent.com/yaagl/yet-another-anime-game-launcher/main/src/clients/secret.ts"
+    // Default location is this fork's public asset file.
+    // Can be overridden via HK4E_WINE_INF_CERT_URL.
+    private static let defaultCertURL = URL(
+        string: "https://raw.githubusercontent.com/git8e/whisky-yaagl/main/assets/wine_inf_cert_str.txt"
     )!
 
     public static func ensurePatched(runtimeId: String) async throws {
@@ -78,22 +80,15 @@ public enum HK4eWineCertificates {
     }
 
     private static func fetchWineInfCertSection() async throws -> String {
-        let (data, _) = try await URLSession(configuration: .ephemeral).data(from: secretURL)
-        let src = String(data: data, encoding: .utf8) ?? ""
+        let url = ProcessInfo.processInfo.environment["HK4E_WINE_INF_CERT_URL"].flatMap(URL.init(string:)) ?? defaultCertURL
 
-        guard let start = src.range(of: "export const WINE_INF_CERT_STR") else {
-            throw HK4eWineCertificatesError.certNotFound
+        var req = URLRequest(url: url)
+        req.setValue("whisky-yaagl", forHTTPHeaderField: "User-Agent")
+        let (data, resp) = try await URLSession(configuration: .ephemeral).data(for: req)
+        if let http = resp as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+            throw HK4eWineCertificatesError.httpError(code: http.statusCode, url: url.absoluteString)
         }
-        let after = src[start.upperBound...]
-        guard let tick1 = after.firstIndex(of: "`") else {
-            throw HK4eWineCertificatesError.certNotFound
-        }
-        let rest = after[after.index(after: tick1)...]
-        guard let tick2 = rest.firstIndex(of: "`") else {
-            throw HK4eWineCertificatesError.certNotFound
-        }
-
-        let body = String(rest[..<tick2])
+        let body = String(data: data, encoding: .utf8) ?? ""
         let trimmed = body.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
             throw HK4eWineCertificatesError.certNotFound
@@ -105,6 +100,7 @@ public enum HK4eWineCertificates {
 public enum HK4eWineCertificatesError: LocalizedError {
     case certNotFound
     case wineInfMissing(String)
+    case httpError(code: Int, url: String)
 
     public var errorDescription: String? {
         switch self {
@@ -112,6 +108,8 @@ public enum HK4eWineCertificatesError: LocalizedError {
             return "Failed to fetch YAAGL WINE_INF_CERT_STR"
         case .wineInfMissing(let path):
             return "wine.inf not found: \(path)"
+        case .httpError(let code, let url):
+            return "Failed to download certificate payload (HTTP \(code)): \(url)"
         }
     }
 }

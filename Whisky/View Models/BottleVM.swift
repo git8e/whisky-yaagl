@@ -134,7 +134,13 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
 
                 if bottle.settings.hk4eCertificateImportEnabled {
                     await MainActor.run { self.createBottleStatus = "Importing certificates" }
-                    try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
+                    do {
+                        try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
+                    } catch {
+                        await MainActor.run {
+                            self.createBottleStatus = "Certificate import failed (ignored): \(error.localizedDescription)"
+                        }
+                    }
                 }
 
                 await MainActor.run { self.createBottleStatus = "Running wineboot" }
