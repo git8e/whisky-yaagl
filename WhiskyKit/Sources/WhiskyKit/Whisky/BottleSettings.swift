@@ -151,6 +151,7 @@ public struct BottleHK4eConfig: Codable, Equatable {
     var customResolutionWidth: Int = 1920
     var customResolutionHeight: Int = 1080
     var gameExecutableURL: URL?
+    var certificateImportEnabled: Bool = true
 
     public init() {}
 
@@ -161,6 +162,7 @@ public struct BottleHK4eConfig: Codable, Equatable {
         self.customResolutionWidth = try container.decodeIfPresent(Int.self, forKey: .customResolutionWidth) ?? 1920
         self.customResolutionHeight = try container.decodeIfPresent(Int.self, forKey: .customResolutionHeight) ?? 1080
         self.gameExecutableURL = try container.decodeIfPresent(URL.self, forKey: .gameExecutableURL)
+        self.certificateImportEnabled = try container.decodeIfPresent(Bool.self, forKey: .certificateImportEnabled) ?? true
     }
 }
 
@@ -293,6 +295,11 @@ public struct BottleSettings: Codable, Equatable {
     public var hk4eGameExecutableURL: URL? {
         get { return hk4eConfig.gameExecutableURL }
         set { hk4eConfig.gameExecutableURL = newValue }
+    }
+
+    public var hk4eCertificateImportEnabled: Bool {
+        get { return hk4eConfig.certificateImportEnabled }
+        set { hk4eConfig.certificateImportEnabled = newValue }
     }
 
     @discardableResult

@@ -31,6 +31,7 @@ struct BottleCreationView: View {
     @State private var initialMetalHud: Bool = false
     @State private var initialRetinaMode: Bool = false
     @State private var initialSteamPatch: Bool = false
+    @State private var initialCertImport: Bool = true
     @State private var initialCustomResolutionEnabled: Bool = false
     @State private var initialCustomResolutionWidth: Int = 1920
     @State private var initialCustomResolutionHeight: Int = 1080
@@ -108,6 +109,8 @@ struct BottleCreationView: View {
                 Toggle("Retina mode", isOn: $initialRetinaMode)
 
                 Toggle("SteamPatch", isOn: $initialSteamPatch)
+
+                Toggle("Certificate import (Recommended)", isOn: $initialCertImport)
 
                 Toggle("Custom resolution", isOn: $initialCustomResolutionEnabled)
                 if initialCustomResolutionEnabled {
@@ -205,6 +208,7 @@ struct BottleCreationView: View {
             initialMetalHud: initialMetalHud,
             initialRetinaMode: initialRetinaMode,
             initialSteamPatch: initialSteamPatch,
+            initialCertImport: initialCertImport,
             initialCustomResolutionEnabled: initialCustomResolutionEnabled,
             initialCustomResolutionWidth: initialCustomResolutionWidth,
             initialCustomResolutionHeight: initialCustomResolutionHeight,
