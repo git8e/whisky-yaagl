@@ -30,6 +30,10 @@ struct PinView: View {
     @State private var name: String = ""
     @State private var opening: Bool = false
 
+    private var isLaunching: Bool {
+        program.isLaunching
+    }
+
     var body: some View {
         VStack {
             Group {
@@ -52,15 +56,24 @@ struct PinView: View {
         .frame(width: 90, height: 90)
         .padding(10)
         .overlay {
-            HStack {
-                Spacer()
-                Image(systemName: "play.fill")
-                    .resizable()
-                    .foregroundColor(.green)
-                    .frame(width: 16, height: 16)
+            if isLaunching {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(.ultraThinMaterial)
+                    ProgressView()
+                        .controlSize(.small)
+                }
+            } else {
+                HStack {
+                    Spacer()
+                    Image(systemName: "play.fill")
+                        .resizable()
+                        .foregroundColor(.green)
+                        .frame(width: 16, height: 16)
+                }
+                .frame(width: 45, height: 45)
+                .padding(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0))
             }
-            .frame(width: 45, height: 45)
-            .padding(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0))
         }
         .contextMenu {
             ProgramMenuView(program: program, path: $path)
@@ -75,8 +88,10 @@ struct PinView: View {
             .labelStyle(.titleAndIcon)
         }
         .onTapGesture(count: 2) {
+            guard !isLaunching else { return }
             runProgram()
         }
+        .allowsHitTesting(!isLaunching)
         .sheet(isPresented: $showRenameSheet) {
             RenameView("rename.pin.title", name: name) { newName in
                 name = newName
@@ -99,15 +114,17 @@ struct PinView: View {
                 bottle.settings.pins[index].name = name
             }
         }
+        .onChange(of: program.isLaunching) { _, newValue in
+            if !newValue {
+                opening = false
+            }
+        }
     }
 
     func runProgram() {
+        guard !opening else { return }
         withAnimation(.easeIn(duration: 0.25)) {
             opening = true
-        } completion: {
-            withAnimation(.easeOut(duration: 0.1)) {
-                opening = false
-            }
         }
 
         program.run()

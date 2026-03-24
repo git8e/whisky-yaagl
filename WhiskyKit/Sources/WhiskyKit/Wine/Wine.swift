@@ -351,7 +351,10 @@ extension Wine {
     private static func queryRegistryKey(
         bottle: Bottle, key: String, name: String, type: RegistryType
     ) async throws -> String? {
-        let output = try await runWine(["reg", "query", key, "-v", name], bottle: bottle)
+        // `reg query` prints a scary error to stderr when the value doesn't exist.
+        // Route stderr to NUL so missing values don't pollute Whisky logs.
+        let cmd = "reg query \"\(key)\" -v \"\(name)\" 2>nul"
+        let output = try await runWine(["cmd", "/c", cmd], bottle: bottle)
         let lines = output.split(omittingEmptySubsequences: true, whereSeparator: \.isNewline)
 
         guard let line = lines.first(where: { $0.contains(type.rawValue) }) else { return nil }
