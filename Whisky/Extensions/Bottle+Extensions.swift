@@ -53,6 +53,17 @@ extension Bottle {
         }
     }
 
+    func openTaskManager() {
+        Task.detached(priority: .userInitiated) {
+            do {
+                try await Wine.taskManager(bottle: self)
+            } catch {
+                Logger.wineKit.error("Failed to open task manager: \(error)")
+                await self.showRunError(message: String(describing: error.localizedDescription))
+            }
+        }
+    }
+
     @discardableResult
     func getStartMenuPrograms() -> [Program] {
         let globalStartMenu = url

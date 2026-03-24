@@ -57,16 +57,20 @@ struct PinView: View {
         .padding(10)
         .overlay {
             if isLaunching {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(.black.opacity(0.22))
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(.ultraThinMaterial.opacity(0.85))
-                    ProgressView()
-                        .controlSize(.large)
-                        .scaleEffect(1.5)
+                VStack {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.black.opacity(0.18))
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.ultraThinMaterial.opacity(0.78))
+                        ProgressView()
+                            .controlSize(.large)
+                            .scaleEffect(1.28)
+                    }
+                    .frame(width: 52, height: 52)
+                    Spacer()
                 }
-                .padding(2)
+                .padding(.top, 2)
             } else {
                 HStack {
                     Spacer()
@@ -112,8 +116,7 @@ struct PinView: View {
         }
         .onChange(of: name) {
             if let index = bottle.settings.pins.firstIndex(where: {
-                let exists = FileManager.default.fileExists(atPath: pin.url?.path(percentEncoded: false) ?? "")
-                return $0.url == pin.url && exists
+                return $0.url == pin.url
             }) {
                 bottle.settings.pins[index].name = name
             }

@@ -95,6 +95,8 @@ public struct BottleWineConfig: Codable, Equatable {
     var windowsVersion: WinVersion = .win10
     var enhancedSync: EnhancedSync = .msync
     var avxEnabled: Bool = false
+    var proxyEnabled: Bool = false
+    var proxyServer: String = ""
     var runtimeId: String = WineRuntimes.whiskyDefaultId
 
     public init() {}
@@ -106,6 +108,8 @@ public struct BottleWineConfig: Codable, Equatable {
         self.windowsVersion = try container.decodeIfPresent(WinVersion.self, forKey: .windowsVersion) ?? .win10
         self.enhancedSync = try container.decodeIfPresent(EnhancedSync.self, forKey: .enhancedSync) ?? .msync
         self.avxEnabled = try container.decodeIfPresent(Bool.self, forKey: .avxEnabled) ?? false
+        self.proxyEnabled = try container.decodeIfPresent(Bool.self, forKey: .proxyEnabled) ?? false
+        self.proxyServer = try container.decodeIfPresent(String.self, forKey: .proxyServer) ?? ""
         self.runtimeId = try container.decodeIfPresent(String.self, forKey: .runtimeId) ?? WineRuntimes.whiskyDefaultId
     }
     // swiftlint:enable line_length
@@ -240,6 +244,16 @@ public struct BottleSettings: Codable, Equatable {
     public var avxEnabled: Bool {
         get { return wineConfig.avxEnabled }
         set { wineConfig.avxEnabled = newValue }
+    }
+
+    public var proxyEnabled: Bool {
+        get { return wineConfig.proxyEnabled }
+        set { wineConfig.proxyEnabled = newValue }
+    }
+
+    public var proxyServer: String {
+        get { return wineConfig.proxyServer }
+        set { wineConfig.proxyServer = newValue }
     }
 
     /// The pinned programs on this bottle

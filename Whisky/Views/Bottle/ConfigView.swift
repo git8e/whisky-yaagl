@@ -32,10 +32,13 @@ struct ConfigView: View {
     @State private var buildVersion: Int = 0
     @State private var retinaMode: Bool = false
     @State private var dpiConfig: Int = 96
+    @State private var proxyEnabled: Bool = false
+    @State private var proxyServer: String = ""
     @State private var winVersionLoadingState: LoadingState = .loading
     @State private var buildVersionLoadingState: LoadingState = .loading
     @State private var retinaModeLoadingState: LoadingState = .loading
     @State private var dpiConfigLoadingState: LoadingState = .loading
+    @State private var proxyLoadingState: LoadingState = .success
     @State private var dpiSheetPresented: Bool = false
     @AppStorage("wineSectionExpanded") private var wineSectionExpanded: Bool = true
     @AppStorage("dxvkSectionExpanded") private var dxvkSectionExpanded: Bool = true
@@ -88,6 +91,31 @@ struct ConfigView: View {
                     Text("config.enhancedSync.none").tag(EnhancedSync.none)
                     Text("config.enhacnedSync.esync").tag(EnhancedSync.esync)
                     Text("config.enhacnedSync.msync").tag(EnhancedSync.msync)
+                }
+                SettingItemView(title: "config.proxy.enable", loadingState: proxyLoadingState) {
+                    Toggle("config.proxy.enable", isOn: $proxyEnabled)
+                        .labelsHidden()
+                        .onChange(of: proxyEnabled) { _, newValue in
+                            bottle.settings.proxyEnabled = newValue
+                            applyProxySettings()
+                        }
+                }
+                if proxyEnabled {
+                    HStack {
+                        Text(String(localized: "config.proxy.server"))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        TextField("config.proxy.server", text: $proxyServer)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 220)
+                            .onSubmit {
+                                bottle.settings.proxyServer = proxyServer
+                                applyProxySettings()
+                            }
+                        Button("config.proxy.apply") {
+                            bottle.settings.proxyServer = proxyServer
+                            applyProxySettings()
+                        }
+                    }
                 }
                 SettingItemView(title: "config.dpi", loadingState: dpiConfigLoadingState) {
                     Button("config.inspect") {
@@ -237,6 +265,15 @@ struct ConfigView: View {
                         }
                     }
                 }
+                Button("button.taskManager") {
+                    Task(priority: .userInitiated) {
+                        do {
+                            try await Wine.taskManager(bottle: bottle)
+                        } catch {
+                            print("Failed to launch task manager")
+                        }
+                    }
+                }
 
                 Button("button.openLogs") {
                     NSWorkspace.shared.open(Wine.logsFolder)
@@ -277,6 +314,8 @@ struct ConfigView: View {
                     dpiConfigLoadingState = .success
                 }
             }
+            proxyEnabled = bottle.settings.proxyEnabled
+            proxyServer = bottle.settings.proxyServer
         }
         .onChange(of: bottle.settings.windowsVersion) { _, newValue in
             if winVersionLoadingState == .success {
@@ -324,6 +363,24 @@ struct ConfigView: View {
             } catch {
                 print(error)
                 buildVersionLoadingState = .failed
+            }
+        }
+    }
+
+    func applyProxySettings() {
+        proxyLoadingState = .modifying
+        Task(priority: .userInitiated) {
+            do {
+                try await WineProxySettings.applyIfNeeded(bottle: bottle)
+                await MainActor.run {
+                    proxyLoadingState = .success
+                    proxyServer = bottle.settings.proxyServer
+                }
+            } catch {
+                print(error)
+                await MainActor.run {
+                    proxyLoadingState = .failed
+                }
             }
         }
     }

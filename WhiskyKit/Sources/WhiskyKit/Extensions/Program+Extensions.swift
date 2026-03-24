@@ -21,6 +21,12 @@ import AppKit
 import os.log
 
 extension Program {
+    private func validateTargetFileExists() -> String? {
+        let targetPath = self.url.path(percentEncoded: false)
+        guard !FileManager.default.fileExists(atPath: targetPath) else { return nil }
+        return String(localized: "error.fileNotFound") + "\n\n" + targetPath
+    }
+
     public func run() {
         if NSEvent.modifierFlags.contains(.shift) {
             self.runInTerminal()
@@ -30,6 +36,15 @@ extension Program {
     }
 
     func runInWine() {
+        if let missingMessage = validateTargetFileExists() {
+            Task { @MainActor in
+                self.isLaunching = false
+                self.lastExitCode = nil
+                self.showRunError(message: missingMessage)
+            }
+            return
+        }
+
         let arguments = settings.arguments.split { $0.isWhitespace }.map(String.init)
         let environment = generateEnvironment()
 
@@ -75,6 +90,13 @@ extension Program {
     }
 
     public func runInTerminal() {
+        if let missingMessage = validateTargetFileExists() {
+            Task { @MainActor in
+                self.showRunError(message: missingMessage)
+            }
+            return
+        }
+
         let wineCmd = generateTerminalCommand().replacingOccurrences(of: "\\", with: "\\\\")
 
         let script = """

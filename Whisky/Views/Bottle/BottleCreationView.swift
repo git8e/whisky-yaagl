@@ -30,6 +30,8 @@ struct BottleCreationView: View {
     @State private var initialRetinaMode: Bool = false
     @State private var initialSteamPatch: Bool = true
     @State private var initialEnableHDR: Bool = false
+    @State private var initialProxyEnabled: Bool = false
+    @State private var initialProxyServer: String = ""
     @State private var initialCustomResolutionEnabled: Bool = false
     @State private var initialCustomResolutionWidth: Int = 1920
     @State private var initialCustomResolutionHeight: Int = 1080
@@ -85,6 +87,12 @@ struct BottleCreationView: View {
                 Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
 
                 Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
+
+                Toggle("config.proxy.enable", isOn: $initialProxyEnabled)
+                if initialProxyEnabled {
+                    TextField("config.proxy.server", text: $initialProxyServer)
+                        .textFieldStyle(.roundedBorder)
+                }
 
                 Toggle("hk4e.customResolution", isOn: $initialCustomResolutionEnabled)
                 if initialCustomResolutionEnabled {
@@ -182,6 +190,8 @@ struct BottleCreationView: View {
             initialRetinaMode: initialRetinaMode,
             initialSteamPatch: initialSteamPatch,
             initialEnableHDR: initialEnableHDR,
+            initialProxyEnabled: initialProxyEnabled,
+            initialProxyServer: initialProxyServer,
             initialCustomResolutionEnabled: initialCustomResolutionEnabled,
             initialCustomResolutionWidth: initialCustomResolutionWidth,
             initialCustomResolutionHeight: initialCustomResolutionHeight,

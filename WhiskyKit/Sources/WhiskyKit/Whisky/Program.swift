@@ -37,7 +37,9 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
 
     @Published public var pinned: Bool {
         didSet {
+            guard pinned != oldValue else { return }
             if pinned {
+                guard !bottle.settings.pins.contains(where: { $0.url == url }) else { return }
                 bottle.settings.pins.append(PinnedProgram(
                     name: name.replacingOccurrences(of: ".exe", with: ""),
                     url: url
