@@ -154,11 +154,11 @@ struct ConfigView: View {
                 }
             }
 
-            Section("HK4e", isExpanded: $hk4eSectionExpanded) {
+            Section("hk4e.section", isExpanded: $hk4eSectionExpanded) {
                 ActionView(
-                    text: "Game Executable",
-                    subtitle: bottle.settings.hk4eGameExecutableURL?.prettyPath() ?? "Not selected",
-                    actionName: "Browse"
+                    text: "hk4e.gameExecutable",
+                    subtitle: bottle.settings.hk4eGameExecutableURL?.prettyPath() ?? String(localized: "hk4e.notSelected"),
+                    actionName: "create.browse"
                 ) {
                     let panel = NSOpenPanel()
                     panel.canChooseFiles = true
@@ -177,24 +177,27 @@ struct ConfigView: View {
                     }
                 }
 
-                Toggle("Left Cmd as Ctrl", isOn: $bottle.settings.hk4eLeftCommandIsCtrl)
+                Toggle("hk4e.leftCommandIsCtrl", isOn: $bottle.settings.hk4eLeftCommandIsCtrl)
 
-                Toggle("SteamPatch", isOn: $bottle.settings.hk4eSteamPatch)
+                Toggle("hk4e.steamPatch", isOn: $bottle.settings.hk4eSteamPatch)
 
-                Toggle("Custom resolution", isOn: $bottle.settings.hk4eCustomResolutionEnabled)
-                HStack {
-                    TextField("Width", value: $bottle.settings.hk4eCustomResolutionWidth, formatter: NumberFormatter())
+                Toggle("hk4e.enableHDR", isOn: $bottle.settings.hk4eEnableHDR)
+
+                Toggle("hk4e.customResolution", isOn: $bottle.settings.hk4eCustomResolutionEnabled)
+                HStack(alignment: .center) {
+                    TextField("hk4e.width", value: $bottle.settings.hk4eCustomResolutionWidth, formatter: NumberFormatter())
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 90)
                     Text("x")
+                        .frame(width: 12, height: 28, alignment: .center)
                         .foregroundStyle(.secondary)
-                    TextField("Height", value: $bottle.settings.hk4eCustomResolutionHeight, formatter: NumberFormatter())
+                    TextField("hk4e.height", value: $bottle.settings.hk4eCustomResolutionHeight, formatter: NumberFormatter())
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 90)
                     Spacer()
                 }
 
-                Text("Launch behavior follows YAAGL hk4eos: SteamPatch, DXMT and crash-file cleanup are handled automatically when running the selected executable.")
+                Text("hk4e.description")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -235,11 +238,11 @@ struct ConfigView: View {
                     }
                 }
 
-                Button("Open Logs") {
+                Button("button.openLogs") {
                     NSWorkspace.shared.open(Wine.logsFolder)
                 }
 
-                Button("Open Latest Log") {
+                Button("button.openLatestLog") {
                     if let url = Wine.latestLogFileURL() {
                         NSWorkspace.shared.open(url)
                     } else {

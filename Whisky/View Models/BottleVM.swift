@@ -61,7 +61,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
 
         Task { @MainActor in
             self.isCreatingBottle = true
-            self.createBottleStatus = "Preparing bottle"
+            self.createBottleStatus = String(localized: "create.status.preparing")
             self.createBottleProgress = nil
             self.createBottleErrorMessage = nil
             self.createdBottleURL = nil
@@ -71,7 +71,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
             var bottleId: Bottle?
             do {
                 await MainActor.run {
-                    self.createBottleStatus = "Creating bottle directory"
+                    self.createBottleStatus = String(localized: "create.status.directory")
                 }
                 try FileManager.default.createDirectory(atPath: newBottleDir.path(percentEncoded: false),
                                                         withIntermediateDirectories: true)
@@ -115,7 +115,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
 
                 try await Wine.withLogSession(for: bottle) {
                     await MainActor.run {
-                        self.createBottleStatus = "Initializing Wine prefix"
+                        self.createBottleStatus = String(localized: "create.status.initializingPrefix")
                         self.createBottleProgress = nil
                     }
 
@@ -128,20 +128,31 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                         "WINEDEBUG": "-all"
                     ]
 
-                    await MainActor.run { self.createBottleStatus = "Importing certificates" }
+                    await MainActor.run { self.createBottleStatus = String(localized: "create.status.certificates") }
                     do {
                         try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
                     } catch {
                         await MainActor.run {
-                            self.createBottleStatus = "Certificate import failed (ignored): \(error.localizedDescription)"
+                            self.createBottleStatus = String(
+                                format: String(localized: "create.status.certificatesIgnored"),
+                                error.localizedDescription
+                            )
                         }
                     }
 
-                    await MainActor.run { self.createBottleStatus = "Running wineboot" }
+                    await MainActor.run { self.createBottleStatus = String(localized: "create.status.wineboot") }
                     _ = try await Wine.runWine(["wineboot", "-u"], bottle: bottle, environment: initEnv)
 
-                    await MainActor.run { self.createBottleStatus = "Setting Windows version" }
+                    await MainActor.run { self.createBottleStatus = String(localized: "create.status.windowsVersion") }
                     _ = try await Wine.runWine(["winecfg", "-v", winVersion.rawValue], bottle: bottle, environment: initEnv)
+
+                    await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
+                    try await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+
+                    if initialRetinaMode {
+                        await MainActor.run { self.createBottleStatus = String(localized: "config.retinaMode") }
+                        try await Wine.changeRetinaMode(bottle: bottle, retinaMode: true)
+                    }
                 }
 
                 // Custom resolution is applied per-launch (YAAGL-style), not during bottle creation.
@@ -155,7 +166,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
 
                 // Add record
                 await MainActor.run {
-                    self.createBottleStatus = "Finalizing"
+                    self.createBottleStatus = String(localized: "create.status.finalizing")
                     self.bottlesList.paths.append(newBottleDir)
                     self.loadBottles()
                     self.createdBottleURL = newBottleDir
@@ -175,7 +186,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     self.createBottleErrorMessage = error.localizedDescription
                     self.isCreatingBottle = false
                     self.createBottleProgress = nil
-                    self.createBottleStatus = "Failed"
+                    self.createBottleStatus = String(localized: "create.status.failed")
                 }
             }
         }

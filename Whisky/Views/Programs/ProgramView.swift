@@ -81,8 +81,14 @@ struct ProgramView: View {
                 if program.isLaunching {
                     Spacer()
                         .frame(width: 10)
-                    ProgressView()
-                        .controlSize(.small)
+                    ZStack {
+                        Circle()
+                            .fill(.black.opacity(0.16))
+                            .frame(width: 28, height: 28)
+                        ProgressView()
+                            .controlSize(.large)
+                            .scaleEffect(1.2)
+                    }
                 }
             }
             .padding()
