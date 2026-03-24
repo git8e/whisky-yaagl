@@ -24,8 +24,11 @@ public enum HK4eDXVK {
         for (idx, name) in needed.enumerated() {
             let dst = HK4eResources.dxvkDir.appending(path: name)
             let url = base.appending(path: name)
-            let per = progress.map { cb in
-                return { frac in cb((Double(idx) + frac) / Double(count)) }
+            var per: (@Sendable (Double) -> Void)?
+            if let cb = progress {
+                per = { frac in
+                    cb((Double(idx) + frac) / Double(count))
+                }
             }
             try await HK4eDownloader.downloadOnce(url: url, destination: dst, progress: per)
         }
