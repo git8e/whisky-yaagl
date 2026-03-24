@@ -111,6 +111,15 @@ SteamPatch automatically downloads the required `protonextras` from the YAAGL re
 
 If the repository download is unavailable, it falls back to downloading the latest YAAGL app tarball and extracting `sidecar/protonextras`.
 
+## Certificate Import
+
+If enabled (default), the app patches the selected Wine runtime's `share/wine/wine.inf` to import a root certificate during prefix creation.
+The certificate payload is downloaded at runtime (not bundled).
+
+Override source URL:
+
+- `HK4E_WINE_INF_CERT_URL=https://.../wine_inf_cert_str.txt`
+
 ## First-Run Setup
 
 On first launch, a setup screen lets you download any of the 4 Wine runtimes.
