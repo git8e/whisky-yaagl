@@ -7,9 +7,23 @@ import Foundation
 
 public enum HK4ePatch {
     private static var fm: FileManager { FileManager.default }
+    private static let cloudArgs = ["-platform_type", "CLOUD_THIRD_PARTY_PC", "-is_cloud", "1"]
 
     private static func toWinePath(_ absPath: String) -> String {
         return "Z:" + absPath.replacingOccurrences(of: "/", with: "\\")
+    }
+
+    private static func quoteForBatch(_ value: String) -> String {
+        let escaped = value.replacingOccurrences(of: "\"", with: "\"\"")
+        return "\"\(escaped)\""
+    }
+
+    private static func waitUntilServerOff(bottle: Bottle) async {
+        do {
+            for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
+        } catch {
+            // best-effort
+        }
     }
 
     private static func workDir(bottle: Bottle) throws -> URL {
@@ -152,31 +166,40 @@ public enum HK4ePatch {
         saveState(bottle: bottle, state: state)
 
         var mergedEnv = environment
-        if bottle.settings.hk4eDXMTInjectionEnabled || bottle.settings.hk4eDXVKInjectionEnabled {
-            // Match YAAGL defaults.
-            mergedEnv["WINEDLLOVERRIDES"] = "d3d11,dxgi=n,b"
-        }
+        // Match YAAGL defaults.
+        mergedEnv["WINEDLLOVERRIDES"] = "d3d11,dxgi=n,b"
+
+        await waitUntilServerOff(bottle: bottle)
 
         let work = try workDir(bottle: bottle)
         let batURL = work.appending(path: "hk4e_run.bat", directoryHint: .notDirectory)
         let exeWine = toWinePath(exeURL.path(percentEncoded: false))
         let dirWine = toWinePath(gameDir.path(percentEncoded: false))
-        let joinedArgs = args.map { $0 }.joined(separator: " ")
+        let hkProtectWine = toWinePath(gameDir.appendingPathComponent("HoYoKProtect.sys", isDirectory: false).path(percentEncoded: false))
+        let joinedArgs = (cloudArgs + args).map(quoteForBatch).joined(separator: " ")
 
-        // Run game in a blocking way so pre/post patching is correct.
         let bat = """
         @echo off
+        cd "%~dp0"
+        if exist \(quoteForBatch(hkProtectWine)) copy /y \(quoteForBatch(hkProtectWine)) "%WINDIR%\\system32\\" >nul
         cd /d \"\(dirWine)\"
-        \"\(exeWine)\" \(joinedArgs)
+        \(quoteForBatch(exeWine)) \(joinedArgs)
         """
         try bat.write(to: batURL, atomically: true, encoding: .utf8)
         let batWine = toWinePath(batURL.path(percentEncoded: false))
 
         var exitCode: Int32 = 0
         do {
+            let launchArgs: [String]
+            if bottle.settings.hk4eSteamPatch {
+                launchArgs = [#"C:\windows\system32\steam.exe"#, exeWine]
+            } else {
+                launchArgs = ["cmd", "/c", quoteForBatch(batWine)]
+            }
+
             for await output in try Wine.runWineProcess(
                 name: exeURL.lastPathComponent,
-                args: ["cmd", "/c", batWine],
+                args: launchArgs,
                 bottle: bottle,
                 environment: mergedEnv
             ) {
@@ -185,10 +208,12 @@ public enum HK4ePatch {
                 }
             }
         } catch {
+            await waitUntilServerOff(bottle: bottle)
             await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL)
             throw error
         }
 
+        await waitUntilServerOff(bottle: bottle)
         await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL)
         try? fm.removeItem(at: batURL)
 

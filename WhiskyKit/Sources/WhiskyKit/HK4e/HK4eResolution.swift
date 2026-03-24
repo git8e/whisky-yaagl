@@ -107,7 +107,7 @@ public enum HK4eResolution {
     }
 
     private static func targetKeys(executableName: String?) -> [String] {
-        let base = #"HKEY_CURRENT_USER\\Software\\miHoYo\\"#
+        let base = #"HKEY_CURRENT_USER\Software\miHoYo\"#
 
         if let executableName {
             let lower = executableName.lowercased()

@@ -19,6 +19,10 @@
 import Foundation
 
 public struct WineRuntime: Identifiable, Hashable, Sendable {
+    public enum RenderBackend: String, Hashable, Sendable {
+        case dxmt
+    }
+
     public struct ArchiveLayout: Hashable, Sendable {
         public var winePathInArchive: String?
 
@@ -30,12 +34,14 @@ public struct WineRuntime: Identifiable, Hashable, Sendable {
     public var id: String
     public var displayName: String
     public var remoteURL: URL?
+    public var renderBackend: RenderBackend?
     public var archive: ArchiveLayout
 
-    public init(id: String, displayName: String, remoteURL: URL?, archive: ArchiveLayout) {
+    public init(id: String, displayName: String, remoteURL: URL?, renderBackend: RenderBackend? = nil, archive: ArchiveLayout) {
         self.id = id
         self.displayName = displayName
         self.remoteURL = remoteURL
+        self.renderBackend = renderBackend
         self.archive = archive
     }
 }
@@ -52,6 +58,7 @@ public enum WineRuntimes {
                     "https://github.com/dawn-winery/dawn-signed/releases/download/wine-stable-gcenx-11.0-osx64/" +
                     "wine-stable-11.0-osx64-signed.tar.xz"
             ),
+            renderBackend: .dxmt,
             archive: .init(winePathInArchive: "Wine Stable.app/Contents/Resources/wine")
         ),
         WineRuntime(
@@ -62,12 +69,14 @@ public enum WineRuntimes {
                     "https://github.com/Gcenx/macOS_Wine_builds/releases/download/10.18/" +
                     "wine-devel-10.18-osx64.tar.xz"
             ),
+            renderBackend: .dxmt,
             archive: .init(winePathInArchive: "Wine Devel.app/Contents/Resources/wine")
         ),
         WineRuntime(
             id: "9.9-dxmt",
             displayName: "Wine 9.9 DXMT",
             remoteURL: URL(string: "https://github.com/3Shain/wine/releases/download/v9.9-mingw/wine.tar.gz"),
+            renderBackend: .dxmt,
             archive: .init(winePathInArchive: nil)
         ),
         // Keep WhiskyWine as the lowest priority runtime in the UI.
