@@ -117,7 +117,16 @@ public enum HK4ePersistentConfig {
         defer { try? fm.removeItem(at: regFileURL) }
 
         let regWinePath = toWinePath(regFileURL.path(percentEncoded: false))
-        _ = try await Wine.runWine(["regedit", regWinePath], bottle: bottle, environment: ["WINEDEBUG": "-all"])
+        _ = try await Wine.runWine(
+            ["regedit", regWinePath],
+            bottle: bottle,
+            environment: [
+                "WINEDEBUG": "-all",
+                // Registry import doesn't need sync enhancements.
+                "WINEESYNC": "0",
+                "WINEMSYNC": "0"
+            ]
+        )
         saveState(bottle: bottle, state: state)
     }
 }
