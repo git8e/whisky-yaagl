@@ -22,6 +22,8 @@ public enum BottleMaintenance {
     private static var fm: FileManager { FileManager.default }
 
     public static func cleanHK4eTweaks(bottle: Bottle) async {
+        await HK4ePatch.revertIfNeeded(bottle: bottle, prefixURL: bottle.url)
+
         do {
             for await _ in try Wine.runWineserverProcess(args: ["-k"], bottle: bottle) { }
         } catch {
@@ -38,6 +40,12 @@ public enum BottleMaintenance {
             try await HK4eResolution.revert(bottle: bottle)
         } catch {
             // best-effort
+        }
+
+        await HK4eHDR.revert(bottle: bottle, executableName: bottle.settings.hk4eGameExecutableURL?.lastPathComponent)
+
+        if bottle.settings.hk4eEnableNVExtension == false {
+            await HK4eTweaks.revertNVExtension(bottle: bottle)
         }
 
         do {
@@ -70,13 +78,7 @@ public enum BottleMaintenance {
             try await SteamPatch.apply(prefixURL: bottle.url)
         }
 
-        if bottle.settings.hk4eCustomResolutionEnabled {
-            try await HK4eResolution.apply(
-                bottle: bottle,
-                width: bottle.settings.hk4eCustomResolutionWidth,
-                height: bottle.settings.hk4eCustomResolutionHeight
-            )
-        }
+        // Custom resolution and HDR are applied per-launch.
 
         do {
             for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }

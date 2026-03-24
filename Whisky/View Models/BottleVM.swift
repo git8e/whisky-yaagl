@@ -114,6 +114,9 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.hk4eCustomResolutionEnabled = initialCustomResolutionEnabled
                 bottle.settings.hk4eCustomResolutionWidth = initialCustomResolutionWidth
                 bottle.settings.hk4eCustomResolutionHeight = initialCustomResolutionHeight
+                if pinProgramURL != nil {
+                    bottle.settings.hk4eLaunchPatchingEnabled = true
+                }
 
                 await MainActor.run {
                     self.createBottleStatus = "Initializing Wine prefix"
@@ -178,32 +181,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     )
                 }
 
-                if initialCustomResolutionEnabled {
-                    await MainActor.run {
-                        self.createBottleStatus = "Waiting for wineserver"
-                        self.createBottleProgress = nil
-                    }
-                    do {
-                        for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
-                    } catch {
-                        // best-effort
-                    }
-
-                    await MainActor.run { self.createBottleStatus = "Applying custom resolution" }
-                    do {
-                        try await HK4eResolution.apply(
-                            bottle: bottle,
-                            width: initialCustomResolutionWidth,
-                            height: initialCustomResolutionHeight,
-                            executableName: pinProgramURL?.lastPathComponent
-                        )
-                    } catch {
-                        // Best-effort: do not fail bottle creation due to a non-critical tweak.
-                        await MainActor.run {
-                            self.createBottleStatus = "Custom resolution failed (ignored): \(error.localizedDescription)"
-                        }
-                    }
-                }
+                // Custom resolution is applied per-launch (YAAGL-style), not during bottle creation.
 
                 if let pinProgramURL {
                     bottle.settings.pins.append(

@@ -35,9 +35,15 @@ extension Program {
 
         Task.detached(priority: .userInitiated) {
             do {
-                try await Wine.runProgram(
-                    at: self.url, args: arguments, bottle: self.bottle, environment: environment
-                )
+                let hk4eEnabled = self.bottle.settings.hk4eLaunchPatchingEnabled
+                let hk4eExe = self.bottle.settings.hk4eGameExecutableURL
+                if hk4eEnabled, hk4eExe == self.url {
+                    try await HK4ePatch.applyAndRun(program: self, args: arguments, environment: environment)
+                } else {
+                    try await Wine.runProgram(
+                        at: self.url, args: arguments, bottle: self.bottle, environment: environment
+                    )
+                }
             } catch {
                 await MainActor.run {
                     self.showRunError(message: error.localizedDescription)

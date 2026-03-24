@@ -179,6 +179,71 @@ struct ConfigView: View {
                     }
                 }
 
+                Toggle("Launch patching (pre/post)", isOn: $bottle.settings.hk4eLaunchPatchingEnabled)
+                Toggle("Remove crash files", isOn: $bottle.settings.hk4eRemoveCrashFiles)
+                Toggle("DXMT injection", isOn: $bottle.settings.hk4eDXMTInjectionEnabled)
+                Toggle("DXVK injection", isOn: $bottle.settings.hk4eDXVKInjectionEnabled)
+                Toggle("ReShade", isOn: $bottle.settings.hk4eReshadeEnabled)
+
+                Toggle("Left Cmd as Ctrl", isOn: $bottle.settings.hk4eLeftCommandIsCtrl)
+                Button("Apply LeftCmd Setting") {
+                    Task(priority: .userInitiated) {
+                        maintenanceBusy = true
+                        do {
+                            try await HK4eTweaks.setLeftCommandIsCtrl(bottle: bottle, enabled: bottle.settings.hk4eLeftCommandIsCtrl)
+                        } catch {
+                            print("Failed to set LeftCommandIsCtrl: \(error)")
+                        }
+                        maintenanceBusy = false
+                    }
+                }
+
+                Toggle("HDR", isOn: $bottle.settings.hk4eEnableHDR)
+                HStack {
+                    Button("Apply") {
+                        Task(priority: .userInitiated) {
+                            maintenanceBusy = true
+                            do {
+                                try await HK4eHDR.apply(bottle: bottle, executableName: bottle.settings.hk4eGameExecutableURL?.lastPathComponent)
+                            } catch {
+                                print("Failed to apply HDR: \(error)")
+                            }
+                            maintenanceBusy = false
+                        }
+                    }
+                    Button("Revert") {
+                        Task(priority: .userInitiated) {
+                            maintenanceBusy = true
+                            await HK4eHDR.revert(bottle: bottle, executableName: bottle.settings.hk4eGameExecutableURL?.lastPathComponent)
+                            maintenanceBusy = false
+                        }
+                    }
+                    Spacer()
+                }
+
+                Toggle("NV Extension", isOn: $bottle.settings.hk4eEnableNVExtension)
+                HStack {
+                    Button("Apply") {
+                        Task(priority: .userInitiated) {
+                            maintenanceBusy = true
+                            do {
+                                try await HK4eTweaks.applyNVExtension(bottle: bottle)
+                            } catch {
+                                print("Failed to apply NV extension: \(error)")
+                            }
+                            maintenanceBusy = false
+                        }
+                    }
+                    Button("Revert") {
+                        Task(priority: .userInitiated) {
+                            maintenanceBusy = true
+                            await HK4eTweaks.revertNVExtension(bottle: bottle)
+                            maintenanceBusy = false
+                        }
+                    }
+                    Spacer()
+                }
+
                 Toggle("SteamPatch", isOn: $bottle.settings.hk4eSteamPatch)
 
                 Toggle("Certificate import", isOn: $bottle.settings.hk4eCertificateImportEnabled)
@@ -306,7 +371,15 @@ struct ConfigView: View {
                     }
                 }
 
-                Text("Runtime assets: set HK4E_RUNTIME_ROOT or bundle Resources/HK4eRuntime")
+                Button("Revert Launch Patches Now") {
+                    Task(priority: .userInitiated) {
+                        maintenanceBusy = true
+                        await HK4ePatch.revertIfNeeded(bottle: bottle, prefixURL: bottle.url)
+                        maintenanceBusy = false
+                    }
+                }
+
+                Text("Patching is only used when running the selected Game Executable.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
