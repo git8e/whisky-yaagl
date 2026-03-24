@@ -36,8 +36,7 @@ public final class Bottle: ObservableObject, Equatable, Hashable, Identifiable, 
     public var pinnedPrograms: [(pin: PinnedProgram, program: Program, // swiftlint:disable:this large_tuple
                                  id: String)] {
         return settings.pins.compactMap { pin in
-            let exists = FileManager.default.fileExists(atPath: pin.url?.path(percentEncoded: false) ?? "")
-            guard let program = programs.first(where: { $0.url == pin.url && exists }) else { return nil }
+            guard let program = programs.first(where: { $0.url == pin.url }) else { return nil }
             return (pin, program, "\(pin.name)//\(program.url)")
         }
     }

@@ -53,6 +53,8 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
         initialSteamPatch: Bool = false,
         initialCertImport: Bool = true,
         initialEnableHDR: Bool = false,
+        initialProxyEnabled: Bool = false,
+        initialProxyServer: String = "",
         initialCustomResolutionEnabled: Bool = false,
         initialCustomResolutionWidth: Int = 1920,
         initialCustomResolutionHeight: Int = 1080,
@@ -110,6 +112,8 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.hk4eSteamPatch = initialSteamPatch
                 bottle.settings.hk4eCertificateImportEnabled = true
                 bottle.settings.hk4eEnableHDR = initialEnableHDR
+                bottle.settings.proxyEnabled = initialProxyEnabled
+                bottle.settings.proxyServer = initialProxyServer
                 bottle.settings.hk4eCustomResolutionEnabled = initialCustomResolutionEnabled
                 bottle.settings.hk4eCustomResolutionWidth = initialCustomResolutionWidth
                 bottle.settings.hk4eCustomResolutionHeight = initialCustomResolutionHeight
@@ -161,6 +165,11 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     if initialRetinaMode {
                         await MainActor.run { self.createBottleStatus = String(localized: "config.retinaMode") }
                         try await Wine.changeRetinaMode(bottle: bottle, retinaMode: true)
+                    }
+
+                    if bottle.settings.proxyEnabled || !bottle.settings.proxyServer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        await MainActor.run { self.createBottleStatus = String(localized: "config.proxy.status") }
+                        try await WineProxySettings.applyIfNeeded(bottle: bottle)
                     }
                 }
 

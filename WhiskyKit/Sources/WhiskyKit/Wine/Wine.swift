@@ -525,6 +525,11 @@ extension Wine {
     }
 
     @discardableResult
+    public static func taskManager(bottle: Bottle) async throws -> String {
+        return try await Wine.runWine(["taskmgr"], bottle: bottle)
+    }
+
+    @discardableResult
     public static func changeWinVersion(bottle: Bottle, win: WinVersion) async throws -> String {
         return try await Wine.runWine(["winecfg", "-v", win.rawValue], bottle: bottle)
     }
