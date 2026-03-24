@@ -143,11 +143,15 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     await MainActor.run { self.createBottleStatus = String(localized: "create.status.wineboot") }
                     _ = try await Wine.runWine(["wineboot", "-u"], bottle: bottle, environment: initEnv)
 
-                    await MainActor.run { self.createBottleStatus = String(localized: "create.status.windowsVersion") }
-                    _ = try await Wine.runWine(["winecfg", "-v", winVersion.rawValue], bottle: bottle, environment: initEnv)
+                    if winVersion != .win10 {
+                        await MainActor.run { self.createBottleStatus = String(localized: "create.status.windowsVersion") }
+                        _ = try await Wine.runWine(["winecfg", "-v", winVersion.rawValue], bottle: bottle, environment: initEnv)
+                    }
 
-                    await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
-                    try await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+                    if bottle.settings.hk4eLeftCommandIsCtrl || bottle.settings.hk4eCustomResolutionEnabled {
+                        await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
+                        try await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+                    }
 
                     if initialRetinaMode {
                         await MainActor.run { self.createBottleStatus = String(localized: "config.retinaMode") }

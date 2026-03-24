@@ -55,6 +55,10 @@ public enum HK4ePersistentConfig {
         )
     }
 
+    private static func isDefaultState(_ state: DesiredState) -> Bool {
+        state.leftCommandIsCtrl == false && state.customResolutionEnabled == false
+    }
+
     private static func loadState(bottle: Bottle) -> DesiredState? {
         do {
             let url = try stateURL(bottle: bottle)
@@ -101,6 +105,9 @@ public enum HK4ePersistentConfig {
 
     public static func applyIfNeeded(bottle: Bottle) async throws {
         let state = desiredState(bottle: bottle)
+        if isDefaultState(state) && loadState(bottle: bottle) == nil {
+            return
+        }
         if loadState(bottle: bottle) == state {
             return
         }
