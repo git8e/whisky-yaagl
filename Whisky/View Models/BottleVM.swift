@@ -181,11 +181,19 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     }
 
                     await MainActor.run { self.createBottleStatus = "Applying custom resolution" }
-                    try await HK4eResolution.apply(
-                        bottle: bottle,
-                        width: initialCustomResolutionWidth,
-                        height: initialCustomResolutionHeight
-                    )
+                    do {
+                        try await HK4eResolution.apply(
+                            bottle: bottle,
+                            width: initialCustomResolutionWidth,
+                            height: initialCustomResolutionHeight,
+                            executableName: pinProgramURL?.lastPathComponent
+                        )
+                    } catch {
+                        // Best-effort: do not fail bottle creation due to a non-critical tweak.
+                        await MainActor.run {
+                            self.createBottleStatus = "Custom resolution failed (ignored): \(error.localizedDescription)"
+                        }
+                    }
                 }
 
                 if let pinProgramURL {
