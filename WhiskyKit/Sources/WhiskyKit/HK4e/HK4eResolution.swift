@@ -71,9 +71,9 @@ public enum HK4eResolution {
         ]
 
         for key in keys {
-            _ = try await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Is Fullscreen mode_h3981298716", "-f"], bottle: bottle)
-            _ = try await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Resolution Width_h182942802", "-f"], bottle: bottle)
-            _ = try await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Resolution Height_h2627697771", "-f"], bottle: bottle)
+            _ = try? await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Is Fullscreen mode_h3981298716", "-f"], bottle: bottle)
+            _ = try? await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Resolution Width_h182942802", "-f"], bottle: bottle)
+            _ = try? await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Resolution Height_h2627697771", "-f"], bottle: bottle)
         }
     }
 
@@ -82,7 +82,9 @@ public enum HK4eResolution {
             ["reg", "add", key, "-v", name, "-t", "REG_DWORD", "-d", String(value), "-f"],
             bottle: bottle
         )
-        if output.localizedCaseInsensitiveContains("error") {
+
+        // Wine prefix init can emit unrelated errors (hostname, winemenubuilder). Only fail on registry-specific errors.
+        if output.contains("reg: Unable to") || output.contains("Unable to access or create") {
             throw HK4eResolutionError.registryWriteFailed(message: output.trimmingCharacters(in: .whitespacesAndNewlines))
         }
     }

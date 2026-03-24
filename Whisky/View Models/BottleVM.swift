@@ -117,7 +117,30 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     self.createBottleStatus = "Initializing Wine prefix"
                     self.createBottleProgress = nil
                 }
-                try await Wine.changeWinVersion(bottle: bottle, win: winVersion)
+
+                // YAAGL-style initialization: explicitly wineboot + wait, then set Win version.
+                let initEnv: [String: String] = [
+                    // Prevent winemenubuilder failures from aborting initialization.
+                    // (Some Wine builds may not ship winemenubuilder.exe in system32.)
+                    "WINEDLLOVERRIDES": "winemenubuilder.exe=d"
+                ]
+
+                await MainActor.run { self.createBottleStatus = "Running wineboot" }
+                _ = try await Wine.runWine(["wineboot", "-u"], bottle: bottle, environment: initEnv)
+                do {
+                    for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
+                } catch {
+                    // best-effort
+                }
+
+                await MainActor.run { self.createBottleStatus = "Setting Windows version" }
+                _ = try await Wine.runWine(["winecfg", "-v", winVersion.rawValue], bottle: bottle, environment: initEnv)
+                do {
+                    for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
+                } catch {
+                    // best-effort
+                }
+
                 let wineVer = try await Wine.wineVersion(bottle: bottle)
                 bottle.settings.wineVersion = SemanticVersion(wineVer) ?? SemanticVersion(0, 0, 0)
 
