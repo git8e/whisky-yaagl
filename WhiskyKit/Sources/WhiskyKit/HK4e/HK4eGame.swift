@@ -8,7 +8,6 @@ import Foundation
 public enum HK4eGame {
     public enum Region: String, Codable {
         case os
-        case cn
     }
 
     public struct Info: Codable {
@@ -19,14 +18,6 @@ public enum HK4eGame {
 
     public static func detect(executableURL: URL) -> Info {
         let exeName = executableURL.lastPathComponent
-        let gameDir = executableURL.deletingLastPathComponent()
-
-        let lower = exeName.lowercased()
-        if lower.contains("yuanshen") || FileManager.default.fileExists(atPath: gameDir.appendingPathComponent("YuanShen_Data").path) {
-            return Info(region: .cn, dataDirName: "YuanShen_Data", executableName: exeName)
-        }
-
-        // Default to OS/global.
         return Info(region: .os, dataDirName: "GenshinImpact_Data", executableName: exeName)
     }
 

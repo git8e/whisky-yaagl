@@ -77,17 +77,8 @@ public enum HK4ePatch {
         let exeURL = URL(fileURLWithPath: state.executablePath, isDirectory: false)
         let info = HK4eGame.detect(executableURL: exeURL)
 
-        if state.hdr {
-            await HK4eHDR.revert(bottle: bottle, executableName: info.executableName)
-        }
         if state.resolution {
             try? await HK4eResolution.revert(bottle: bottle)
-        }
-        if state.reshade {
-            HK4eReShade.revertGameDir(gameDir: gameDir)
-        }
-        if state.dxvk {
-            HK4eDXVK.revertPrefix(prefixURL: prefixURL)
         }
         if state.dxmt {
             HK4eDXMT.revertPrefix(prefixURL: prefixURL)
@@ -108,40 +99,17 @@ public enum HK4ePatch {
 
         await revertIfNeeded(bottle: bottle, prefixURL: prefixURL)
 
-        // Registry tweaks that should persist.
         try? await HK4eTweaks.setLeftCommandIsCtrl(bottle: bottle, enabled: bottle.settings.hk4eLeftCommandIsCtrl)
-        if bottle.settings.hk4eEnableNVExtension {
-            try? await HK4eTweaks.applyNVExtension(bottle: bottle)
-        }
 
-        // Pre-launch toggles.
-        if bottle.settings.hk4eDXMTInjectionEnabled {
-            try await HK4eDXMT.ensureInstalled()
-            HK4eDXMT.applyToRuntime(runtimeId: bottle.settings.wineRuntimeId)
-            try? HK4eDXMT.applyToPrefix(prefixURL: prefixURL)
-        }
-
-        if bottle.settings.hk4eDXVKInjectionEnabled {
-            try await HK4eDXVK.ensureInstalled()
-            try? HK4eDXVK.applyToPrefix(prefixURL: prefixURL)
-        }
-
-        if bottle.settings.hk4eReshadeEnabled {
-            try await HK4eReShade.ensureInstalled()
-            try? HK4eReShade.applyToGameDir(gameDir: gameDir)
-        }
+        try await HK4eDXMT.ensureInstalled()
+        HK4eDXMT.applyToRuntime(runtimeId: bottle.settings.wineRuntimeId)
+        try? HK4eDXMT.applyToPrefix(prefixURL: prefixURL)
 
         if bottle.settings.hk4eSteamPatch {
             try? await SteamPatch.apply(prefixURL: prefixURL)
         }
 
-        if bottle.settings.hk4eRemoveCrashFiles {
-            patchRemovedFiles(gameDir: gameDir, removed: HK4eGame.removedFiles(for: info))
-        }
-
-        if bottle.settings.hk4eEnableHDR {
-            try? await HK4eHDR.apply(bottle: bottle, executableName: info.executableName)
-        }
+        patchRemovedFiles(gameDir: gameDir, removed: HK4eGame.removedFiles(for: info))
 
         if bottle.settings.hk4eCustomResolutionEnabled {
             try? await HK4eResolution.apply(
@@ -156,11 +124,11 @@ public enum HK4ePatch {
             patched: true,
             gameDir: gameDir.path(percentEncoded: false),
             executablePath: exeURL.path(percentEncoded: false),
-            removeCrashFiles: bottle.settings.hk4eRemoveCrashFiles,
-            dxmt: bottle.settings.hk4eDXMTInjectionEnabled,
-            dxvk: bottle.settings.hk4eDXVKInjectionEnabled,
-            reshade: bottle.settings.hk4eReshadeEnabled,
-            hdr: bottle.settings.hk4eEnableHDR,
+            removeCrashFiles: true,
+            dxmt: true,
+            dxvk: false,
+            reshade: false,
+            hdr: false,
             resolution: bottle.settings.hk4eCustomResolutionEnabled
         )
         saveState(bottle: bottle, state: state)
@@ -201,7 +169,8 @@ public enum HK4ePatch {
                 name: exeURL.lastPathComponent,
                 args: launchArgs,
                 bottle: bottle,
-                environment: mergedEnv
+                environment: mergedEnv,
+                directory: work
             ) {
                 if case .terminated(let p) = output {
                     exitCode = p.terminationStatus
@@ -223,24 +192,11 @@ public enum HK4ePatch {
     }
 
     private static func postRevert(bottle: Bottle, info: HK4eGame.Info, gameDir: URL, prefixURL: URL) async {
-        if bottle.settings.hk4eEnableHDR {
-            await HK4eHDR.revert(bottle: bottle, executableName: info.executableName)
-        }
         if bottle.settings.hk4eCustomResolutionEnabled {
             try? await HK4eResolution.revert(bottle: bottle)
         }
-        if bottle.settings.hk4eReshadeEnabled {
-            HK4eReShade.revertGameDir(gameDir: gameDir)
-        }
-        if bottle.settings.hk4eDXVKInjectionEnabled {
-            HK4eDXVK.revertPrefix(prefixURL: prefixURL)
-        }
-        if bottle.settings.hk4eDXMTInjectionEnabled {
-            HK4eDXMT.revertPrefix(prefixURL: prefixURL)
-        }
-        if bottle.settings.hk4eRemoveCrashFiles {
-            revertRemovedFiles(gameDir: gameDir, removed: HK4eGame.removedFiles(for: info))
-        }
+        HK4eDXMT.revertPrefix(prefixURL: prefixURL)
+        revertRemovedFiles(gameDir: gameDir, removed: HK4eGame.removedFiles(for: info))
 
         clearState(bottle: bottle)
     }

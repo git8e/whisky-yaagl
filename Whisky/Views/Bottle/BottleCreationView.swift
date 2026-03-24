@@ -27,11 +27,7 @@ struct BottleCreationView: View {
     @State private var newBottleName: String = ""
     @State private var newBottleVersion: WinVersion = .win10
     @State private var wineRuntimeId: String = "11.0-dxmt-signed"
-    @State private var wineArchiveURL: URL?
-    @State private var initialMetalHud: Bool = false
-    @State private var initialRetinaMode: Bool = false
-    @State private var initialSteamPatch: Bool = false
-    @State private var initialCertImport: Bool = true
+    @State private var initialSteamPatch: Bool = true
     @State private var initialCustomResolutionEnabled: Bool = false
     @State private var initialCustomResolutionWidth: Int = 1920
     @State private var initialCustomResolutionHeight: Int = 1080
@@ -63,29 +59,6 @@ struct BottleCreationView: View {
                             .tag(runtime.id)
                     }
                 }
-                .onChange(of: wineRuntimeId) { _, newValue in
-                    if newValue == WineRuntimes.whiskyDefaultId {
-                        wineArchiveURL = nil
-                    }
-                }
-
-                if wineRuntimeId != WineRuntimes.whiskyDefaultId {
-                    ActionView(
-                        text: "Wine Archive (Optional)",
-                        subtitle: wineArchiveURL?.path(percentEncoded: false) ?? "Auto download on create",
-                        actionName: "Browse"
-                    ) {
-                        let panel = NSOpenPanel()
-                        panel.canChooseFiles = true
-                        panel.canChooseDirectories = false
-                        panel.allowsMultipleSelection = false
-                        panel.begin { result in
-                            if result == .OK, let url = panel.urls.first {
-                                wineArchiveURL = url
-                            }
-                        }
-                    }
-                }
 
                 ActionView(
                     text: "create.path",
@@ -105,12 +78,7 @@ struct BottleCreationView: View {
                     }
                 }
 
-                Toggle("Metal HUD", isOn: $initialMetalHud)
-                Toggle("Retina mode", isOn: $initialRetinaMode)
-
                 Toggle("SteamPatch", isOn: $initialSteamPatch)
-
-                Toggle("Certificate import (Recommended)", isOn: $initialCertImport)
 
                 Toggle("Custom resolution", isOn: $initialCustomResolutionEnabled)
                 if initialCustomResolutionEnabled {
@@ -204,11 +172,7 @@ struct BottleCreationView: View {
             winVersion: newBottleVersion,
             bottleURL: newBottleURL,
             wineRuntimeId: wineRuntimeId,
-            wineArchiveURL: wineArchiveURL,
-            initialMetalHud: initialMetalHud,
-            initialRetinaMode: initialRetinaMode,
             initialSteamPatch: initialSteamPatch,
-            initialCertImport: initialCertImport,
             initialCustomResolutionEnabled: initialCustomResolutionEnabled,
             initialCustomResolutionWidth: initialCustomResolutionWidth,
             initialCustomResolutionHeight: initialCustomResolutionHeight,

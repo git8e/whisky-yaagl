@@ -37,9 +37,6 @@ struct ConfigView: View {
     @State private var retinaModeLoadingState: LoadingState = .loading
     @State private var dpiConfigLoadingState: LoadingState = .loading
     @State private var dpiSheetPresented: Bool = false
-    @State private var steamPatchInstalled: Bool = false
-    @State private var maintenanceBusy: Bool = false
-    @State private var showResetPrefixConfirm: Bool = false
     @AppStorage("wineSectionExpanded") private var wineSectionExpanded: Bool = true
     @AppStorage("dxvkSectionExpanded") private var dxvkSectionExpanded: Bool = true
     @AppStorage("metalSectionExpanded") private var metalSectionExpanded: Bool = true
@@ -180,135 +177,9 @@ struct ConfigView: View {
                     }
                 }
 
-                Toggle("Launch patching (pre/post)", isOn: $bottle.settings.hk4eLaunchPatchingEnabled)
-                Toggle("Remove crash files", isOn: $bottle.settings.hk4eRemoveCrashFiles)
-                Toggle("DXMT injection", isOn: $bottle.settings.hk4eDXMTInjectionEnabled)
-                Toggle("DXVK injection", isOn: $bottle.settings.hk4eDXVKInjectionEnabled)
-                Toggle("ReShade", isOn: $bottle.settings.hk4eReshadeEnabled)
-
                 Toggle("Left Cmd as Ctrl", isOn: $bottle.settings.hk4eLeftCommandIsCtrl)
-                Button("Apply LeftCmd Setting") {
-                    Task(priority: .userInitiated) {
-                        maintenanceBusy = true
-                        do {
-                            try await HK4eTweaks.setLeftCommandIsCtrl(bottle: bottle, enabled: bottle.settings.hk4eLeftCommandIsCtrl)
-                        } catch {
-                            print("Failed to set LeftCommandIsCtrl: \(error)")
-                        }
-                        maintenanceBusy = false
-                    }
-                }
-
-                Toggle("HDR", isOn: $bottle.settings.hk4eEnableHDR)
-                HStack {
-                    Button("Apply") {
-                        Task(priority: .userInitiated) {
-                            maintenanceBusy = true
-                            do {
-                                try await HK4eHDR.apply(bottle: bottle, executableName: bottle.settings.hk4eGameExecutableURL?.lastPathComponent)
-                            } catch {
-                                print("Failed to apply HDR: \(error)")
-                            }
-                            maintenanceBusy = false
-                        }
-                    }
-                    Button("Revert") {
-                        Task(priority: .userInitiated) {
-                            maintenanceBusy = true
-                            await HK4eHDR.revert(bottle: bottle, executableName: bottle.settings.hk4eGameExecutableURL?.lastPathComponent)
-                            maintenanceBusy = false
-                        }
-                    }
-                    Spacer()
-                }
-
-                Toggle("NV Extension", isOn: $bottle.settings.hk4eEnableNVExtension)
-                HStack {
-                    Button("Apply") {
-                        Task(priority: .userInitiated) {
-                            maintenanceBusy = true
-                            do {
-                                try await HK4eTweaks.applyNVExtension(bottle: bottle)
-                            } catch {
-                                print("Failed to apply NV extension: \(error)")
-                            }
-                            maintenanceBusy = false
-                        }
-                    }
-                    Button("Revert") {
-                        Task(priority: .userInitiated) {
-                            maintenanceBusy = true
-                            await HK4eTweaks.revertNVExtension(bottle: bottle)
-                            maintenanceBusy = false
-                        }
-                    }
-                    Spacer()
-                }
 
                 Toggle("SteamPatch", isOn: $bottle.settings.hk4eSteamPatch)
-
-                Toggle("Certificate import", isOn: $bottle.settings.hk4eCertificateImportEnabled)
-                HStack {
-                    Button("Apply") {
-                        Task(priority: .userInitiated) {
-                            maintenanceBusy = true
-                            do {
-                                try await HK4eWineCertificates.ensurePatched(runtimeId: bottle.settings.wineRuntimeId)
-                            } catch {
-                                print("Failed to apply cert patch: \(error)")
-                            }
-                            maintenanceBusy = false
-                        }
-                    }
-                    Button("Revert") {
-                        maintenanceBusy = true
-                        do {
-                            try HK4eWineCertificates.revert(runtimeId: bottle.settings.wineRuntimeId)
-                        } catch {
-                            print("Failed to revert cert patch: \(error)")
-                        }
-                        maintenanceBusy = false
-                    }
-                    Spacer()
-                    Text("Applies to selected Wine runtime")
-                        .foregroundStyle(.secondary)
-                        .font(.subheadline)
-                }
-
-                HStack {
-                    Button("Apply") {
-                        Task(priority: .userInitiated) {
-                            maintenanceBusy = true
-                            do {
-                                try await SteamPatch.apply(prefixURL: bottle.url)
-                                await MainActor.run {
-                                    steamPatchInstalled = SteamPatch.isInstalled(prefixURL: bottle.url)
-                                }
-                            } catch {
-                                print("Failed to apply SteamPatch: \(error)")
-                            }
-                            maintenanceBusy = false
-                        }
-                    }
-                    Button("Remove") {
-                        Task(priority: .userInitiated) {
-                            maintenanceBusy = true
-                            do {
-                                try SteamPatch.remove(prefixURL: bottle.url)
-                                await MainActor.run {
-                                    steamPatchInstalled = SteamPatch.isInstalled(prefixURL: bottle.url)
-                                }
-                            } catch {
-                                print("Failed to remove SteamPatch: \(error)")
-                            }
-                            maintenanceBusy = false
-                        }
-                    }
-                    Spacer()
-                    Text(steamPatchInstalled ? "Installed" : "Not Installed")
-                        .foregroundStyle(.secondary)
-                        .font(.subheadline)
-                }
 
                 Toggle("Custom resolution", isOn: $bottle.settings.hk4eCustomResolutionEnabled)
                 HStack {
@@ -321,66 +192,9 @@ struct ConfigView: View {
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 90)
                     Spacer()
-                    Button("Apply") {
-                        Task(priority: .userInitiated) {
-                            maintenanceBusy = true
-                            do {
-                                try await HK4eResolution.apply(
-                                    bottle: bottle,
-                                    width: bottle.settings.hk4eCustomResolutionWidth,
-                                    height: bottle.settings.hk4eCustomResolutionHeight
-                                )
-                            } catch {
-                                print("Failed to apply resolution: \(error)")
-                            }
-                            maintenanceBusy = false
-                        }
-                    }
-                    Button("Revert") {
-                        Task(priority: .userInitiated) {
-                            maintenanceBusy = true
-                            do {
-                                try await HK4eResolution.revert(bottle: bottle)
-                            } catch {
-                                print("Failed to revert resolution: \(error)")
-                            }
-                            maintenanceBusy = false
-                        }
-                    }
                 }
 
-                HStack {
-                    Button("Clean HK4e Tweaks") {
-                        Task(priority: .userInitiated) {
-                            maintenanceBusy = true
-                            await BottleMaintenance.cleanHK4eTweaks(bottle: bottle)
-                            await MainActor.run {
-                                steamPatchInstalled = SteamPatch.isInstalled(prefixURL: bottle.url)
-                            }
-                            maintenanceBusy = false
-                        }
-                    }
-                    Button("Reset Prefix") {
-                        showResetPrefixConfirm = true
-                    }
-                    .foregroundStyle(.red)
-                    .disabled(maintenanceBusy)
-                    Spacer()
-                    if maintenanceBusy {
-                        ProgressView()
-                            .controlSize(.small)
-                    }
-                }
-
-                Button("Revert Launch Patches Now") {
-                    Task(priority: .userInitiated) {
-                        maintenanceBusy = true
-                        await HK4ePatch.revertIfNeeded(bottle: bottle, prefixURL: bottle.url)
-                        maintenanceBusy = false
-                    }
-                }
-
-                Text("Patching is only used when running the selected Game Executable.")
+                Text("Launch behavior follows YAAGL hk4eos: SteamPatch, DXMT and crash-file cleanup are handled automatically when running the selected executable.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -436,29 +250,8 @@ struct ConfigView: View {
             .padding()
         }
         .navigationTitle("tab.config")
-        .alert("Reset Prefix", isPresented: $showResetPrefixConfirm) {
-            Button("Reset", role: .destructive) {
-                Task(priority: .userInitiated) {
-                    maintenanceBusy = true
-                    do {
-                        try await BottleMaintenance.resetPrefix(bottle: bottle)
-                        await MainActor.run {
-                            steamPatchInstalled = SteamPatch.isInstalled(prefixURL: bottle.url)
-                        }
-                    } catch {
-                        print("Failed to reset prefix: \(error)")
-                    }
-                    maintenanceBusy = false
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("This will delete the Wine prefix contents (drive_c, registry, etc.) and recreate a fresh prefix. Metadata and Program Settings will be kept.")
-        }
         .onAppear {
             winVersionLoadingState = .success
-
-            steamPatchInstalled = SteamPatch.isInstalled(prefixURL: bottle.url)
 
             loadBuildName()
 

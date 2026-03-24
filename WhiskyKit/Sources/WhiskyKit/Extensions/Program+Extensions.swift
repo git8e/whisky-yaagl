@@ -40,9 +40,8 @@ extension Program {
             }
             do {
                 try await Wine.withLogSession(for: self.bottle) {
-                    let hk4eEnabled = self.bottle.settings.hk4eLaunchPatchingEnabled
                     let hk4eExe = self.bottle.settings.hk4eGameExecutableURL
-                    if hk4eEnabled, hk4eExe == self.url {
+                    if hk4eExe == self.url {
                         try await HK4ePatch.applyAndRun(program: self, args: arguments, environment: environment)
                     } else {
                         try await Wine.runProgram(

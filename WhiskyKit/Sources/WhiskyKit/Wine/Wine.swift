@@ -49,11 +49,12 @@ public class Wine {
     /// Run a `wine` process with the given arguments and environment variables returning a stream of output
     private static func runWineProcess(
         name: String? = nil, args: [String], environment: [String: String] = [:],
-        executableURL: URL = defaultWineBinary,
+        executableURL: URL = defaultWineBinary, directory: URL? = nil,
         fileHandle: FileHandle?
     ) throws -> AsyncStream<ProcessOutput> {
         return try runProcess(
             name: name, args: args, environment: environment, executableURL: executableURL,
+            directory: directory,
             fileHandle: fileHandle
         )
     }
@@ -72,7 +73,7 @@ public class Wine {
 
     /// Run a `wine` process with the given arguments and environment variables returning a stream of output
     public static func runWineProcess(
-        name: String? = nil, args: [String], bottle: Bottle, environment: [String: String] = [:]
+        name: String? = nil, args: [String], bottle: Bottle, environment: [String: String] = [:], directory: URL? = nil
     ) throws -> AsyncStream<ProcessOutput> {
         let fileHandle = try makeFileHandle()
         if Self.currentLogSessionURL == nil {
@@ -86,6 +87,7 @@ public class Wine {
             name: name, args: args,
             environment: constructWineEnvironment(for: bottle, environment: environment),
             executableURL: wineBinary,
+            directory: directory,
             fileHandle: fileHandle
         )
     }
