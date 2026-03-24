@@ -29,12 +29,15 @@ public enum HK4eReShade {
         let setupExe = dir.appending(path: "install.exe")
         let compiler = dir.appending(path: "d3dcompiler_47.dll")
 
-        try await HK4eDownloader.downloadOnce(url: setupURL, destination: setupExe, progress: progress.map { cb in
-            return { frac in cb(frac * 0.7) }
-        })
-        try await HK4eDownloader.downloadOnce(url: compilerURL, destination: compiler, progress: progress.map { cb in
-            return { frac in cb(0.7 + frac * 0.3) }
-        })
+        var p1: (@Sendable (Double) -> Void)?
+        var p2: (@Sendable (Double) -> Void)?
+        if let cb = progress {
+            p1 = { frac in cb(frac * 0.7) }
+            p2 = { frac in cb(0.7 + frac * 0.3) }
+        }
+
+        try await HK4eDownloader.downloadOnce(url: setupURL, destination: setupExe, progress: p1)
+        try await HK4eDownloader.downloadOnce(url: compilerURL, destination: compiler, progress: p2)
 
         // Extract embedded zip from the setup EXE.
         let zipURL = dir.appending(path: "install.zip")
