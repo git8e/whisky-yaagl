@@ -99,7 +99,9 @@ public enum HK4ePatch {
 
         await revertIfNeeded(bottle: bottle, prefixURL: prefixURL)
 
-        try await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+        if bottle.settings.hk4eLeftCommandIsCtrl || bottle.settings.hk4eCustomResolutionEnabled {
+            try await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+        }
 
         try await HK4eDXMT.ensureInstalled()
         HK4eDXMT.applyToRuntime(runtimeId: bottle.settings.wineRuntimeId)
