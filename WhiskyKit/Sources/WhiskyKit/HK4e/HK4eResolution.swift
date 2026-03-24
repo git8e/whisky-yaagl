@@ -44,31 +44,41 @@ public enum HK4eResolution {
         try data.write(to: url)
     }
 
-    public static func apply(bottle: Bottle, width: Int, height: Int) async throws {
+    public static func apply(
+        bottle: Bottle,
+        width: Int,
+        height: Int,
+        executableName: String? = nil
+    ) async throws {
         guard width > 0, height > 0 else {
             throw HK4eResolutionError.invalidSize(width: width, height: height)
         }
 
-        let keys: [String] = [
-            #"HKEY_CURRENT_USER\\Software\\miHoYo\\Genshin Impact"#,
-            #"HKEY_CURRENT_USER\\Software\\miHoYo\\GenshinImpact"#,
-            #"HKEY_CURRENT_USER\\Software\\miHoYo\\原神"#
-        ]
+        let keys = targetKeys(executableName: executableName)
 
         // Use `reg add` so the key is created if missing.
+        // Best-effort across candidate keys (some Wine builds may fail on certain Unicode keys).
+        var didSucceed = false
+        var lastError: String?
+
         for key in keys {
-            try await runRegAddDword(bottle: bottle, key: key, name: "Screenmanager Is Fullscreen mode_h3981298716", value: 0)
-            try await runRegAddDword(bottle: bottle, key: key, name: "Screenmanager Resolution Width_h182942802", value: width)
-            try await runRegAddDword(bottle: bottle, key: key, name: "Screenmanager Resolution Height_h2627697771", value: height)
+            do {
+                try await runRegAddDword(bottle: bottle, key: key, name: "Screenmanager Is Fullscreen mode_h3981298716", value: 0)
+                try await runRegAddDword(bottle: bottle, key: key, name: "Screenmanager Resolution Width_h182942802", value: width)
+                try await runRegAddDword(bottle: bottle, key: key, name: "Screenmanager Resolution Height_h2627697771", value: height)
+                didSucceed = true
+            } catch {
+                lastError = error.localizedDescription
+            }
+        }
+
+        if !didSucceed {
+            throw HK4eResolutionError.registryWriteFailed(message: lastError ?? "Failed to write resolution registry keys")
         }
     }
 
     public static func revert(bottle: Bottle) async throws {
-        let keys: [String] = [
-            #"HKEY_CURRENT_USER\\Software\\miHoYo\\Genshin Impact"#,
-            #"HKEY_CURRENT_USER\\Software\\miHoYo\\GenshinImpact"#,
-            #"HKEY_CURRENT_USER\\Software\\miHoYo\\原神"#
-        ]
+        let keys = targetKeys(executableName: nil)
 
         for key in keys {
             _ = try? await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Is Fullscreen mode_h3981298716", "-f"], bottle: bottle)
@@ -83,10 +93,36 @@ public enum HK4eResolution {
             bottle: bottle
         )
 
-        // Wine prefix init can emit unrelated errors (hostname, winemenubuilder). Only fail on registry-specific errors.
+        // Wine prefix init can emit unrelated errors (hostname, winemenubuilder).
+        // Only fail on registry-specific errors and keep the message short.
         if output.contains("reg: Unable to") || output.contains("Unable to access or create") {
-            throw HK4eResolutionError.registryWriteFailed(message: output.trimmingCharacters(in: .whitespacesAndNewlines))
+            let msg = output
+                .split(whereSeparator: { $0.isNewline })
+                .last
+                .map(String.init)
+                ?? output
+            throw HK4eResolutionError.registryWriteFailed(message: msg)
         }
+    }
+
+    private static func targetKeys(executableName: String?) -> [String] {
+        let base = #"HKEY_CURRENT_USER\\Software\\miHoYo\\"#
+
+        if let executableName {
+            let lower = executableName.lowercased()
+            if lower.contains("yuanshen") {
+                return [base + "原神"]
+            }
+            if lower.contains("genshinimpact") {
+                return [base + "GenshinImpact", base + "Genshin Impact"]
+            }
+            if lower.contains("genshin") {
+                return [base + "Genshin Impact", base + "GenshinImpact"]
+            }
+        }
+
+        // Unknown executable: try common variants.
+        return [base + "GenshinImpact", base + "Genshin Impact", base + "原神"]
     }
 }
 
