@@ -20,6 +20,8 @@ import Foundation
 import os.log
 
 public class Wine {
+    @TaskLocal public static var currentLogSessionURL: URL?
+
     /// URL to the installed `DXVK` folder
     private static let dxvkFolder: URL = WhiskyWineInstaller.libraryFolder.appending(path: "DXVK")
     /// Path to the default `wine64` binary
@@ -73,8 +75,10 @@ public class Wine {
         name: String? = nil, args: [String], bottle: Bottle, environment: [String: String] = [:]
     ) throws -> AsyncStream<ProcessOutput> {
         let fileHandle = try makeFileHandle()
-        fileHandle.writeApplicaitonInfo()
-        fileHandle.writeInfo(for: bottle)
+        if Self.currentLogSessionURL == nil {
+            fileHandle.writeApplicaitonInfo()
+            fileHandle.writeInfo(for: bottle)
+        }
 
         let wineBinary = WineRuntimeManager.wineBinary(runtimeId: bottle.settings.wineRuntimeId)
 
@@ -91,8 +95,10 @@ public class Wine {
         name: String? = nil, args: [String], bottle: Bottle, environment: [String: String] = [:]
     ) throws -> AsyncStream<ProcessOutput> {
         let fileHandle = try makeFileHandle()
-        fileHandle.writeApplicaitonInfo()
-        fileHandle.writeInfo(for: bottle)
+        if Self.currentLogSessionURL == nil {
+            fileHandle.writeApplicaitonInfo()
+            fileHandle.writeInfo(for: bottle)
+        }
 
         let wineserverBinary = WineRuntimeManager.wineserverBinary(runtimeId: bottle.settings.wineRuntimeId)
 
@@ -183,11 +189,16 @@ public class Wine {
     ) async throws -> String {
         var result: [String] = []
         let fileHandle = try makeFileHandle()
-        fileHandle.writeApplicaitonInfo()
         var environment = environment
 
+        if Self.currentLogSessionURL == nil {
+            fileHandle.writeApplicaitonInfo()
+        }
+
         if let bottle = bottle {
-            fileHandle.writeInfo(for: bottle)
+            if Self.currentLogSessionURL == nil {
+                fileHandle.writeInfo(for: bottle)
+            }
             environment = constructWineEnvironment(for: bottle, environment: environment)
         }
 
@@ -309,6 +320,17 @@ enum RegistryType: String {
 extension Wine {
     public static let logsFolder = WhiskyPaths.logsRoot
 
+    public static func withLogSession<T>(for bottle: Bottle?, operation: () async throws -> T) async throws -> T {
+        if Self.currentLogSessionURL != nil {
+            return try await operation()
+        }
+
+        let sessionURL = try createLogSessionURL(bottle: bottle)
+        return try await Self.$currentLogSessionURL.withValue(sessionURL) {
+            try await operation()
+        }
+    }
+
     public static func latestLogFileURL() -> URL? {
         let fm = FileManager.default
         let logsPath = logsFolder.path(percentEncoded: false)
@@ -331,10 +353,32 @@ extension Wine {
             try FileManager.default.createDirectory(at: Self.logsFolder, withIntermediateDirectories: true)
         }
 
-        let dateString = Date.now.ISO8601Format()
-        let fileURL = Self.logsFolder.appending(path: dateString).appendingPathExtension("log")
+        if let sessionURL = Self.currentLogSessionURL {
+            let handle = try FileHandle(forWritingTo: sessionURL)
+            try handle.seekToEnd()
+            return handle
+        }
+
+        let fileURL = nextLogFileURL()
         try "".write(to: fileURL, atomically: true, encoding: .utf8)
         return try FileHandle(forWritingTo: fileURL)
+    }
+
+    private static func createLogSessionURL(bottle: Bottle?) throws -> URL {
+        let fileURL = nextLogFileURL()
+        try "".write(to: fileURL, atomically: true, encoding: .utf8)
+        let fileHandle = try FileHandle(forWritingTo: fileURL)
+        fileHandle.writeApplicaitonInfo()
+        if let bottle {
+            fileHandle.writeInfo(for: bottle)
+        }
+        try fileHandle.close()
+        return fileURL
+    }
+
+    private static func nextLogFileURL() -> URL {
+        let dateString = Date.now.ISO8601Format()
+        return Self.logsFolder.appending(path: dateString).appendingPathExtension("log")
     }
 }
 
