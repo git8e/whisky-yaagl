@@ -81,6 +81,18 @@ During bottle creation you can select:
 If the selected runtime is not installed, it will be downloaded once and cached.
 You can also point to a local archive (`.tar.gz` / `.tar.xz`).
 
+## Storage Location
+
+This fork stores data under:
+
+- `~/Library/Application Support/Whisky/`
+  - `Bottles/` (Wine prefixes)
+  - `Libraries/` (WhiskyWine + additional Wine runtimes)
+  - `Downloads/` (cached Wine/sidecar downloads)
+
+Legacy data under `~/Library/Containers/com.isaacmarovitz.Whisky/` and
+`~/Library/Application Support/com.isaacmarovitz.Whisky/` is migrated on first run when possible.
+
 ### Bottle HK4e Tools (Manual / One-Time)
 
 In Bottle -> Config -> HK4e:
@@ -98,6 +110,18 @@ Important: this fork does NOT patch/revert on every launch.
 SteamPatch automatically downloads the required `protonextras` from the YAAGL repository (only the 4 required files) and caches it locally.
 
 If the repository download is unavailable, it falls back to downloading the latest YAAGL app tarball and extracting `sidecar/protonextras`.
+
+## First-Run Setup
+
+On first launch, a setup screen lets you download any of the 4 Wine runtimes.
+Wine 11.0 DXMT is downloaded by default (recommended).
+
+During bottle creation, the prefix initialization follows a YAAGL-style sequence:
+
+- `wineboot -u` -> `wineserver -w`
+- set Windows version -> `wineserver -w`
+
+Non-fatal bootstrap diagnostics (e.g. missing `winemenubuilder.exe`) should not block bottle creation.
 
 Optional override:
 

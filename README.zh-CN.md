@@ -34,6 +34,17 @@ open "Whisky.app"
 
 如果对应 Wine 运行时未安装：只会下载一次并缓存；也可以手动选择本地压缩包（`.tar.gz` / `.tar.xz`）。
 
+## 数据存储目录
+
+本 fork 的数据存储在：
+
+- `~/Library/Application Support/Whisky/`
+  - `Bottles/`（容器 / Wine prefix）
+  - `Libraries/`（WhiskyWine 以及其它 Wine 运行时）
+  - `Downloads/`（Wine/sidecar 下载缓存）
+
+如果存在旧数据（例如 `~/Library/Containers/com.isaacmarovitz.Whisky/`、`~/Library/Application Support/com.isaacmarovitz.Whisky/`），首次运行会尽量自动迁移。
+
 ### 容器里的 HK4e 工具（手动/一次性）
 
 在 Bottle -> Config -> HK4e：
@@ -51,6 +62,18 @@ open "Whisky.app"
 SteamPatch 会自动从 YAAGL 仓库直接下载所需的 `protonextras`（只下 4 个必需文件）并缓存到本机（只下载一次）。
 
 如果仓库下载不可用，会降级为下载最新 YAAGL 应用 tarball 并解出 `sidecar/protonextras`。
+
+## 首次启动依赖下载
+
+首次启动会进入一个 Wine 运行时下载页，你可以对 4 个 Wine 运行时分别点击开关触发下载。
+默认会自动开始下载 Wine 11.0 DXMT（推荐）。
+
+创建容器时的 prefix 初始化按 YAAGL 风格执行：
+
+- `wineboot -u` -> `wineserver -w`
+- 设置 Windows 版本 -> `wineserver -w`
+
+像 `winemenubuilder.exe` 缺失这类非致命日志不应导致创建容器失败。
 
 可选：你仍然可以用环境变量覆盖资源路径：`HK4E_RUNTIME_ROOT=/path/to/yaaglwdos`。
 
