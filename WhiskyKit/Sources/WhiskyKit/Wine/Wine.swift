@@ -303,6 +303,23 @@ enum RegistryType: String {
 extension Wine {
     public static let logsFolder = WhiskyPaths.logsRoot
 
+    public static func latestLogFileURL() -> URL? {
+        let fm = FileManager.default
+        let logsPath = logsFolder.path(percentEncoded: false)
+        guard fm.fileExists(atPath: logsPath) else { return nil }
+        do {
+            let urls = try fm.contentsOfDirectory(at: logsFolder, includingPropertiesForKeys: [.contentModificationDateKey])
+                .filter { $0.pathExtension == "log" }
+            return urls.sorted {
+                let d1 = (try? $0.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                let d2 = (try? $1.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                return d1 < d2
+            }.last
+        } catch {
+            return nil
+        }
+    }
+
     public static func makeFileHandle() throws -> FileHandle {
         if !FileManager.default.fileExists(atPath: Self.logsFolder.path) {
             try FileManager.default.createDirectory(at: Self.logsFolder, withIntermediateDirectories: true)

@@ -14,7 +14,7 @@ public enum HK4eWineCertificates {
     private static let markerBegin = "; YAAGL_WINE_INF_CERT_BEGIN"
     private static let markerEnd = "; YAAGL_WINE_INF_CERT_END"
 
-    // Default location is this fork's public asset file.
+    // Certificate payload is bundled in the app resources. A remote fallback is kept for recovery.
     // Can be overridden via HK4E_WINE_INF_CERT_URL.
     private static let defaultCertURL = URL(
         string: "https://raw.githubusercontent.com/git8e/whisky-yaagl/main/assets/wine_inf_cert_str.txt"
@@ -80,6 +80,14 @@ public enum HK4eWineCertificates {
     }
 
     private static func fetchWineInfCertSection() async throws -> String {
+        if let bundled = Bundle.main.url(forResource: "wine_inf_cert_str", withExtension: "txt") {
+            let body = (try? String(contentsOf: bundled, encoding: .utf8)) ?? ""
+            let trimmed = body.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty {
+                return body
+            }
+        }
+
         let url = ProcessInfo.processInfo.environment["HK4E_WINE_INF_CERT_URL"].flatMap(URL.init(string:)) ?? defaultCertURL
 
         var req = URLRequest(url: url)

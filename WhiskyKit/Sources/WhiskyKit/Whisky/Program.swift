@@ -48,6 +48,9 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
         }
     }
 
+    @Published public var isLaunching: Bool = false
+    @Published public var lastExitCode: Int? = nil
+
     public let peFile: PEFile?
 
     public init(url: URL, bottle: Bottle) {

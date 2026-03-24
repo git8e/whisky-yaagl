@@ -28,6 +28,7 @@ struct ProgramMenuView: View {
             program.run()
         }
         .labelStyle(.titleAndIcon)
+        .disabled(program.isLaunching)
         Section("program.settings") {
             Button("program.config", systemImage: "gearshape") {
                 path.append(program)

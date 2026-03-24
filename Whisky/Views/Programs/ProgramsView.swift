@@ -189,6 +189,12 @@ struct ProgramItemView: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
                 .help("button.run")
+                .disabled(program.isLaunching)
+                if program.isLaunching {
+                    ProgressView()
+                        .controlSize(.mini)
+                        .padding(.leading, 4)
+                }
             }
         }
         .padding(4)
