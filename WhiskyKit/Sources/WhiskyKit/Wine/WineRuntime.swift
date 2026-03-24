@@ -45,12 +45,6 @@ public enum WineRuntimes {
 
     public static let all: [WineRuntime] = [
         WineRuntime(
-            id: whiskyDefaultId,
-            displayName: "WhiskyWine (Default)",
-            remoteURL: nil,
-            archive: .init(winePathInArchive: nil)
-        ),
-        WineRuntime(
             id: "11.0-dxmt-signed",
             displayName: "Wine 11.0 DXMT (signed)",
             remoteURL: URL(
@@ -74,6 +68,13 @@ public enum WineRuntimes {
             id: "9.9-dxmt",
             displayName: "Wine 9.9 DXMT",
             remoteURL: URL(string: "https://github.com/3Shain/wine/releases/download/v9.9-mingw/wine.tar.gz"),
+            archive: .init(winePathInArchive: nil)
+        ),
+        // Keep WhiskyWine as the lowest priority runtime in the UI.
+        WineRuntime(
+            id: whiskyDefaultId,
+            displayName: "WhiskyWine",
+            remoteURL: nil,
             archive: .init(winePathInArchive: nil)
         )
     ]
