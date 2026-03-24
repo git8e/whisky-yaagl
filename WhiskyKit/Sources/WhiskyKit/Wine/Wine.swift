@@ -185,19 +185,19 @@ public class Wine {
     @discardableResult
     /// Run a `wine` command with the given arguments and return the output result
     public static func runWine(
-        _ args: [String], bottle: Bottle?, environment: [String: String] = [:]
+        _ args: [String], bottle: Bottle?, environment: [String: String] = [:], log: Bool = true
     ) async throws -> String {
         var result: [String] = []
-        let fileHandle = try makeFileHandle()
+        let fileHandle = log ? try makeFileHandle() : nil
         var environment = environment
 
-        if Self.currentLogSessionURL == nil {
-            fileHandle.writeApplicaitonInfo()
+        if log, Self.currentLogSessionURL == nil {
+            fileHandle?.writeApplicaitonInfo()
         }
 
         if let bottle = bottle {
-            if Self.currentLogSessionURL == nil {
-                fileHandle.writeInfo(for: bottle)
+            if log, Self.currentLogSessionURL == nil {
+                fileHandle?.writeInfo(for: bottle)
             }
             environment = constructWineEnvironment(for: bottle, environment: environment)
         }
@@ -401,7 +401,7 @@ extension Wine {
     private static func queryRegistryKey(
         bottle: Bottle, key: String, name: String, type: RegistryType
     ) async throws -> String? {
-        let output = try await runWine(["reg", "query", key, "-v", name], bottle: bottle)
+        let output = try await runWine(["reg", "query", key, "-v", name], bottle: bottle, log: false)
         if output.contains("Unable to find the specified registry value") ||
             output.contains("Unable to access or create the specified registry key") ||
             output.contains("Invalid system key") {
@@ -487,7 +487,34 @@ extension Wine {
 
     @discardableResult
     public static func regedit(bottle: Bottle) async throws -> String {
-        return try await Wine.runWine(["regedit"], bottle: bottle)
+        let fileHandle = try makeFileHandle()
+        if Self.currentLogSessionURL == nil {
+            fileHandle.writeApplicaitonInfo()
+            fileHandle.writeInfo(for: bottle)
+        }
+
+        let regeditBinary = WineRuntimeManager.binFolder(runtimeId: bottle.settings.wineRuntimeId).appending(path: "regedit")
+        let executableURL = FileManager.default.fileExists(atPath: regeditBinary.path(percentEncoded: false))
+            ? regeditBinary
+            : WineRuntimeManager.wineBinary(runtimeId: bottle.settings.wineRuntimeId)
+        let args: [String] = executableURL == regeditBinary ? [] : ["regedit"]
+
+        var result: [String] = []
+        for await output in try runProcess(
+            name: "regedit",
+            args: args,
+            environment: constructWineEnvironment(for: bottle),
+            executableURL: executableURL,
+            fileHandle: fileHandle
+        ) {
+            switch output {
+            case .started, .terminated:
+                break
+            case .message(let message), .error(let message):
+                result.append(message)
+            }
+        }
+        return result.joined()
     }
 
     @discardableResult

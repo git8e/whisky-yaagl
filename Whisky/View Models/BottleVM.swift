@@ -118,73 +118,75 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     bottle.settings.hk4eLaunchPatchingEnabled = true
                 }
 
-                await MainActor.run {
-                    self.createBottleStatus = "Initializing Wine prefix"
-                    self.createBottleProgress = nil
-                }
-
-                // YAAGL-style initialization: explicitly wineboot + wait, then set Win version.
-                let initEnv: [String: String] = [
-                    // Prevent winemenubuilder failures from aborting initialization.
-                    // (Some Wine builds may not ship winemenubuilder.exe in system32.)
-                    "WINEDLLOVERRIDES": "winemenubuilder.exe=d",
-                    // Keep bootstrap noise from surfacing as fatal errors.
-                    "WINEDEBUG": "-all"
-                ]
-
-                if bottle.settings.hk4eCertificateImportEnabled {
-                    await MainActor.run { self.createBottleStatus = "Importing certificates" }
-                    do {
-                        try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
-                    } catch {
-                        await MainActor.run {
-                            self.createBottleStatus = "Certificate import failed (ignored): \(error.localizedDescription)"
-                        }
-                    }
-                }
-
-                await MainActor.run { self.createBottleStatus = "Running wineboot" }
-                _ = try await Wine.runWine(["wineboot", "-u"], bottle: bottle, environment: initEnv)
-                do {
-                    for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
-                } catch {
-                    // best-effort
-                }
-
-                await MainActor.run { self.createBottleStatus = "Setting Windows version" }
-                _ = try await Wine.runWine(["winecfg", "-v", winVersion.rawValue], bottle: bottle, environment: initEnv)
-                do {
-                    for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
-                } catch {
-                    // best-effort
-                }
-
-                let wineVer = try await Wine.wineVersion(bottle: bottle)
-                bottle.settings.wineVersion = SemanticVersion(wineVer) ?? SemanticVersion(0, 0, 0)
-
-                if initialRetinaMode {
-                    await MainActor.run { self.createBottleStatus = "Applying Retina mode" }
-                    try await Wine.changeRetinaMode(bottle: bottle, retinaMode: true)
-                }
-
-                if initialSteamPatch {
+                try await Wine.withLogSession(for: bottle) {
                     await MainActor.run {
-                        self.createBottleStatus = "Applying SteamPatch"
+                        self.createBottleStatus = "Initializing Wine prefix"
                         self.createBottleProgress = nil
                     }
-                    try await SteamPatch.apply(
-                        prefixURL: bottle.url,
-                        status: { message in
-                            Task { @MainActor in
-                                self.createBottleStatus = message
-                            }
-                        },
-                        progress: { frac in
-                            Task { @MainActor in
-                                self.createBottleProgress = frac
+
+                    // YAAGL-style initialization: explicitly wineboot + wait, then set Win version.
+                    let initEnv: [String: String] = [
+                        // Prevent winemenubuilder failures from aborting initialization.
+                        // (Some Wine builds may not ship winemenubuilder.exe in system32.)
+                        "WINEDLLOVERRIDES": "winemenubuilder.exe=d",
+                        // Keep bootstrap noise from surfacing as fatal errors.
+                        "WINEDEBUG": "-all"
+                    ]
+
+                    if bottle.settings.hk4eCertificateImportEnabled {
+                        await MainActor.run { self.createBottleStatus = "Importing certificates" }
+                        do {
+                            try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
+                        } catch {
+                            await MainActor.run {
+                                self.createBottleStatus = "Certificate import failed (ignored): \(error.localizedDescription)"
                             }
                         }
-                    )
+                    }
+
+                    await MainActor.run { self.createBottleStatus = "Running wineboot" }
+                    _ = try await Wine.runWine(["wineboot", "-u"], bottle: bottle, environment: initEnv)
+                    do {
+                        for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
+                    } catch {
+                        // best-effort
+                    }
+
+                    await MainActor.run { self.createBottleStatus = "Setting Windows version" }
+                    _ = try await Wine.runWine(["winecfg", "-v", winVersion.rawValue], bottle: bottle, environment: initEnv)
+                    do {
+                        for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
+                    } catch {
+                        // best-effort
+                    }
+
+                    let wineVer = try await Wine.wineVersion(bottle: bottle)
+                    bottle.settings.wineVersion = SemanticVersion(wineVer) ?? SemanticVersion(0, 0, 0)
+
+                    if initialRetinaMode {
+                        await MainActor.run { self.createBottleStatus = "Applying Retina mode" }
+                        try await Wine.changeRetinaMode(bottle: bottle, retinaMode: true)
+                    }
+
+                    if initialSteamPatch {
+                        await MainActor.run {
+                            self.createBottleStatus = "Applying SteamPatch"
+                            self.createBottleProgress = nil
+                        }
+                        try await SteamPatch.apply(
+                            prefixURL: bottle.url,
+                            status: { message in
+                                Task { @MainActor in
+                                    self.createBottleStatus = message
+                                }
+                            },
+                            progress: { frac in
+                                Task { @MainActor in
+                                    self.createBottleProgress = frac
+                                }
+                            }
+                        )
+                    }
                 }
 
                 // Custom resolution is applied per-launch (YAAGL-style), not during bottle creation.

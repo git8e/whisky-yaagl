@@ -54,7 +54,7 @@ public enum HK4eResolution {
             throw HK4eResolutionError.invalidSize(width: width, height: height)
         }
 
-        let keys = targetKeys(executableName: executableName)
+        let keys = applyKeys(executableName: executableName)
 
         // Use `reg add` so the key is created if missing.
         // Best-effort across candidate keys (some Wine builds may fail on certain Unicode keys).
@@ -78,7 +78,7 @@ public enum HK4eResolution {
     }
 
     public static func revert(bottle: Bottle) async throws {
-        let keys = targetKeys(executableName: nil)
+        let keys = revertKeys()
 
         for key in keys {
             _ = try? await Wine.runWine(["reg", "delete", key, "-v", "Screenmanager Is Fullscreen mode_h3981298716", "-f"], bottle: bottle)
@@ -106,7 +106,7 @@ public enum HK4eResolution {
         }
     }
 
-    private static func targetKeys(executableName: String?) -> [String] {
+    private static func applyKeys(executableName: String?) -> [String] {
         let base = #"HKEY_CURRENT_USER\Software\miHoYo\"#
 
         if let executableName {
@@ -115,15 +115,16 @@ public enum HK4eResolution {
                 return [base + "原神"]
             }
             if lower.contains("genshinimpact") {
-                return [base + "GenshinImpact", base + "Genshin Impact"]
-            }
-            if lower.contains("genshin") {
-                return [base + "Genshin Impact", base + "GenshinImpact"]
+                return [base + "Genshin Impact"]
             }
         }
 
-        // Unknown executable: try common variants.
-        return [base + "GenshinImpact", base + "Genshin Impact", base + "原神"]
+        return [base + "Genshin Impact"]
+    }
+
+    private static func revertKeys() -> [String] {
+        let base = #"HKEY_CURRENT_USER\Software\miHoYo\"#
+        return [base + "Genshin Impact", base + "GenshinImpact", base + "原神"]
     }
 }
 
