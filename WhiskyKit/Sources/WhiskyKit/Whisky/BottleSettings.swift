@@ -152,6 +152,15 @@ public struct BottleHK4eConfig: Codable, Equatable {
     var customResolutionHeight: Int = 1080
     var gameExecutableURL: URL?
     var certificateImportEnabled: Bool = true
+    var leftCommandIsCtrl: Bool = false
+    var enableHDR: Bool = false
+    var enableNVExtension: Bool = false
+
+    var launchPatchingEnabled: Bool = false
+    var removeCrashFiles: Bool = true
+    var dxmtInjectionEnabled: Bool = false
+    var dxvkInjectionEnabled: Bool = false
+    var reshadeEnabled: Bool = false
 
     public init() {}
 
@@ -163,6 +172,14 @@ public struct BottleHK4eConfig: Codable, Equatable {
         self.customResolutionHeight = try container.decodeIfPresent(Int.self, forKey: .customResolutionHeight) ?? 1080
         self.gameExecutableURL = try container.decodeIfPresent(URL.self, forKey: .gameExecutableURL)
         self.certificateImportEnabled = try container.decodeIfPresent(Bool.self, forKey: .certificateImportEnabled) ?? true
+        self.leftCommandIsCtrl = try container.decodeIfPresent(Bool.self, forKey: .leftCommandIsCtrl) ?? false
+        self.enableHDR = try container.decodeIfPresent(Bool.self, forKey: .enableHDR) ?? false
+        self.enableNVExtension = try container.decodeIfPresent(Bool.self, forKey: .enableNVExtension) ?? false
+        self.launchPatchingEnabled = try container.decodeIfPresent(Bool.self, forKey: .launchPatchingEnabled) ?? false
+        self.removeCrashFiles = try container.decodeIfPresent(Bool.self, forKey: .removeCrashFiles) ?? true
+        self.dxmtInjectionEnabled = try container.decodeIfPresent(Bool.self, forKey: .dxmtInjectionEnabled) ?? false
+        self.dxvkInjectionEnabled = try container.decodeIfPresent(Bool.self, forKey: .dxvkInjectionEnabled) ?? false
+        self.reshadeEnabled = try container.decodeIfPresent(Bool.self, forKey: .reshadeEnabled) ?? false
     }
 }
 
@@ -300,6 +317,46 @@ public struct BottleSettings: Codable, Equatable {
     public var hk4eCertificateImportEnabled: Bool {
         get { return hk4eConfig.certificateImportEnabled }
         set { hk4eConfig.certificateImportEnabled = newValue }
+    }
+
+    public var hk4eLeftCommandIsCtrl: Bool {
+        get { return hk4eConfig.leftCommandIsCtrl }
+        set { hk4eConfig.leftCommandIsCtrl = newValue }
+    }
+
+    public var hk4eEnableHDR: Bool {
+        get { return hk4eConfig.enableHDR }
+        set { hk4eConfig.enableHDR = newValue }
+    }
+
+    public var hk4eEnableNVExtension: Bool {
+        get { return hk4eConfig.enableNVExtension }
+        set { hk4eConfig.enableNVExtension = newValue }
+    }
+
+    public var hk4eLaunchPatchingEnabled: Bool {
+        get { return hk4eConfig.launchPatchingEnabled }
+        set { hk4eConfig.launchPatchingEnabled = newValue }
+    }
+
+    public var hk4eRemoveCrashFiles: Bool {
+        get { return hk4eConfig.removeCrashFiles }
+        set { hk4eConfig.removeCrashFiles = newValue }
+    }
+
+    public var hk4eDXMTInjectionEnabled: Bool {
+        get { return hk4eConfig.dxmtInjectionEnabled }
+        set { hk4eConfig.dxmtInjectionEnabled = newValue }
+    }
+
+    public var hk4eDXVKInjectionEnabled: Bool {
+        get { return hk4eConfig.dxvkInjectionEnabled }
+        set { hk4eConfig.dxvkInjectionEnabled = newValue }
+    }
+
+    public var hk4eReshadeEnabled: Bool {
+        get { return hk4eConfig.reshadeEnabled }
+        set { hk4eConfig.reshadeEnabled = newValue }
     }
 
     @discardableResult
