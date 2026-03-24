@@ -124,7 +124,7 @@ public enum HK4eResolution {
 
     private static func revertKeys() -> [String] {
         let base = #"HKEY_CURRENT_USER\Software\miHoYo\"#
-        return [base + "Genshin Impact", base + "GenshinImpact", base + "原神"]
+        return [base + "Genshin Impact"]
     }
 }
 

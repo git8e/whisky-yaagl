@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import SemanticVersion
 import WhiskyKit
 
 // swiftlint:disable:next todo
@@ -107,16 +106,12 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.windowsVersion = winVersion
                 bottle.settings.name = bottleName
 
-                bottle.settings.metalHud = initialMetalHud
-
                 bottle.settings.hk4eSteamPatch = initialSteamPatch
-                bottle.settings.hk4eCertificateImportEnabled = initialCertImport
+                bottle.settings.hk4eCertificateImportEnabled = true
                 bottle.settings.hk4eCustomResolutionEnabled = initialCustomResolutionEnabled
                 bottle.settings.hk4eCustomResolutionWidth = initialCustomResolutionWidth
                 bottle.settings.hk4eCustomResolutionHeight = initialCustomResolutionHeight
-                if pinProgramURL != nil {
-                    bottle.settings.hk4eLaunchPatchingEnabled = true
-                }
+                bottle.settings.hk4eLaunchPatchingEnabled = true
 
                 try await Wine.withLogSession(for: bottle) {
                     await MainActor.run {
@@ -133,60 +128,20 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                         "WINEDEBUG": "-all"
                     ]
 
-                    if bottle.settings.hk4eCertificateImportEnabled {
-                        await MainActor.run { self.createBottleStatus = "Importing certificates" }
-                        do {
-                            try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
-                        } catch {
-                            await MainActor.run {
-                                self.createBottleStatus = "Certificate import failed (ignored): \(error.localizedDescription)"
-                            }
+                    await MainActor.run { self.createBottleStatus = "Importing certificates" }
+                    do {
+                        try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
+                    } catch {
+                        await MainActor.run {
+                            self.createBottleStatus = "Certificate import failed (ignored): \(error.localizedDescription)"
                         }
                     }
 
                     await MainActor.run { self.createBottleStatus = "Running wineboot" }
                     _ = try await Wine.runWine(["wineboot", "-u"], bottle: bottle, environment: initEnv)
-                    do {
-                        for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
-                    } catch {
-                        // best-effort
-                    }
 
                     await MainActor.run { self.createBottleStatus = "Setting Windows version" }
                     _ = try await Wine.runWine(["winecfg", "-v", winVersion.rawValue], bottle: bottle, environment: initEnv)
-                    do {
-                        for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
-                    } catch {
-                        // best-effort
-                    }
-
-                    let wineVer = try await Wine.wineVersion(bottle: bottle)
-                    bottle.settings.wineVersion = SemanticVersion(wineVer) ?? SemanticVersion(0, 0, 0)
-
-                    if initialRetinaMode {
-                        await MainActor.run { self.createBottleStatus = "Applying Retina mode" }
-                        try await Wine.changeRetinaMode(bottle: bottle, retinaMode: true)
-                    }
-
-                    if initialSteamPatch {
-                        await MainActor.run {
-                            self.createBottleStatus = "Applying SteamPatch"
-                            self.createBottleProgress = nil
-                        }
-                        try await SteamPatch.apply(
-                            prefixURL: bottle.url,
-                            status: { message in
-                                Task { @MainActor in
-                                    self.createBottleStatus = message
-                                }
-                            },
-                            progress: { frac in
-                                Task { @MainActor in
-                                    self.createBottleProgress = frac
-                                }
-                            }
-                        )
-                    }
                 }
 
                 // Custom resolution is applied per-launch (YAAGL-style), not during bottle creation.
