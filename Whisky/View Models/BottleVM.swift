@@ -52,6 +52,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
         initialRetinaMode: Bool = false,
         initialSteamPatch: Bool = false,
         initialCertImport: Bool = true,
+        initialEnableHDR: Bool = false,
         initialCustomResolutionEnabled: Bool = false,
         initialCustomResolutionWidth: Int = 1920,
         initialCustomResolutionHeight: Int = 1080,
@@ -108,6 +109,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
 
                 bottle.settings.hk4eSteamPatch = initialSteamPatch
                 bottle.settings.hk4eCertificateImportEnabled = true
+                bottle.settings.hk4eEnableHDR = initialEnableHDR
                 bottle.settings.hk4eCustomResolutionEnabled = initialCustomResolutionEnabled
                 bottle.settings.hk4eCustomResolutionWidth = initialCustomResolutionWidth
                 bottle.settings.hk4eCustomResolutionHeight = initialCustomResolutionHeight
@@ -125,7 +127,10 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                         // (Some Wine builds may not ship winemenubuilder.exe in system32.)
                         "WINEDLLOVERRIDES": "winemenubuilder.exe=d",
                         // Keep bootstrap noise from surfacing as fatal errors.
-                        "WINEDEBUG": "-all"
+                        "WINEDEBUG": "-all",
+                        // Avoid MSYNC/ESYNC overhead during prefix init.
+                        "WINEESYNC": "0",
+                        "WINEMSYNC": "0"
                     ]
 
                     await MainActor.run { self.createBottleStatus = String(localized: "create.status.certificates") }

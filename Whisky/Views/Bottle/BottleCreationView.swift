@@ -29,6 +29,7 @@ struct BottleCreationView: View {
     @State private var wineRuntimeId: String = "11.0-dxmt-signed"
     @State private var initialRetinaMode: Bool = false
     @State private var initialSteamPatch: Bool = true
+    @State private var initialEnableHDR: Bool = false
     @State private var initialCustomResolutionEnabled: Bool = false
     @State private var initialCustomResolutionWidth: Int = 1920
     @State private var initialCustomResolutionHeight: Int = 1080
@@ -82,6 +83,8 @@ struct BottleCreationView: View {
                 Toggle("config.retinaMode", isOn: $initialRetinaMode)
 
                 Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
+
+                Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
 
                 Toggle("hk4e.customResolution", isOn: $initialCustomResolutionEnabled)
                 if initialCustomResolutionEnabled {
@@ -178,6 +181,7 @@ struct BottleCreationView: View {
             wineRuntimeId: wineRuntimeId,
             initialRetinaMode: initialRetinaMode,
             initialSteamPatch: initialSteamPatch,
+            initialEnableHDR: initialEnableHDR,
             initialCustomResolutionEnabled: initialCustomResolutionEnabled,
             initialCustomResolutionWidth: initialCustomResolutionWidth,
             initialCustomResolutionHeight: initialCustomResolutionHeight,
