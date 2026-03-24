@@ -90,7 +90,8 @@ public enum HK4eResolution {
     private static func runRegAddDword(bottle: Bottle, key: String, name: String, value: Int) async throws {
         let output = try await Wine.runWine(
             ["reg", "add", key, "-v", name, "-t", "REG_DWORD", "-d", String(value), "-f"],
-            bottle: bottle
+            bottle: bottle,
+            environment: ["WINEDEBUG": "-all"]
         )
 
         // Wine prefix init can emit unrelated errors (hostname, winemenubuilder).

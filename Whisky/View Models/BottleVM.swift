@@ -52,6 +52,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
         initialMetalHud: Bool = false,
         initialRetinaMode: Bool = false,
         initialSteamPatch: Bool = false,
+        initialCertImport: Bool = true,
         initialCustomResolutionEnabled: Bool = false,
         initialCustomResolutionWidth: Int = 1920,
         initialCustomResolutionHeight: Int = 1080,
@@ -109,6 +110,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.metalHud = initialMetalHud
 
                 bottle.settings.hk4eSteamPatch = initialSteamPatch
+                bottle.settings.hk4eCertificateImportEnabled = initialCertImport
                 bottle.settings.hk4eCustomResolutionEnabled = initialCustomResolutionEnabled
                 bottle.settings.hk4eCustomResolutionWidth = initialCustomResolutionWidth
                 bottle.settings.hk4eCustomResolutionHeight = initialCustomResolutionHeight
@@ -122,8 +124,15 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 let initEnv: [String: String] = [
                     // Prevent winemenubuilder failures from aborting initialization.
                     // (Some Wine builds may not ship winemenubuilder.exe in system32.)
-                    "WINEDLLOVERRIDES": "winemenubuilder.exe=d"
+                    "WINEDLLOVERRIDES": "winemenubuilder.exe=d",
+                    // Keep bootstrap noise from surfacing as fatal errors.
+                    "WINEDEBUG": "-all"
                 ]
+
+                if bottle.settings.hk4eCertificateImportEnabled {
+                    await MainActor.run { self.createBottleStatus = "Importing certificates" }
+                    try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
+                }
 
                 await MainActor.run { self.createBottleStatus = "Running wineboot" }
                 _ = try await Wine.runWine(["wineboot", "-u"], bottle: bottle, environment: initEnv)

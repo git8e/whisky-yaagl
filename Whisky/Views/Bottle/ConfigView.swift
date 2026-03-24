@@ -180,6 +180,35 @@ struct ConfigView: View {
                 }
 
                 Toggle("SteamPatch", isOn: $bottle.settings.hk4eSteamPatch)
+
+                Toggle("Certificate import", isOn: $bottle.settings.hk4eCertificateImportEnabled)
+                HStack {
+                    Button("Apply") {
+                        Task(priority: .userInitiated) {
+                            maintenanceBusy = true
+                            do {
+                                try await HK4eWineCertificates.ensurePatched(runtimeId: bottle.settings.wineRuntimeId)
+                            } catch {
+                                print("Failed to apply cert patch: \(error)")
+                            }
+                            maintenanceBusy = false
+                        }
+                    }
+                    Button("Revert") {
+                        maintenanceBusy = true
+                        do {
+                            try HK4eWineCertificates.revert(runtimeId: bottle.settings.wineRuntimeId)
+                        } catch {
+                            print("Failed to revert cert patch: \(error)")
+                        }
+                        maintenanceBusy = false
+                    }
+                    Spacer()
+                    Text("Applies to selected Wine runtime")
+                        .foregroundStyle(.secondary)
+                        .font(.subheadline)
+                }
+
                 HStack {
                     Button("Apply") {
                         Task(priority: .userInitiated) {
