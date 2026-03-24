@@ -8,6 +8,10 @@ import Foundation
 public enum HK4ePatch {
     private static var fm: FileManager { FileManager.default }
 
+    private static func toWinePath(_ absPath: String) -> String {
+        return "Z:" + absPath.replacingOccurrences(of: "/", with: "\\")
+    }
+
     private static func workDir(bottle: Bottle) throws -> URL {
         let dir = bottle.url.appendingPathComponent("HK4e", isDirectory: true)
         if !fm.fileExists(atPath: dir.path(percentEncoded: false)) {
@@ -153,12 +157,43 @@ public enum HK4ePatch {
             mergedEnv["WINEDLLOVERRIDES"] = "d3d11,dxgi=n,b"
         }
 
+        let work = try workDir(bottle: bottle)
+        let batURL = work.appending(path: "hk4e_run.bat", directoryHint: .notDirectory)
+        let exeWine = toWinePath(exeURL.path(percentEncoded: false))
+        let dirWine = toWinePath(gameDir.path(percentEncoded: false))
+        let joinedArgs = args.map { $0 }.joined(separator: " ")
+
+        // Run game in a blocking way so pre/post patching is correct.
+        let bat = """
+        @echo off
+        cd /d \"\(dirWine)\"
+        \"\(exeWine)\" \(joinedArgs)
+        """
+        try bat.write(to: batURL, atomically: true, encoding: .utf8)
+        let batWine = toWinePath(batURL.path(percentEncoded: false))
+
+        var exitCode: Int32 = 0
         do {
-            try await Wine.runProgram(at: exeURL, args: args, bottle: bottle, environment: mergedEnv)
-            await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL)
+            for await output in try Wine.runWineProcess(
+                name: exeURL.lastPathComponent,
+                args: ["cmd", "/c", batWine],
+                bottle: bottle,
+                environment: mergedEnv
+            ) {
+                if case .terminated(let p) = output {
+                    exitCode = p.terminationStatus
+                }
+            }
         } catch {
             await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL)
             throw error
+        }
+
+        await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL)
+        try? fm.removeItem(at: batURL)
+
+        if exitCode != 0 {
+            throw HK4ePatchError.gameExited(code: Int(exitCode))
         }
     }
 
@@ -205,6 +240,17 @@ public enum HK4ePatch {
                 try? fm.removeItem(at: src)
             }
             try? fm.moveItem(at: bak, to: src)
+        }
+    }
+}
+
+public enum HK4ePatchError: LocalizedError {
+    case gameExited(code: Int)
+
+    public var errorDescription: String? {
+        switch self {
+        case .gameExited(let code):
+            return "Game process exited with code \(code)"
         }
     }
 }

@@ -34,6 +34,10 @@ extension Program {
         let environment = generateEnvironment()
 
         Task.detached(priority: .userInitiated) {
+            await MainActor.run {
+                self.isLaunching = true
+                self.lastExitCode = nil
+            }
             do {
                 let hk4eEnabled = self.bottle.settings.hk4eLaunchPatchingEnabled
                 let hk4eExe = self.bottle.settings.hk4eGameExecutableURL
@@ -44,7 +48,18 @@ extension Program {
                         at: self.url, args: arguments, bottle: self.bottle, environment: environment
                     )
                 }
+                await MainActor.run {
+                    self.isLaunching = false
+                    self.lastExitCode = 0
+                }
             } catch {
+                await MainActor.run {
+                    self.isLaunching = false
+                    self.lastExitCode = (error as? HK4ePatchError).flatMap { err in
+                        if case .gameExited(let code) = err { return code }
+                        return nil
+                    }
+                }
                 await MainActor.run {
                     self.showRunError(message: error.localizedDescription)
                 }
@@ -87,6 +102,12 @@ extension Program {
         alert.informativeText = String(localized: "alert.info")
         + " \(self.url.lastPathComponent): "
         + message
+
+        if let log = Wine.latestLogFileURL() {
+            alert.informativeText += "\n\nLog: \(log.path(percentEncoded: false))"
+        } else {
+            alert.informativeText += "\n\nLogs: \(Wine.logsFolder.path(percentEncoded: false))"
+        }
         alert.alertStyle = .critical
         alert.addButton(withTitle: String(localized: "button.ok"))
         alert.runModal()

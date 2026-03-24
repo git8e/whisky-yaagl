@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import AppKit
 import WhiskyKit
 
 enum LoadingState {
@@ -417,6 +418,18 @@ struct ConfigView: View {
                         } catch {
                             print("Failed to launch winecfg")
                         }
+                    }
+                }
+
+                Button("Open Logs") {
+                    NSWorkspace.shared.open(Wine.logsFolder)
+                }
+
+                Button("Open Latest Log") {
+                    if let url = Wine.latestLogFileURL() {
+                        NSWorkspace.shared.open(url)
+                    } else {
+                        NSWorkspace.shared.open(Wine.logsFolder)
                     }
                 }
             }

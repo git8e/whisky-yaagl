@@ -114,7 +114,7 @@ If the repository download is unavailable, it falls back to downloading the late
 ## Certificate Import
 
 If enabled (default), the app patches the selected Wine runtime's `share/wine/wine.inf` to import a root certificate during prefix creation.
-The certificate payload is downloaded at runtime (not bundled).
+The certificate payload is bundled in the app by default (to avoid network failures during bottle creation).
 
 Override source URL:
 
