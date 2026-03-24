@@ -268,6 +268,12 @@ public class Wine {
             "WINEDEBUG": "fixme-all",
             "GST_DEBUG": "1"
         ]
+        if let runtime = WineRuntimes.runtime(id: bottle.settings.wineRuntimeId), runtime.renderBackend == .dxmt {
+            result["DXMT_LOG_PATH"] = WhiskyPaths.applicationSupportRoot.path(percentEncoded: false)
+            result["DXMT_CONFIG"] = "d3d11.preferredMaxFrameRate=60;"
+            result["DXMT_CONFIG_FILE"] = WhiskyPaths.applicationSupportRoot.appending(path: "dxmt.conf").path(percentEncoded: false)
+            result["GST_PLUGIN_FEATURE_RANK"] = "atdec:MAX,avdec_h264:MAX"
+        }
         bottle.settings.environmentVariables(wineEnv: &result)
         guard !environment.isEmpty else { return result }
         result.merge(environment, uniquingKeysWith: { $1 })
@@ -351,10 +357,12 @@ extension Wine {
     private static func queryRegistryKey(
         bottle: Bottle, key: String, name: String, type: RegistryType
     ) async throws -> String? {
-        // `reg query` prints a scary error to stderr when the value doesn't exist.
-        // Route stderr to NUL so missing values don't pollute Whisky logs.
-        let cmd = "reg query \"\(key)\" -v \"\(name)\" 2>nul"
-        let output = try await runWine(["cmd", "/c", cmd], bottle: bottle)
+        let output = try await runWine(["reg", "query", key, "-v", name], bottle: bottle)
+        if output.contains("Unable to find the specified registry value") ||
+            output.contains("Unable to access or create the specified registry key") ||
+            output.contains("Invalid system key") {
+            return nil
+        }
         let lines = output.split(omittingEmptySubsequences: true, whereSeparator: \.isNewline)
 
         guard let line = lines.first(where: { $0.contains(type.rawValue) }) else { return nil }
