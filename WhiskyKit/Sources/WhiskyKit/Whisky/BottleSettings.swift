@@ -96,7 +96,8 @@ public struct BottleWineConfig: Codable, Equatable {
     var enhancedSync: EnhancedSync = .msync
     var avxEnabled: Bool = false
     var proxyEnabled: Bool = false
-    var proxyServer: String = ""
+    var proxyHost: String = ""
+    var proxyPort: String = ""
     var runtimeId: String = WineRuntimes.whiskyDefaultId
 
     public init() {}
@@ -109,7 +110,15 @@ public struct BottleWineConfig: Codable, Equatable {
         self.enhancedSync = try container.decodeIfPresent(EnhancedSync.self, forKey: .enhancedSync) ?? .msync
         self.avxEnabled = try container.decodeIfPresent(Bool.self, forKey: .avxEnabled) ?? false
         self.proxyEnabled = try container.decodeIfPresent(Bool.self, forKey: .proxyEnabled) ?? false
-        self.proxyServer = try container.decodeIfPresent(String.self, forKey: .proxyServer) ?? ""
+        self.proxyHost = try container.decodeIfPresent(String.self, forKey: .proxyHost) ?? ""
+        self.proxyPort = try container.decodeIfPresent(String.self, forKey: .proxyPort) ?? ""
+        if (self.proxyHost.isEmpty && self.proxyPort.isEmpty),
+           let legacyProxy = try container.decodeIfPresent(String.self, forKey: .proxyServer),
+           !legacyProxy.isEmpty {
+            let parts = legacyProxy.split(separator: ":", maxSplits: 1).map(String.init)
+            self.proxyHost = parts.first ?? ""
+            self.proxyPort = parts.count > 1 ? parts[1] : ""
+        }
         self.runtimeId = try container.decodeIfPresent(String.self, forKey: .runtimeId) ?? WineRuntimes.whiskyDefaultId
     }
     // swiftlint:enable line_length
@@ -251,9 +260,29 @@ public struct BottleSettings: Codable, Equatable {
         set { wineConfig.proxyEnabled = newValue }
     }
 
+    public var proxyHost: String {
+        get { return wineConfig.proxyHost }
+        set { wineConfig.proxyHost = newValue }
+    }
+
+    public var proxyPort: String {
+        get { return wineConfig.proxyPort }
+        set { wineConfig.proxyPort = newValue }
+    }
+
     public var proxyServer: String {
-        get { return wineConfig.proxyServer }
-        set { wineConfig.proxyServer = newValue }
+        get {
+            let host = wineConfig.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
+            let port = wineConfig.proxyPort.trimmingCharacters(in: .whitespacesAndNewlines)
+            if host.isEmpty { return "" }
+            if port.isEmpty { return host }
+            return "\(host):\(port)"
+        }
+        set {
+            let parts = newValue.split(separator: ":", maxSplits: 1).map(String.init)
+            wineConfig.proxyHost = parts.first ?? ""
+            wineConfig.proxyPort = parts.count > 1 ? parts[1] : ""
+        }
     }
 
     /// The pinned programs on this bottle

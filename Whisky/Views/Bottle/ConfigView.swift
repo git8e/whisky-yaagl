@@ -33,7 +33,8 @@ struct ConfigView: View {
     @State private var retinaMode: Bool = false
     @State private var dpiConfig: Int = 96
     @State private var proxyEnabled: Bool = false
-    @State private var proxyServer: String = ""
+    @State private var proxyHost: String = ""
+    @State private var proxyPort: String = ""
     @State private var winVersionLoadingState: LoadingState = .loading
     @State private var buildVersionLoadingState: LoadingState = .loading
     @State private var retinaModeLoadingState: LoadingState = .loading
@@ -104,15 +105,16 @@ struct ConfigView: View {
                     HStack {
                         Text(String(localized: "config.proxy.server"))
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        TextField("config.proxy.server", text: $proxyServer)
+                        TextField("config.proxy.host", text: $proxyHost)
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 220)
-                            .onSubmit {
-                                bottle.settings.proxyServer = proxyServer
-                                applyProxySettings()
-                            }
+                            .frame(width: 160)
+                        Text(":")
+                            .foregroundStyle(.secondary)
+                        TextField("config.proxy.port", text: $proxyPort)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 80)
+                            .onSubmit { applyProxySettings() }
                         Button("config.proxy.apply") {
-                            bottle.settings.proxyServer = proxyServer
                             applyProxySettings()
                         }
                     }
@@ -315,7 +317,8 @@ struct ConfigView: View {
                 }
             }
             proxyEnabled = bottle.settings.proxyEnabled
-            proxyServer = bottle.settings.proxyServer
+            proxyHost = bottle.settings.proxyHost
+            proxyPort = bottle.settings.proxyPort
         }
         .onChange(of: bottle.settings.windowsVersion) { _, newValue in
             if winVersionLoadingState == .success {
@@ -368,13 +371,17 @@ struct ConfigView: View {
     }
 
     func applyProxySettings() {
+        bottle.settings.proxyEnabled = proxyEnabled
+        bottle.settings.proxyHost = proxyHost
+        bottle.settings.proxyPort = proxyPort
         proxyLoadingState = .modifying
         Task(priority: .userInitiated) {
             do {
                 try await WineProxySettings.applyIfNeeded(bottle: bottle)
                 await MainActor.run {
                     proxyLoadingState = .success
-                    proxyServer = bottle.settings.proxyServer
+                    proxyHost = bottle.settings.proxyHost
+                    proxyPort = bottle.settings.proxyPort
                 }
             } catch {
                 print(error)

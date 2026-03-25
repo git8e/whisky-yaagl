@@ -5,7 +5,8 @@ public enum WineProxySettings {
 
     private struct DesiredState: Codable, Equatable {
         var enabled: Bool
-        var server: String
+        var host: String
+        var port: String
     }
 
     private static func workDir(bottle: Bottle) throws -> URL {
@@ -40,7 +41,11 @@ public enum WineProxySettings {
     }
 
     private static func desiredState(bottle: Bottle) -> DesiredState {
-        DesiredState(enabled: bottle.settings.proxyEnabled, server: bottle.settings.proxyServer.trimmingCharacters(in: .whitespacesAndNewlines))
+        DesiredState(
+            enabled: bottle.settings.proxyEnabled,
+            host: bottle.settings.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines),
+            port: bottle.settings.proxyPort.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
     }
 
     private static func loadState(bottle: Bottle) -> DesiredState? {
@@ -70,8 +75,10 @@ public enum WineProxySettings {
             String(format: #""ProxyEnable"=dword:%08x"#, state.enabled ? 1 : 0)
         ]
 
-        if state.enabled, !state.server.isEmpty {
-            let escaped = state.server.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: #"\""#)
+        let server = state.port.isEmpty ? state.host : "\(state.host):\(state.port)"
+
+        if state.enabled, !server.isEmpty {
+            let escaped = server.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: #"\""#)
             lines.append("\"ProxyServer\"=\"\(escaped)\"")
         } else {
             lines.append(#""ProxyServer"=-"#)

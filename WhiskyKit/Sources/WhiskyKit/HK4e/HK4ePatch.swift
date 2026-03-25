@@ -159,7 +159,7 @@ public enum HK4ePatch {
             if bottle.settings.hk4eSteamPatch {
                 launchArgs = [#"C:\windows\system32\steam.exe"#, exeWine]
             } else {
-                launchArgs = ["cmd", "/c", quoteForBatch(batWine)]
+                launchArgs = ["cmd", "/c", batWine]
             }
 
             for await output in try Wine.runWineProcess(
