@@ -36,28 +36,21 @@ struct PinView: View {
 
     var body: some View {
         VStack {
-            Group {
-                if let image = image {
-                    image
-                        .resizable()
-                } else {
-                    Image(systemName: "app.dashed")
-                        .resizable()
+            ZStack(alignment: .topTrailing) {
+                Group {
+                    if let image = image {
+                        image
+                            .resizable()
+                    } else {
+                        Image(systemName: "app.dashed")
+                            .resizable()
+                    }
                 }
-            }
-            .frame(width: 45, height: 45)
-            .scaleEffect(opening ? 2 : 1)
-            .opacity(opening ? 0 : 1)
-            Spacer()
-            Text(name)
-                .multilineTextAlignment(.center)
-                .lineLimit(2, reservesSpace: true)
-        }
-        .frame(width: 90, height: 90)
-        .padding(10)
-        .overlay {
-            if isLaunching {
-                VStack {
+                .frame(width: 45, height: 45)
+                .scaleEffect(opening ? 2 : 1)
+                .opacity(opening ? 0 : 1)
+
+                if isLaunching {
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(.black.opacity(0.18))
@@ -65,24 +58,26 @@ struct PinView: View {
                             .fill(.ultraThinMaterial.opacity(0.78))
                         ProgressView()
                             .controlSize(.large)
-                            .scaleEffect(1.28)
+                            .scaleEffect(1.18)
                     }
-                    .frame(width: 52, height: 52)
-                    Spacer()
-                }
-                .padding(.top, 2)
-            } else {
-                HStack {
-                    Spacer()
+                    .frame(width: 46, height: 46)
+                } else {
                     Image(systemName: "play.fill")
                         .resizable()
                         .foregroundColor(.green)
                         .frame(width: 16, height: 16)
+                        .padding(.top, 2)
+                        .padding(.trailing, 2)
                 }
-                .frame(width: 45, height: 45)
-                .padding(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 0))
             }
+            .frame(width: 45, height: 45)
+            Spacer()
+            Text(name)
+                .multilineTextAlignment(.center)
+                .lineLimit(2, reservesSpace: true)
         }
+        .frame(width: 90, height: 90)
+        .padding(10)
         .contextMenu {
             ProgramMenuView(program: program, path: $path)
 
