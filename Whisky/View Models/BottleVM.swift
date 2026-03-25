@@ -54,7 +54,8 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
         initialCertImport: Bool = true,
         initialEnableHDR: Bool = false,
         initialProxyEnabled: Bool = false,
-        initialProxyServer: String = "",
+        initialProxyHost: String = "",
+        initialProxyPort: String = "",
         initialCustomResolutionEnabled: Bool = false,
         initialCustomResolutionWidth: Int = 1920,
         initialCustomResolutionHeight: Int = 1080,
@@ -113,7 +114,8 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.hk4eCertificateImportEnabled = true
                 bottle.settings.hk4eEnableHDR = initialEnableHDR
                 bottle.settings.proxyEnabled = initialProxyEnabled
-                bottle.settings.proxyServer = initialProxyServer
+                bottle.settings.proxyHost = initialProxyHost
+                bottle.settings.proxyPort = initialProxyPort
                 bottle.settings.hk4eCustomResolutionEnabled = initialCustomResolutionEnabled
                 bottle.settings.hk4eCustomResolutionWidth = initialCustomResolutionWidth
                 bottle.settings.hk4eCustomResolutionHeight = initialCustomResolutionHeight
@@ -167,7 +169,9 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                         try await Wine.changeRetinaMode(bottle: bottle, retinaMode: true)
                     }
 
-                    if bottle.settings.proxyEnabled || !bottle.settings.proxyServer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    if bottle.settings.proxyEnabled ||
+                        !bottle.settings.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                        !bottle.settings.proxyPort.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         await MainActor.run { self.createBottleStatus = String(localized: "config.proxy.status") }
                         try await WineProxySettings.applyIfNeeded(bottle: bottle)
                     }

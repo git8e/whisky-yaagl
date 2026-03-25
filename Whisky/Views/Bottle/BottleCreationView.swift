@@ -31,7 +31,8 @@ struct BottleCreationView: View {
     @State private var initialSteamPatch: Bool = true
     @State private var initialEnableHDR: Bool = false
     @State private var initialProxyEnabled: Bool = false
-    @State private var initialProxyServer: String = ""
+    @State private var initialProxyHost: String = ""
+    @State private var initialProxyPort: String = ""
     @State private var initialCustomResolutionEnabled: Bool = false
     @State private var initialCustomResolutionWidth: Int = 1920
     @State private var initialCustomResolutionHeight: Int = 1080
@@ -90,8 +91,16 @@ struct BottleCreationView: View {
 
                 Toggle("config.proxy.enable", isOn: $initialProxyEnabled)
                 if initialProxyEnabled {
-                    TextField("config.proxy.server", text: $initialProxyServer)
-                        .textFieldStyle(.roundedBorder)
+                    HStack(alignment: .center) {
+                        TextField("config.proxy.host", text: $initialProxyHost)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 180)
+                        Text(":")
+                            .foregroundStyle(.secondary)
+                        TextField("config.proxy.port", text: $initialProxyPort)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 90)
+                    }
                 }
 
                 Toggle("hk4e.customResolution", isOn: $initialCustomResolutionEnabled)
@@ -191,7 +200,8 @@ struct BottleCreationView: View {
             initialSteamPatch: initialSteamPatch,
             initialEnableHDR: initialEnableHDR,
             initialProxyEnabled: initialProxyEnabled,
-            initialProxyServer: initialProxyServer,
+            initialProxyHost: initialProxyHost,
+            initialProxyPort: initialProxyPort,
             initialCustomResolutionEnabled: initialCustomResolutionEnabled,
             initialCustomResolutionWidth: initialCustomResolutionWidth,
             initialCustomResolutionHeight: initialCustomResolutionHeight,
