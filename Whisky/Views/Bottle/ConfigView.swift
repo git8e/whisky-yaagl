@@ -46,6 +46,10 @@ struct ConfigView: View {
     @AppStorage("metalSectionExpanded") private var metalSectionExpanded: Bool = true
     @AppStorage("hk4eSectionExpanded") private var hk4eSectionExpanded: Bool = true
 
+    private var isDXMTRuntime: Bool {
+        WineRuntimes.runtime(id: bottle.settings.wineRuntimeId)?.renderBackend == .dxmt
+    }
+
     var body: some View {
         Form {
             Section("config.title.wine", isExpanded: $wineSectionExpanded) {
@@ -212,12 +216,47 @@ struct ConfigView: View {
                 }
 
                 Toggle("hk4e.leftCommandIsCtrl", isOn: $bottle.settings.hk4eLeftCommandIsCtrl)
+                    .onChange(of: bottle.settings.hk4eLeftCommandIsCtrl) { _, _ in
+                        Task(priority: .userInitiated) {
+                            try? await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+                        }
+                    }
 
                 Toggle("hk4e.steamPatch", isOn: $bottle.settings.hk4eSteamPatch)
+                    .onChange(of: bottle.settings.hk4eSteamPatch) { _, enabled in
+                        Task(priority: .userInitiated) {
+                            if enabled {
+                                try? await SteamPatch.apply(prefixURL: bottle.url)
+                            } else {
+                                try? SteamPatch.remove(prefixURL: bottle.url)
+                            }
+                        }
+                    }
+
+                if isDXMTRuntime {
+                    Toggle("hk4e.dxmtInjection", isOn: $bottle.settings.hk4eDXMTInjectionEnabled)
+                        .onChange(of: bottle.settings.hk4eDXMTInjectionEnabled) { _, enabled in
+                            Task(priority: .userInitiated) {
+                                if enabled {
+                                    try? await HK4eDXMT.ensureInstalled(progress: nil)
+                                    HK4eDXMT.applyToRuntime(runtimeId: bottle.settings.wineRuntimeId)
+                                    try? HK4eDXMT.applyToPrefix(prefixURL: bottle.url)
+                                } else {
+                                    HK4eDXMT.revertPrefix(prefixURL: bottle.url)
+                                    HK4eDXMT.revertRuntime(runtimeId: bottle.settings.wineRuntimeId)
+                                }
+                            }
+                        }
+                }
 
                 Toggle("hk4e.enableHDR", isOn: $bottle.settings.hk4eEnableHDR)
 
                 Toggle("hk4e.customResolution", isOn: $bottle.settings.hk4eCustomResolutionEnabled)
+                    .onChange(of: bottle.settings.hk4eCustomResolutionEnabled) { _, _ in
+                        Task(priority: .userInitiated) {
+                            try? await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+                        }
+                    }
                 HStack(alignment: .center) {
                     TextField("hk4e.width", value: $bottle.settings.hk4eCustomResolutionWidth, formatter: NumberFormatter())
                         .textFieldStyle(.roundedBorder)

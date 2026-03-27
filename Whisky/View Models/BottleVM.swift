@@ -115,6 +115,9 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.hk4eSteamPatch = initialSteamPatch
                 bottle.settings.hk4eCertificateImportEnabled = true
                 bottle.settings.hk4eEnableHDR = initialEnableHDR
+                if let runtime = WineRuntimes.runtime(id: wineRuntimeId), runtime.renderBackend == .dxmt {
+                    bottle.settings.hk4eDXMTInjectionEnabled = true
+                }
                 bottle.settings.proxyEnabled = initialProxyEnabled
                 bottle.settings.proxyHost = initialProxyHost
                 bottle.settings.proxyPort = initialProxyPort
@@ -159,6 +162,21 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     if winVersion != .win10 {
                         await MainActor.run { self.createBottleStatus = String(localized: "create.status.windowsVersion") }
                         _ = try await Wine.runWine(["winecfg", "-v", winVersion.rawValue], bottle: bottle, environment: initEnv)
+                    }
+
+                    // Pre-configure HK4e-related patch dependencies so the bottle is ready before first launch.
+                    if bottle.settings.hk4eDXMTInjectionEnabled,
+                       let runtime = WineRuntimes.runtime(id: wineRuntimeId),
+                       runtime.renderBackend == .dxmt {
+                        await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
+                        try await HK4eDXMT.ensureInstalled(progress: nil)
+                        HK4eDXMT.applyToRuntime(runtimeId: wineRuntimeId)
+                        try? HK4eDXMT.applyToPrefix(prefixURL: newBottleDir)
+                    }
+
+                    if bottle.settings.hk4eSteamPatch {
+                        await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
+                        try? await SteamPatch.apply(prefixURL: newBottleDir)
                     }
 
                     if bottle.settings.hk4eLeftCommandIsCtrl || bottle.settings.hk4eCustomResolutionEnabled {

@@ -80,7 +80,9 @@ public enum HK4ePatch {
         if state.hdr {
             await HK4eHDR.revert(bottle: bottle, region: info.region)
         }
-        if state.dxmt {
+        // DXMT injection is treated as a persistent bottle/runtime configuration.
+        // Only revert legacy per-launch DXMT changes when DXMT injection is currently disabled.
+        if state.dxmt, !bottle.settings.hk4eDXMTInjectionEnabled {
             HK4eDXMT.revertPrefix(prefixURL: prefixURL)
         }
         if state.removeCrashFiles {
@@ -99,7 +101,7 @@ public enum HK4ePatch {
 
         let runtimeId = bottle.settings.wineRuntimeId
         let runtime = WineRuntimes.runtime(id: runtimeId)
-        let usesDXMT = (runtime?.renderBackend == .dxmt)
+        let usesDXMT = (runtime?.renderBackend == .dxmt) && bottle.settings.hk4eDXMTInjectionEnabled
         let supportsHK4ePatching = (runtime != nil) && (runtimeId != WineRuntimes.whiskyDefaultId)
 
         await revertIfNeeded(bottle: bottle, prefixURL: prefixURL)
@@ -217,9 +219,7 @@ public enum HK4ePatch {
         if state.hdr {
             await HK4eHDR.revert(bottle: bottle, region: info.region)
         }
-        if state.dxmt {
-            HK4eDXMT.revertPrefix(prefixURL: prefixURL)
-        }
+        // DXMT injection is persistent; do not revert at end of launch.
         if state.removeCrashFiles {
             revertRemovedFiles(gameDir: gameDir, removed: HK4eGame.removedFiles(for: info))
         }

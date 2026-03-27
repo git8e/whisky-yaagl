@@ -165,7 +165,7 @@ public struct BottleHK4eConfig: Codable, Equatable {
 
     var launchPatchingEnabled: Bool = false
     var removeCrashFiles: Bool = true
-    var dxmtInjectionEnabled: Bool = false
+    var dxmtInjectionEnabled: Bool = true
     var dxvkInjectionEnabled: Bool = false
     var reshadeEnabled: Bool = false
 
@@ -185,7 +185,7 @@ public struct BottleHK4eConfig: Codable, Equatable {
         self.enableNVExtension = try container.decodeIfPresent(Bool.self, forKey: .enableNVExtension) ?? false
         self.launchPatchingEnabled = try container.decodeIfPresent(Bool.self, forKey: .launchPatchingEnabled) ?? false
         self.removeCrashFiles = try container.decodeIfPresent(Bool.self, forKey: .removeCrashFiles) ?? true
-        self.dxmtInjectionEnabled = try container.decodeIfPresent(Bool.self, forKey: .dxmtInjectionEnabled) ?? false
+        self.dxmtInjectionEnabled = try container.decodeIfPresent(Bool.self, forKey: .dxmtInjectionEnabled) ?? true
         self.dxvkInjectionEnabled = try container.decodeIfPresent(Bool.self, forKey: .dxvkInjectionEnabled) ?? false
         self.reshadeEnabled = try container.decodeIfPresent(Bool.self, forKey: .reshadeEnabled) ?? false
     }

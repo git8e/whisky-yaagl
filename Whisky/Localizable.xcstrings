@@ -21323,6 +21323,28 @@
         }
       }
     },
+    "hk4e.dxmtInjection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DXMT Injection"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DXMT 注入"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DXMT 注入"
+          }
+        }
+      }
+    },
     "button.taskManager" : {
       "localizations" : {
         "en" : {

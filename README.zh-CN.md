@@ -1,5 +1,7 @@
 # Whisky YAAGL Fork
 
+[English README](README.md)
+
 这是一个更面向普通用户的 `Whisky` 分支，主要用于在 macOS 上更方便地运行 HK4e / 原神相关环境。
 
 它不是官方版 Whisky。
@@ -48,8 +50,19 @@ open "Whisky.app"
 
 首次打开时，应用会引导你下载 Wine 运行时。
 
-- 推荐默认使用 `Wine 11.0 DXMT (signed)`
+- 推荐默认使用 `Wine 11.4 DXMT (signed)`
 - 运行时下载一次后会缓存到本地，不需要每次重复下载
+
+## 快速上手
+
+1. 从仓库的 `Actions` 下载 `Whisky.app`（见“下载方式”）。
+2. 首次启动时下载 Wine 运行时（推荐：`Wine 11.4 DXMT (signed)`）。
+3. 创建容器：
+   - 选择 HK4e 区服：`OS`（国际服）或 `CN`（原神）
+   - 可选开启 SteamPatch / HDR
+   - 可选填写代理 IP + 端口
+4. 在容器的 HK4e 配置里选择游戏 exe（OS 选 `GenshinImpact.exe`，CN 选 `YuanShen.exe`）。
+5. 从置顶的程序（或程序列表）启动。
 
 ## 创建容器时可以设置什么
 
@@ -58,6 +71,7 @@ open "Whisky.app"
 - Wine 运行时
 - Windows 版本
 - Retina 模式
+- HK4e 区服（OS / CN）
 - SteamPatch
 - HDR
 - 代理服务器 IP 和端口
@@ -143,5 +157,10 @@ open "Whisky.app"
 ## 致谢
 
 这个项目建立在 Whisky 以及 Wine、DXVK、MoltenVK、CrossOver、Apple D3DMetal 等项目之上。
+
+特别感谢：
+
+- [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher)：提供了很多 HK4e 相关流程的参考实现与思路。
+- [Whisky](https://github.com/Whisky-App/Whisky)：提供了本分支的基础框架与 macOS 上的 Wine bottle 体验。
 
 也建议支持 upstream Whisky 和相关上游项目。

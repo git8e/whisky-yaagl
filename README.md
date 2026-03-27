@@ -8,6 +8,8 @@ Whisky for macOS, adjusted for HK4e / Genshin workflows.
 
 </div>
 
+[中文文档](README.zh-CN.md)
+
 ## What This App Is
 
 This project is a user-focused fork of [Whisky](https://github.com/Whisky-App/Whisky) for people who want to run HK4e / Genshin-style setups on macOS with less manual tweaking.
@@ -45,9 +47,20 @@ open "Whisky.app"
 
 On first launch, the app guides you through runtime setup.
 
-- `Wine 11.0 DXMT (signed)` is the recommended default.
+- `Wine 11.4 DXMT (signed)` is the recommended default.
 - Other supported runtimes are also available in the setup screen.
 - Downloads are cached, so each runtime only needs to be installed once.
+
+## Quick Start
+
+1. Install the app from `Actions` artifacts (see `Download`).
+2. Launch the app once and let it download a Wine runtime (recommended: `Wine 11.4 DXMT (signed)`).
+3. Create a new bottle:
+   - Pick HK4e region: `OS` (Global) or `CN` (YuanShen)
+   - (Optional) enable SteamPatch / HDR
+   - (Optional) set proxy host + port
+4. In the bottle's HK4e section, select your game executable (`GenshinImpact.exe` for OS, `YuanShen.exe` for CN).
+5. Launch from the pinned program (or the program list).
 
 ## Creating A Bottle
 
@@ -56,6 +69,7 @@ When creating a bottle, you can choose:
 - Wine runtime
 - Windows version
 - Retina mode
+- HK4e region (OS / CN)
 - SteamPatch
 - HDR
 - Proxy server host and port
@@ -144,4 +158,9 @@ If a game fails to start, the most useful things to check are:
 
 This project is built on top of Whisky and the work of the Wine, DXVK, MoltenVK, CrossOver, and Apple D3DMetal communities.
 
-Please also support the upstream projects that make Whisky possible.
+## Special Thanks
+
+- [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher) for the HK4e-oriented workflow ideas and reference behavior.
+- [Whisky](https://github.com/Whisky-App/Whisky) for the base app and the macOS Wine bottle experience.
+
+Please also support the upstream projects that make this fork possible.
