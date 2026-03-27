@@ -191,6 +191,27 @@ public struct BottleHK4eConfig: Codable, Equatable {
     }
 }
 
+public struct BottleNAPConfig: Codable, Equatable {
+    var region: NapGame.Region = .os
+    var customResolutionEnabled: Bool = false
+    var customResolutionWidth: Int = 1920
+    var customResolutionHeight: Int = 1080
+    var gameExecutableURL: URL?
+    var fixWebview: Bool = true
+
+    public init() {}
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.region = try container.decodeIfPresent(NapGame.Region.self, forKey: .region) ?? .os
+        self.customResolutionEnabled = try container.decodeIfPresent(Bool.self, forKey: .customResolutionEnabled) ?? false
+        self.customResolutionWidth = try container.decodeIfPresent(Int.self, forKey: .customResolutionWidth) ?? 1920
+        self.customResolutionHeight = try container.decodeIfPresent(Int.self, forKey: .customResolutionHeight) ?? 1080
+        self.gameExecutableURL = try container.decodeIfPresent(URL.self, forKey: .gameExecutableURL)
+        self.fixWebview = try container.decodeIfPresent(Bool.self, forKey: .fixWebview) ?? true
+    }
+}
+
 public struct BottleSettings: Codable, Equatable {
     static let defaultFileVersion = SemanticVersion(1, 0, 0)
 
@@ -200,6 +221,7 @@ public struct BottleSettings: Codable, Equatable {
     private var metalConfig: BottleMetalConfig
     private var dxvkConfig: BottleDXVKConfig
     private var hk4eConfig: BottleHK4eConfig
+    private var napConfig: BottleNAPConfig
 
     public init() {
         self.info = BottleInfo()
@@ -207,6 +229,7 @@ public struct BottleSettings: Codable, Equatable {
         self.metalConfig = BottleMetalConfig()
         self.dxvkConfig = BottleDXVKConfig()
         self.hk4eConfig = BottleHK4eConfig()
+        self.napConfig = BottleNAPConfig()
     }
 
     // swiftlint:disable line_length
@@ -218,6 +241,7 @@ public struct BottleSettings: Codable, Equatable {
         self.metalConfig = try container.decodeIfPresent(BottleMetalConfig.self, forKey: .metalConfig) ?? BottleMetalConfig()
         self.dxvkConfig = try container.decodeIfPresent(BottleDXVKConfig.self, forKey: .dxvkConfig) ?? BottleDXVKConfig()
         self.hk4eConfig = try container.decodeIfPresent(BottleHK4eConfig.self, forKey: .hk4eConfig) ?? BottleHK4eConfig()
+        self.napConfig = try container.decodeIfPresent(BottleNAPConfig.self, forKey: .napConfig) ?? BottleNAPConfig()
     }
     // swiftlint:enable line_length
 
@@ -400,6 +424,36 @@ public struct BottleSettings: Codable, Equatable {
     public var hk4eReshadeEnabled: Bool {
         get { return hk4eConfig.reshadeEnabled }
         set { hk4eConfig.reshadeEnabled = newValue }
+    }
+
+    public var napRegion: NapGame.Region {
+        get { return napConfig.region }
+        set { napConfig.region = newValue }
+    }
+
+    public var napCustomResolutionEnabled: Bool {
+        get { return napConfig.customResolutionEnabled }
+        set { napConfig.customResolutionEnabled = newValue }
+    }
+
+    public var napCustomResolutionWidth: Int {
+        get { return napConfig.customResolutionWidth }
+        set { napConfig.customResolutionWidth = newValue }
+    }
+
+    public var napCustomResolutionHeight: Int {
+        get { return napConfig.customResolutionHeight }
+        set { napConfig.customResolutionHeight = newValue }
+    }
+
+    public var napGameExecutableURL: URL? {
+        get { return napConfig.gameExecutableURL }
+        set { napConfig.gameExecutableURL = newValue }
+    }
+
+    public var napFixWebview: Bool {
+        get { return napConfig.fixWebview }
+        set { napConfig.fixWebview = newValue }
     }
 
     @discardableResult

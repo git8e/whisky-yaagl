@@ -56,8 +56,12 @@ extension Program {
             do {
                 try await Wine.withLogSession(for: self.bottle) {
                     let hk4eExe = self.bottle.settings.hk4eGameExecutableURL
+                    let napExe = self.bottle.settings.napGameExecutableURL
+
                     if hk4eExe == self.url {
                         try await HK4ePatch.applyAndRun(program: self, args: arguments, environment: environment)
+                    } else if napExe == self.url {
+                        try await NAPPatch.applyAndRun(program: self, args: arguments, environment: environment)
                     } else {
                         try await Wine.runProgram(
                             at: self.url, args: arguments, bottle: self.bottle, environment: environment
@@ -72,6 +76,9 @@ extension Program {
                 await MainActor.run {
                     self.isLaunching = false
                     self.lastExitCode = (error as? HK4ePatchError).flatMap { err in
+                        if case .gameExited(let code) = err { return code }
+                        return nil
+                    } ?? (error as? NAPPatchError).flatMap { err in
                         if case .gameExited(let code) = err { return code }
                         return nil
                     }
