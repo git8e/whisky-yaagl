@@ -97,15 +97,20 @@ public enum HK4ePatch {
         let gameDir = exeURL.deletingLastPathComponent()
         let info = HK4eGame.detect(bottle: bottle, executableURL: exeURL)
 
+        let runtime = WineRuntimes.runtime(id: bottle.settings.wineRuntimeId)
+        let usesDXMT = (runtime?.renderBackend == .dxmt)
+
         await revertIfNeeded(bottle: bottle, prefixURL: prefixURL)
 
         if bottle.settings.hk4eLeftCommandIsCtrl || bottle.settings.hk4eCustomResolutionEnabled {
             try await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
         }
 
-        try await HK4eDXMT.ensureInstalled()
-        HK4eDXMT.applyToRuntime(runtimeId: bottle.settings.wineRuntimeId)
-        try? HK4eDXMT.applyToPrefix(prefixURL: prefixURL)
+        if usesDXMT {
+            try await HK4eDXMT.ensureInstalled()
+            HK4eDXMT.applyToRuntime(runtimeId: bottle.settings.wineRuntimeId)
+            try? HK4eDXMT.applyToPrefix(prefixURL: prefixURL)
+        }
 
         if bottle.settings.hk4eSteamPatch {
             try? await SteamPatch.apply(prefixURL: prefixURL)
@@ -122,7 +127,7 @@ public enum HK4ePatch {
             gameDir: gameDir.path(percentEncoded: false),
             executablePath: exeURL.path(percentEncoded: false),
             removeCrashFiles: true,
-            dxmt: true,
+            dxmt: usesDXMT,
             dxvk: false,
             reshade: false,
             hdr: bottle.settings.hk4eEnableHDR,
@@ -132,7 +137,9 @@ public enum HK4ePatch {
 
         var mergedEnv = environment
         // Match YAAGL defaults.
-        mergedEnv["WINEDLLOVERRIDES"] = "d3d11,dxgi=n,b"
+        if usesDXMT && HK4eDXMT.useNativeDlls() {
+            mergedEnv["WINEDLLOVERRIDES"] = "d3d11,dxgi=n,b"
+        }
 
         await waitUntilServerOff(bottle: bottle)
 
@@ -175,12 +182,26 @@ public enum HK4ePatch {
             }
         } catch {
             await waitUntilServerOff(bottle: bottle)
-            await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL, hdrApplied: state.hdr)
+            await postRevert(
+                bottle: bottle,
+                info: info,
+                gameDir: gameDir,
+                prefixURL: prefixURL,
+                hdrApplied: state.hdr,
+                dxmtApplied: state.dxmt
+            )
             throw error
         }
 
         await waitUntilServerOff(bottle: bottle)
-        await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL, hdrApplied: state.hdr)
+        await postRevert(
+            bottle: bottle,
+            info: info,
+            gameDir: gameDir,
+            prefixURL: prefixURL,
+            hdrApplied: state.hdr,
+            dxmtApplied: state.dxmt
+        )
         try? fm.removeItem(at: batURL)
 
         if exitCode != 0 {
@@ -193,12 +214,15 @@ public enum HK4ePatch {
         info: HK4eGame.Info,
         gameDir: URL,
         prefixURL: URL,
-        hdrApplied: Bool
+        hdrApplied: Bool,
+        dxmtApplied: Bool
     ) async {
         if hdrApplied {
             await HK4eHDR.revert(bottle: bottle, region: info.region)
         }
-        HK4eDXMT.revertPrefix(prefixURL: prefixURL)
+        if dxmtApplied {
+            HK4eDXMT.revertPrefix(prefixURL: prefixURL)
+        }
         revertRemovedFiles(gameDir: gameDir, removed: HK4eGame.removedFiles(for: info))
 
         clearState(bottle: bottle)

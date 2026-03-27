@@ -26,7 +26,7 @@ struct BottleCreationView: View {
 
     @State private var newBottleName: String = ""
     @State private var newBottleVersion: WinVersion = .win10
-    @State private var wineRuntimeId: String = "11.0-dxmt-signed"
+    @State private var wineRuntimeId: String = "11.4-dxmt-signed"
     @State private var initialRetinaMode: Bool = false
     @State private var initialHK4eRegion: HK4eGame.Region = .os
     @State private var initialSteamPatch: Bool = true

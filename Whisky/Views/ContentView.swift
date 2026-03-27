@@ -101,7 +101,8 @@ struct ContentView: View {
                 }
             }
 
-            if !WineRuntimeManager.isInstalled(runtimeId: "11.0-dxmt-signed") {
+            if !WineRuntimeManager.isInstalled(runtimeId: "11.4-dxmt-signed") &&
+                !WineRuntimeManager.isInstalled(runtimeId: "11.0-dxmt-signed") {
                 showSetup = true
             }
         }
