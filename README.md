@@ -2,7 +2,7 @@
 
 # Whisky YAAGL Fork
 
-Whisky for macOS, adjusted for HK4e / Genshin workflows.
+Whisky for macOS, adjusted for HK4e (Genshin) and NAP (ZZZ) workflows.
 
 ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/build.yml?style=for-the-badge)
 
@@ -12,12 +12,12 @@ Whisky for macOS, adjusted for HK4e / Genshin workflows.
 
 ## What This App Is
 
-This project is a user-focused fork of [Whisky](https://github.com/Whisky-App/Whisky) for people who want to run HK4e / Genshin-style setups on macOS with less manual tweaking.
+This project is a user-focused fork of [Whisky](https://github.com/Whisky-App/Whisky) for people who want to run HK4e (Genshin) and NAP (ZZZ) setups on macOS with less manual tweaking.
 
 Compared with upstream Whisky, this fork mainly adds:
 
 - More Wine runtimes you can choose from when creating a bottle.
-- HK4e-oriented options such as SteamPatch, HDR, Retina mode, custom resolution, and a stored game executable.
+- Game-oriented options such as SteamPatch, HDR, Retina mode, custom resolution, and a stored game executable.
 - Better launch feedback, log access, and one-click tools such as Task Manager.
 - A simpler data layout under `~/Library/Application Support/Whisky/`.
 
@@ -55,10 +55,12 @@ On first launch, the app guides you through runtime setup.
 1. Install the app from `Actions` artifacts (see `Download`).
 2. Launch the app once and let it download a Wine runtime (recommended: `Wine 11.4 DXMT (signed)`).
 3. Create a new bottle:
-   - Pick HK4e region: `OS` (Global) or `CN` (YuanShen)
-   - (Optional) enable SteamPatch / HDR
+   - Pick `Game / Region`: `Genshin Impact (hk4eos)` / `原神 (hk4ecn)` / `ZZZ Global (napos)` / `ZZZ China (napcn)`
+   - (Optional, HK4e) enable SteamPatch / HDR
    - (Optional) set proxy host + port
-4. In the bottle's HK4e section, select your game executable (`GenshinImpact.exe` for OS, `YuanShen.exe` for CN).
+4. In the bottle's config, select your game executable:
+   - HK4e: `GenshinImpact.exe` (hk4eos) / `YuanShen.exe` (hk4ecn)
+   - ZZZ: `ZenlessZoneZero.exe`
 5. Launch from the pinned program (or the program list).
 
 ## Creating A Bottle
@@ -68,9 +70,9 @@ When creating a bottle, you can choose:
 - Wine runtime
 - Windows version
 - Retina mode
-- HK4e region (OS / CN)
-- SteamPatch
-- HDR
+- Game / region preset (HK4e / NAP)
+- (HK4e) SteamPatch
+- (HK4e) HDR
 - Proxy server host and port
 - Optional custom resolution
 - Optional game executable to pin on the bottle home screen
@@ -88,6 +90,14 @@ In `Bottle -> Config -> HK4e`, you can manage:
 - Custom resolution
 
 This fork keeps HK4e settings persistent where possible, so the app does not need to rewrite the same registry values on every launch.
+
+## NAP / ZZZ Features
+
+In `Bottle -> Config -> NAP`, you can manage:
+
+- Game executable path
+- Fix WebView
+- Custom resolution
 
 ## Useful Tools
 
@@ -125,6 +135,7 @@ This fork borrows HK4e workflow ideas from YAAGL, but adapts them to Whisky's bo
 - Native macOS app experience: GUI-first workflow with integrated tools and logs.
 - Faster day-to-day flow: fewer external steps than YAAGL’s per-launch patch/revert approach.
 - Fewer failure modes: less fragile launch-time patching, and clearer error surfaces when something does go wrong.
+- Multi-game concurrency: multiple bottles can launch the same or different games at the same time.
 
 ## Storage Location
 
