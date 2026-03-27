@@ -125,10 +125,17 @@ public enum HK4eDXMT {
         let system32 = prefixURL.appendingPathComponent("drive_c/windows/system32", isDirectory: true)
         guard fm.fileExists(atPath: system32.path(percentEncoded: false)) else { return }
 
-        // DXMT 0.74+ expects D3D DLLs in system32 with overrides.
-        let names = useNativeDlls()
-            ? ["d3d10core.dll", "d3d11.dll", "dxgi.dll"]
-            : []
+        if useNativeDlls() {
+            // If this prefix was previously patched using the legacy (<0.74) strategy,
+            // restore the original D3D DLLs so runtime builtin patching can take effect.
+            restoreBackups(in: system32, names: ["d3d10core.dll", "d3d11.dll", "dxgi.dll"])
+        }
+
+        // YAAGL-style behavior:
+        // - For DXMT < 0.74, D3D DLLs are copied into prefix system32.
+        // - For DXMT >= 0.74, D3D DLLs are patched into the Wine runtime (builtin),
+        //   and we only rely on WINEDLLOVERRIDES at launch.
+        let names = useNativeDlls() ? [] : ["d3d10core.dll", "d3d11.dll", "dxgi.dll"]
 
         // winemetal.dll is always copied to system32.
         for name in names + ["winemetal.dll"] {
@@ -148,8 +155,31 @@ public enum HK4eDXMT {
         }
     }
 
+    private static func restoreBackups(in system32: URL, names: [String]) {
+        for name in names {
+            let dst = system32.appending(path: name)
+            let bak = system32.appending(path: name + ".bak")
+            guard fm.fileExists(atPath: bak.path(percentEncoded: false)) else { continue }
+            if fm.fileExists(atPath: dst.path(percentEncoded: false)) {
+                try? fm.removeItem(at: dst)
+            }
+            try? fm.moveItem(at: bak, to: dst)
+        }
+    }
+
     public static func applyToRuntime(runtimeId: String) {
         let root = WineRuntimeManager.wineRoot(runtimeId: runtimeId)
+        let builtinDir = root.appendingPathComponent("lib/wine/x86_64-windows", isDirectory: true)
+
+        // For DXMT >= 0.74, patch builtin D3D DLLs into the runtime.
+        if useNativeDlls(), fm.fileExists(atPath: builtinDir.path(percentEncoded: false)) {
+            for name in ["d3d10core.dll", "d3d11.dll", "dxgi.dll", "nvngx.dll"] {
+                let src = HK4eResources.dxmtDir.appending(path: name)
+                let dst = builtinDir.appending(path: name)
+                copyWithBackup(src: src, dst: dst)
+            }
+        }
+
         let winemetalDLLDst = root.appendingPathComponent("lib/wine/x86_64-windows/winemetal.dll", isDirectory: false)
         let winemetalSODst = root.appendingPathComponent("lib/wine/x86_64-unix/winemetal.so", isDirectory: false)
 
@@ -163,6 +193,10 @@ public enum HK4eDXMT {
     public static func revertRuntime(runtimeId: String) {
         let root = WineRuntimeManager.wineRoot(runtimeId: runtimeId)
         let targets = [
+            root.appendingPathComponent("lib/wine/x86_64-windows/d3d10core.dll", isDirectory: false),
+            root.appendingPathComponent("lib/wine/x86_64-windows/d3d11.dll", isDirectory: false),
+            root.appendingPathComponent("lib/wine/x86_64-windows/dxgi.dll", isDirectory: false),
+            root.appendingPathComponent("lib/wine/x86_64-windows/nvngx.dll", isDirectory: false),
             root.appendingPathComponent("lib/wine/x86_64-windows/winemetal.dll", isDirectory: false),
             root.appendingPathComponent("lib/wine/x86_64-unix/winemetal.so", isDirectory: false)
         ]
