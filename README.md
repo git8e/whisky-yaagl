@@ -30,8 +30,6 @@ This is not an official Whisky build.
 
 ## Download
 
-You do not need Xcode.
-
 1. Open the repository's `Actions` page.
 2. Open the latest successful `Build (macOS)` run.
 3. Scroll to `Artifacts` and download `Whisky.app.zip`.
@@ -123,6 +121,10 @@ This fork borrows HK4e workflow ideas from YAAGL, but adapts them to Whisky's bo
 - Less launch-time work: most settings are persisted and only re-applied when missing.
 - Shared-runtime aware: changes that touch Wine runtimes are treated as runtime-level and designed to be idempotent across bottles.
 - Better troubleshooting UX: per-launch logs, one-click tools, and clearer “file not found” errors (e.g. external drives).
+- Easier Wine switching: downloaded runtimes are cached, so switching versions does not require re-downloading.
+- Native macOS app experience: GUI-first workflow with integrated tools and logs.
+- Faster day-to-day flow: fewer external steps than YAAGL’s per-launch patch/revert approach.
+- Fewer failure modes: less fragile launch-time patching, and clearer error surfaces when something does go wrong.
 
 ## Storage Location
 
