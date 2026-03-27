@@ -130,20 +130,27 @@ extension Program {
         let logURL = latestLogURL ?? Wine.logsFolder
         let logLabel = (latestLogURL != nil) ? "Log:" : "Logs:"
 
+        let fullPath = logURL.path(percentEncoded: false)
+        let displayPath = (fullPath as NSString).abbreviatingWithTildeInPath
+
         // NSAlert does not support attributed informative text via public API.
         // Use an accessory view with a clickable link-style text field.
         let labelField = NSTextField(labelWithString: logLabel)
         labelField.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        let linkField = NSTextField(labelWithString: logURL.path(percentEncoded: false))
+        let linkField = NSTextField(labelWithString: displayPath)
         linkField.allowsEditingTextAttributes = true
         linkField.isSelectable = true
-        linkField.maximumNumberOfLines = 1
-        linkField.cell?.lineBreakMode = .byTruncatingMiddle
+        linkField.maximumNumberOfLines = 2
+        linkField.cell?.wraps = true
+        linkField.cell?.isScrollable = false
+        linkField.cell?.lineBreakMode = .byWordWrapping
+        linkField.alignment = .left
         linkField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        linkField.toolTip = fullPath
 
         linkField.attributedStringValue = NSAttributedString(
-            string: logURL.path(percentEncoded: false),
+            string: displayPath,
             attributes: [
                 .link: logURL,
                 .foregroundColor: NSColor.linkColor,
