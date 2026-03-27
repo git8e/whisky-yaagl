@@ -126,11 +126,43 @@ extension Program {
         + " \(self.url.lastPathComponent): "
         + message
 
-        if let log = Wine.latestLogFileURL() {
-            alert.informativeText += "\n\nLog: \(log.path(percentEncoded: false))"
-        } else {
-            alert.informativeText += "\n\nLogs: \(Wine.logsFolder.path(percentEncoded: false))"
-        }
+        let latestLogURL = Wine.latestLogFileURL()
+        let logURL = latestLogURL ?? Wine.logsFolder
+        let logLabel = (latestLogURL != nil) ? "Log:" : "Logs:"
+
+        // NSAlert does not support attributed informative text via public API.
+        // Use an accessory view with a clickable link-style text field.
+        let labelField = NSTextField(labelWithString: logLabel)
+        labelField.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        let linkField = NSTextField(labelWithString: logURL.path(percentEncoded: false))
+        linkField.allowsEditingTextAttributes = true
+        linkField.isSelectable = true
+        linkField.maximumNumberOfLines = 1
+        linkField.cell?.lineBreakMode = .byTruncatingMiddle
+        linkField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+        linkField.attributedStringValue = NSAttributedString(
+            string: logURL.path(percentEncoded: false),
+            attributes: [
+                .link: logURL,
+                .foregroundColor: NSColor.linkColor,
+                .underlineStyle: NSUnderlineStyle.single.rawValue
+            ]
+        )
+
+        let row = NSStackView(views: [labelField, linkField])
+        row.orientation = .horizontal
+        row.alignment = .firstBaseline
+        row.spacing = 6
+
+        let accessory = NSStackView(views: [row])
+        accessory.orientation = .vertical
+        accessory.alignment = .leading
+        accessory.spacing = 6
+        accessory.edgeInsets = NSEdgeInsets(top: 8, left: 0, bottom: 0, right: 0)
+        alert.accessoryView = accessory
+
         alert.alertStyle = .critical
         alert.addButton(withTitle: String(localized: "button.ok"))
         alert.runModal()
