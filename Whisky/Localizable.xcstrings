@@ -21724,19 +21724,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ZZZ Global (napos)"
+            "value" : "Zenless Zone Zero (napos)"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "绝区零 国际服 (napos)"
+            "value" : "Zenless Zone Zero (napos)"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "絕區零 國際服 (napos)"
+            "value" : "Zenless Zone Zero (napos)"
           }
         }
       }
