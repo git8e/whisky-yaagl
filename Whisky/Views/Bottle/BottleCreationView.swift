@@ -113,13 +113,13 @@ struct BottleCreationView: View {
                 Toggle("config.proxy.enable", isOn: $initialProxyEnabled)
                 if initialProxyEnabled {
                     HStack(alignment: .center) {
-                        TextField("config.proxy.host", text: $initialProxyHost)
+                        TextField("", text: $initialProxyHost, prompt: Text("config.proxy.host"))
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 180)
+                            .frame(width: 188)
                             .onChange(of: initialProxyHost) { _, _ in normalizeProxyFields() }
-                        TextField("config.proxy.port", text: $initialProxyPort)
+                        TextField("", text: $initialProxyPort, prompt: Text("config.proxy.port"))
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 90)
+                            .frame(width: 96)
                     }
                 }
 
