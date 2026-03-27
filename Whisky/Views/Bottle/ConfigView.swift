@@ -108,14 +108,16 @@ struct ConfigView: View {
                 if proxyEnabled {
                     HStack {
                         Text(String(localized: "config.proxy.server"))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        TextField("config.proxy.host", text: $proxyHost)
+                        TextField("", text: $proxyHost, prompt: Text("config.proxy.host"))
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 160)
+                            .frame(width: 168)
                             .onChange(of: proxyHost) { _, _ in normalizeProxyFields() }
-                        TextField("config.proxy.port", text: $proxyPort)
+                        TextField("", text: $proxyPort, prompt: Text("config.proxy.port"))
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 80)
+                            .frame(width: 88)
                             .onSubmit { applyProxySettings() }
                         Button("config.proxy.apply") {
                             applyProxySettings()
