@@ -2,7 +2,7 @@
 
 [English README](README.md)
 
-这是一个更面向普通用户的 `Whisky` 分支，主要用于在 macOS 上更方便地运行 HK4e / 原神相关环境。
+这是一个更面向普通用户的 `Whisky` 分支，主要用于在 macOS 上更方便地运行 HK4e（原神）和 NAP（绝区零）相关环境。
 
 它不是官方版 Whisky。
 
@@ -57,10 +57,12 @@
 1. 从仓库的 `Actions` 下载 `Whisky.app`（见“下载方式”）。
 2. 首次启动时下载 Wine 运行时（推荐：`Wine 11.4 DXMT (signed)`）。
 3. 创建容器：
-   - 选择 HK4e 区服：`OS`（国际服）或 `CN`（原神）
-   - 可选开启 SteamPatch / HDR
+   - 选择“游戏 / 区服”：`Genshin Impact (hk4eos)` / `原神 (hk4ecn)` / `ZZZ Global (napos)` / `ZZZ China (napcn)`
+   - （仅 HK4e）可选开启 SteamPatch / HDR
    - 可选填写代理 IP + 端口
-4. 在容器的 HK4e 配置里选择游戏 exe（OS 选 `GenshinImpact.exe`，CN 选 `YuanShen.exe`）。
+4. 在容器配置中选择游戏 exe：
+   - HK4e：`GenshinImpact.exe`（hk4eos）/ `YuanShen.exe`（hk4ecn）
+   - 绝区零：`ZenlessZoneZero.exe`
 5. 从置顶的程序（或程序列表）启动。
 
 ## 创建容器时可以设置什么
@@ -70,9 +72,9 @@
 - Wine 运行时
 - Windows 版本
 - Retina 模式
-- HK4e 区服（OS / CN）
-- SteamPatch
-- HDR
+- 游戏 / 区服（HK4e / NAP）
+- （仅 HK4e）SteamPatch
+- （仅 HK4e）HDR
 - 代理服务器 IP 和端口
 - 自定义分辨率
 - 可选的游戏可执行文件路径（用于自动置顶）
@@ -90,6 +92,14 @@
 - 自定义分辨率
 
 这一版会尽量把 HK4e 相关设置保留在容器里，只在确实发生变化时才重新写入。
+
+## NAP / 绝区零相关功能
+
+在 `Bottle -> Config -> NAP` 中可以设置：
+
+- 游戏可执行文件
+- 修复 WebView
+- 自定义分辨率
 
 ## 常用工具
 
@@ -127,6 +137,7 @@
 - 原生 macOS App：图形界面为主，常用工具与日志入口都在应用内。
 - 运行体验更快：相比 YAAGL 的外部流程，日常启动与操作步骤更少。
 - 更不容易报错：减少启动期 patch/revert 的易错环节，出错时也更容易定位。
+- 多游戏可同时运行：不同容器可以同时启动同一款或不同的游戏，互不影响。
 
 ## 数据存储目录
 
