@@ -35,6 +35,10 @@ struct ConfigView: View {
     @State private var proxyEnabled: Bool = false
     @State private var proxyHost: String = ""
     @State private var proxyPort: String = ""
+
+    @State private var runtimeInstallLoadingState: LoadingState = .success
+    @State private var runtimeWineVersion: String? = nil
+    @State private var isRevertingRuntimeSelection: Bool = false
     @State private var winVersionLoadingState: LoadingState = .loading
     @State private var buildVersionLoadingState: LoadingState = .loading
     @State private var retinaModeLoadingState: LoadingState = .loading
@@ -53,6 +57,45 @@ struct ConfigView: View {
     var body: some View {
         Form {
             Section("config.title.wine", isExpanded: $wineSectionExpanded) {
+                SettingItemView(title: "config.wineRuntime", loadingState: runtimeInstallLoadingState) {
+                    Picker("config.wineRuntime", selection: $bottle.settings.wineRuntimeId) {
+                        ForEach(WineRuntimes.all, id: \.id) { runtime in
+                            let installed = WineRuntimeManager.isInstalled(runtimeId: runtime.id)
+                            let suffix: String = {
+                                if runtime.id == bottle.settings.wineRuntimeId, let v = runtimeWineVersion, !v.isEmpty {
+                                    return " (\(v))"
+                                }
+                                if !installed {
+                                    return " (Not Installed)"
+                                }
+                                return ""
+                            }()
+                            Text("\(runtime.displayName)\(suffix)").tag(runtime.id)
+                        }
+                    }
+                    .onChange(of: bottle.settings.wineRuntimeId) { oldRuntimeId, newRuntimeId in
+                        guard isRevertingRuntimeSelection == false else { return }
+
+                        runtimeInstallLoadingState = .modifying
+                        Task(priority: .userInitiated) {
+                            do {
+                                try await WineRuntimeManager.ensureInstalled(runtimeId: newRuntimeId)
+                                let version = try? await Wine.wineVersion(bottle: bottle)
+                                await MainActor.run {
+                                    runtimeWineVersion = version
+                                    runtimeInstallLoadingState = .success
+                                }
+                            } catch {
+                                await MainActor.run {
+                                    isRevertingRuntimeSelection = true
+                                    bottle.settings.wineRuntimeId = oldRuntimeId
+                                    isRevertingRuntimeSelection = false
+                                    runtimeInstallLoadingState = .success
+                                }
+                            }
+                        }
+                    }
+                }
                 SettingItemView(title: "config.winVersion", loadingState: winVersionLoadingState) {
                     Picker("config.winVersion", selection: $bottle.settings.windowsVersion) {
                         ForEach(WinVersion.allCases.reversed(), id: \.self) {
@@ -276,6 +319,53 @@ struct ConfigView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
+
+            Section("nap.section") {
+                ActionView(
+                    text: "nap.gameExecutable",
+                    subtitle: bottle.settings.napGameExecutableURL?.prettyPath() ?? String(localized: "nap.notSelected"),
+                    actionName: "create.browse"
+                ) {
+                    let panel = NSOpenPanel()
+                    panel.canChooseFiles = true
+                    panel.canChooseDirectories = false
+                    panel.allowsMultipleSelection = false
+                    panel.begin { result in
+                        if result == .OK, let url = panel.urls.first {
+                            bottle.settings.napGameExecutableURL = url
+
+                            if !bottle.settings.pins.contains(where: { $0.url == url }) {
+                                bottle.settings.pins.append(
+                                    PinnedProgram(name: url.deletingPathExtension().lastPathComponent, url: url)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Picker("nap.region", selection: $bottle.settings.napRegion) {
+                    Text("nap.region.os").tag(NapGame.Region.os)
+                    Text("nap.region.cn").tag(NapGame.Region.cn)
+                }
+
+                Toggle("nap.fixWebview", isOn: $bottle.settings.napFixWebview)
+
+                Toggle("nap.customResolution", isOn: $bottle.settings.napCustomResolutionEnabled)
+                HStack(alignment: .center) {
+                    TextField("nap.width", value: $bottle.settings.napCustomResolutionWidth, formatter: NumberFormatter())
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 90)
+                        .disabled(!bottle.settings.napCustomResolutionEnabled)
+                    Text("x")
+                        .frame(width: 12, height: 28, alignment: .center)
+                        .foregroundStyle(.secondary)
+                    TextField("nap.height", value: $bottle.settings.napCustomResolutionHeight, formatter: NumberFormatter())
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 90)
+                        .disabled(!bottle.settings.napCustomResolutionEnabled)
+                    Spacer()
+                }
+            }
         }
         .formStyle(.grouped)
         .animation(.whiskyDefault, value: wineSectionExpanded)
@@ -364,6 +454,13 @@ struct ConfigView: View {
             proxyEnabled = bottle.settings.proxyEnabled
             proxyHost = bottle.settings.proxyHost
             proxyPort = bottle.settings.proxyPort
+
+            Task(priority: .userInitiated) {
+                let version = try? await Wine.wineVersion(bottle: bottle)
+                await MainActor.run {
+                    runtimeWineVersion = version
+                }
+            }
         }
         .onChange(of: bottle.settings.windowsVersion) { _, newValue in
             if winVersionLoadingState == .success {

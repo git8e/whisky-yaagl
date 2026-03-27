@@ -28,15 +28,38 @@ struct BottleCreationView: View {
     @State private var newBottleVersion: WinVersion = .win10
     @State private var wineRuntimeId: String = "11.4-dxmt-signed"
     @State private var initialRetinaMode: Bool = false
-    @State private var initialHK4eRegion: HK4eGame.Region = .os
+
+    private enum GameRegionPreset: String, CaseIterable, Sendable {
+        case hk4eOs
+        case hk4eCn
+        case napOs
+        case napCn
+
+        var isHK4e: Bool { self == .hk4eOs || self == .hk4eCn }
+        var isNAP: Bool { self == .napOs || self == .napCn }
+
+        var gamePreset: BottleVM.GamePreset { isHK4e ? .hk4e : .nap }
+        var hk4eRegion: HK4eGame.Region { self == .hk4eCn ? .cn : .os }
+        var napRegion: NapGame.Region { self == .napCn ? .cn : .os }
+    }
+
+    @State private var gameRegionPreset: GameRegionPreset = .hk4eOs
+
     @State private var initialSteamPatch: Bool = true
     @State private var initialEnableHDR: Bool = false
+
+    @State private var initialNapFixWebview: Bool = true
+
     @State private var initialProxyEnabled: Bool = false
     @State private var initialProxyHost: String = ""
     @State private var initialProxyPort: String = ""
     @State private var initialCustomResolutionEnabled: Bool = false
     @State private var initialCustomResolutionWidth: Int = 1920
     @State private var initialCustomResolutionHeight: Int = 1080
+
+    @State private var initialNapCustomResolutionEnabled: Bool = false
+    @State private var initialNapCustomResolutionWidth: Int = 1920
+    @State private var initialNapCustomResolutionHeight: Int = 1080
     @State private var pinProgramURL: URL?
     @State private var newBottleURL: URL = UserDefaults.standard.url(forKey: "defaultBottleLocation")
                                            ?? BottleData.defaultBottleDir
@@ -101,14 +124,19 @@ struct BottleCreationView: View {
 
                 Toggle("config.retinaMode", isOn: $initialRetinaMode)
 
-                Picker("hk4e.region", selection: $initialHK4eRegion) {
-                    Text("hk4e.region.os").tag(HK4eGame.Region.os)
-                    Text("hk4e.region.cn").tag(HK4eGame.Region.cn)
+                Picker("create.gameRegion", selection: $gameRegionPreset) {
+                    Text("hk4e.region.os").tag(GameRegionPreset.hk4eOs)
+                    Text("hk4e.region.cn").tag(GameRegionPreset.hk4eCn)
+                    Text("nap.region.os").tag(GameRegionPreset.napOs)
+                    Text("nap.region.cn").tag(GameRegionPreset.napCn)
                 }
 
-                Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
-
-                Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
+                if gameRegionPreset.isHK4e {
+                    Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
+                    Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
+                } else {
+                    Toggle("nap.fixWebview", isOn: $initialNapFixWebview)
+                }
 
                 Toggle("config.proxy.enable", isOn: $initialProxyEnabled)
                 if initialProxyEnabled {
@@ -123,24 +151,42 @@ struct BottleCreationView: View {
                     }
                 }
 
-                Toggle("hk4e.customResolution", isOn: $initialCustomResolutionEnabled)
-                if initialCustomResolutionEnabled {
-                    HStack(alignment: .center) {
-                        TextField("hk4e.width", value: $initialCustomResolutionWidth, formatter: NumberFormatter())
-                            .textFieldStyle(.roundedBorder)
-                            .frame(width: 90)
-                        Text("x")
-                            .frame(width: 12, height: 28, alignment: .center)
-                            .foregroundStyle(.secondary)
-                        TextField("hk4e.height", value: $initialCustomResolutionHeight, formatter: NumberFormatter())
-                            .textFieldStyle(.roundedBorder)
-                            .frame(width: 90)
+                if gameRegionPreset.isHK4e {
+                    Toggle("hk4e.customResolution", isOn: $initialCustomResolutionEnabled)
+                    if initialCustomResolutionEnabled {
+                        HStack(alignment: .center) {
+                            TextField("hk4e.width", value: $initialCustomResolutionWidth, formatter: NumberFormatter())
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 90)
+                            Text("x")
+                                .frame(width: 12, height: 28, alignment: .center)
+                                .foregroundStyle(.secondary)
+                            TextField("hk4e.height", value: $initialCustomResolutionHeight, formatter: NumberFormatter())
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 90)
+                        }
+                    }
+                } else {
+                    Toggle("nap.customResolution", isOn: $initialNapCustomResolutionEnabled)
+                    if initialNapCustomResolutionEnabled {
+                        HStack(alignment: .center) {
+                            TextField("nap.width", value: $initialNapCustomResolutionWidth, formatter: NumberFormatter())
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 90)
+                            Text("x")
+                                .frame(width: 12, height: 28, alignment: .center)
+                                .foregroundStyle(.secondary)
+                            TextField("nap.height", value: $initialNapCustomResolutionHeight, formatter: NumberFormatter())
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 90)
+                        }
                     }
                 }
 
                 ActionView(
-                    text: "hk4e.gameExecutableOptional",
-                    subtitle: pinProgramURL?.path(percentEncoded: false) ?? String(localized: "hk4e.notSelected"),
+                    text: gameRegionPreset.isHK4e ? "hk4e.gameExecutableOptional" : "nap.gameExecutableOptional",
+                    subtitle: pinProgramURL?.path(percentEncoded: false)
+                        ?? String(localized: gameRegionPreset.isHK4e ? "hk4e.notSelected" : "nap.notSelected"),
                     actionName: "create.browse"
                 ) {
                     let panel = NSOpenPanel()
@@ -152,10 +198,12 @@ struct BottleCreationView: View {
                             pinProgramURL = url
 
                             let lower = url.lastPathComponent.lowercased()
-                            if lower.contains("yuanshen") {
-                                initialHK4eRegion = .cn
+                            if lower.contains("zenlesszonezero") {
+                                gameRegionPreset = .napOs
+                            } else if lower.contains("yuanshen") {
+                                gameRegionPreset = .hk4eCn
                             } else if lower.contains("genshinimpact") {
-                                initialHK4eRegion = .os
+                                gameRegionPreset = .hk4eOs
                             }
                         }
                     }
@@ -218,21 +266,35 @@ struct BottleCreationView: View {
     }
 
     func submit() {
+        let preset = gameRegionPreset.gamePreset
+        let hk4eSteamPatch = (preset == .hk4e) ? initialSteamPatch : false
+        let hk4eEnableHDR = (preset == .hk4e) ? initialEnableHDR : false
+        let hk4eCustomResolutionEnabled = (preset == .hk4e) ? initialCustomResolutionEnabled : false
+
+        let napFixWebview = (preset == .nap) ? initialNapFixWebview : true
+        let napCustomResolutionEnabled = (preset == .nap) ? initialNapCustomResolutionEnabled : false
+
         _ = bottleVM.createNewBottle(
             bottleName: newBottleName,
             winVersion: newBottleVersion,
             bottleURL: newBottleURL,
             wineRuntimeId: wineRuntimeId,
             initialRetinaMode: initialRetinaMode,
-            initialHK4eRegion: initialHK4eRegion,
-            initialSteamPatch: initialSteamPatch,
-            initialEnableHDR: initialEnableHDR,
+            gamePreset: preset,
+            initialHK4eRegion: gameRegionPreset.hk4eRegion,
+            initialSteamPatch: hk4eSteamPatch,
+            initialEnableHDR: hk4eEnableHDR,
+            initialNapRegion: gameRegionPreset.napRegion,
+            initialNapFixWebview: napFixWebview,
             initialProxyEnabled: initialProxyEnabled,
             initialProxyHost: initialProxyHost,
             initialProxyPort: initialProxyPort,
-            initialCustomResolutionEnabled: initialCustomResolutionEnabled,
+            initialCustomResolutionEnabled: hk4eCustomResolutionEnabled,
             initialCustomResolutionWidth: initialCustomResolutionWidth,
             initialCustomResolutionHeight: initialCustomResolutionHeight,
+            initialNapCustomResolutionEnabled: napCustomResolutionEnabled,
+            initialNapCustomResolutionWidth: initialNapCustomResolutionWidth,
+            initialNapCustomResolutionHeight: initialNapCustomResolutionHeight,
             pinProgramURL: pinProgramURL
         )
     }

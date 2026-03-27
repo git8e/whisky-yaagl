@@ -24,6 +24,11 @@ import WhiskyKit
 final class BottleVM: ObservableObject, @unchecked Sendable {
     @MainActor static let shared = BottleVM()
 
+    enum GamePreset: String, CaseIterable, Sendable {
+        case hk4e
+        case nap
+    }
+
     var bottlesList = BottleData()
     @Published var bottles: [Bottle] = []
 
@@ -50,16 +55,22 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
         wineArchiveURL: URL? = nil,
         initialMetalHud: Bool = false,
         initialRetinaMode: Bool = false,
+        gamePreset: GamePreset = .hk4e,
         initialHK4eRegion: HK4eGame.Region = .os,
         initialSteamPatch: Bool = false,
         initialCertImport: Bool = true,
         initialEnableHDR: Bool = false,
+        initialNapRegion: NapGame.Region = .os,
+        initialNapFixWebview: Bool = true,
         initialProxyEnabled: Bool = false,
         initialProxyHost: String = "",
         initialProxyPort: String = "",
         initialCustomResolutionEnabled: Bool = false,
         initialCustomResolutionWidth: Int = 1920,
         initialCustomResolutionHeight: Int = 1080,
+        initialNapCustomResolutionEnabled: Bool = false,
+        initialNapCustomResolutionWidth: Int = 1920,
+        initialNapCustomResolutionHeight: Int = 1080,
         pinProgramURL: URL? = nil
     ) -> URL {
         let newBottleDir = bottleURL.appending(path: UUID().uuidString)
@@ -113,18 +124,21 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
 
                 bottle.settings.hk4eRegion = initialHK4eRegion
                 bottle.settings.hk4eSteamPatch = initialSteamPatch
-                bottle.settings.hk4eCertificateImportEnabled = true
+                bottle.settings.hk4eCertificateImportEnabled = initialCertImport
                 bottle.settings.hk4eEnableHDR = initialEnableHDR
-                if let runtime = WineRuntimes.runtime(id: wineRuntimeId), runtime.renderBackend == .dxmt {
-                    bottle.settings.hk4eDXMTInjectionEnabled = true
-                }
+                bottle.settings.hk4eLaunchPatchingEnabled = (gamePreset == .hk4e)
+
+                bottle.settings.napRegion = initialNapRegion
+                bottle.settings.napFixWebview = initialNapFixWebview
+                bottle.settings.napCustomResolutionEnabled = initialNapCustomResolutionEnabled
+                bottle.settings.napCustomResolutionWidth = initialNapCustomResolutionWidth
+                bottle.settings.napCustomResolutionHeight = initialNapCustomResolutionHeight
                 bottle.settings.proxyEnabled = initialProxyEnabled
                 bottle.settings.proxyHost = initialProxyHost
                 bottle.settings.proxyPort = initialProxyPort
                 bottle.settings.hk4eCustomResolutionEnabled = initialCustomResolutionEnabled
                 bottle.settings.hk4eCustomResolutionWidth = initialCustomResolutionWidth
                 bottle.settings.hk4eCustomResolutionHeight = initialCustomResolutionHeight
-                bottle.settings.hk4eLaunchPatchingEnabled = true
 
                 try await Wine.withLogSession(for: bottle) {
                     await MainActor.run {
@@ -144,15 +158,17 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                         "WINEMSYNC": "0"
                     ]
 
-                    await MainActor.run { self.createBottleStatus = String(localized: "create.status.certificates") }
-                    do {
-                        try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
-                    } catch {
-                        await MainActor.run {
-                            self.createBottleStatus = String(
-                                format: String(localized: "create.status.certificatesIgnored"),
-                                error.localizedDescription
-                            )
+                    if gamePreset == .hk4e, bottle.settings.hk4eCertificateImportEnabled {
+                        await MainActor.run { self.createBottleStatus = String(localized: "create.status.certificates") }
+                        do {
+                            try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
+                        } catch {
+                            await MainActor.run {
+                                self.createBottleStatus = String(
+                                    format: String(localized: "create.status.certificatesIgnored"),
+                                    error.localizedDescription
+                                )
+                            }
                         }
                     }
 
@@ -164,24 +180,26 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                         _ = try await Wine.runWine(["winecfg", "-v", winVersion.rawValue], bottle: bottle, environment: initEnv)
                     }
 
-                    // Pre-configure HK4e-related patch dependencies so the bottle is ready before first launch.
-                    if bottle.settings.hk4eDXMTInjectionEnabled,
-                       let runtime = WineRuntimes.runtime(id: wineRuntimeId),
-                       runtime.renderBackend == .dxmt {
-                        await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
-                        try await HK4eDXMT.ensureInstalled(progress: nil)
-                        HK4eDXMT.applyToRuntime(runtimeId: wineRuntimeId)
-                        try? HK4eDXMT.applyToPrefix(prefixURL: newBottleDir)
-                    }
+                    if gamePreset == .hk4e {
+                        // Pre-configure HK4e-related patch dependencies so the bottle is ready before first launch.
+                        if bottle.settings.hk4eDXMTInjectionEnabled,
+                           let runtime = WineRuntimes.runtime(id: wineRuntimeId),
+                           runtime.renderBackend == .dxmt {
+                            await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
+                            try await HK4eDXMT.ensureInstalled(progress: nil)
+                            HK4eDXMT.applyToRuntime(runtimeId: wineRuntimeId)
+                            try? HK4eDXMT.applyToPrefix(prefixURL: newBottleDir)
+                        }
 
-                    if bottle.settings.hk4eSteamPatch {
-                        await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
-                        try? await SteamPatch.apply(prefixURL: newBottleDir)
-                    }
+                        if bottle.settings.hk4eSteamPatch {
+                            await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
+                            try? await SteamPatch.apply(prefixURL: newBottleDir)
+                        }
 
-                    if bottle.settings.hk4eLeftCommandIsCtrl || bottle.settings.hk4eCustomResolutionEnabled {
-                        await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
-                        try await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+                        if bottle.settings.hk4eLeftCommandIsCtrl || bottle.settings.hk4eCustomResolutionEnabled {
+                            await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
+                            try await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+                        }
                     }
 
                     if initialRetinaMode {
@@ -203,7 +221,12 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     bottle.settings.pins.append(
                         PinnedProgram(name: pinProgramURL.deletingPathExtension().lastPathComponent, url: pinProgramURL)
                     )
-                    bottle.settings.hk4eGameExecutableURL = pinProgramURL
+                    switch gamePreset {
+                    case .hk4e:
+                        bottle.settings.hk4eGameExecutableURL = pinProgramURL
+                    case .nap:
+                        bottle.settings.napGameExecutableURL = pinProgramURL
+                    }
                 }
 
                 // Add record
