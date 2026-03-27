@@ -41,11 +41,12 @@ public enum WineProxySettings {
     }
 
     private static func desiredState(bottle: Bottle) -> DesiredState {
-        DesiredState(
-            enabled: bottle.settings.proxyEnabled,
-            host: bottle.settings.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines),
-            port: bottle.settings.proxyPort.trimmingCharacters(in: .whitespacesAndNewlines)
-        )
+        let host = bottle.settings.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
+        let port = bottle.settings.proxyPort.trimmingCharacters(in: .whitespacesAndNewlines)
+        let server = port.isEmpty ? host : "\(host):\(port)"
+        // Avoid a Wine wininet crash when ProxyEnable=1 but ProxyServer is missing/empty.
+        let enabled = bottle.settings.proxyEnabled && !server.isEmpty
+        return DesiredState(enabled: enabled, host: host, port: port)
     }
 
     private static func loadState(bottle: Bottle) -> DesiredState? {
@@ -68,16 +69,16 @@ public enum WineProxySettings {
     }
 
     private static func buildRegistryContent(state: DesiredState) -> String {
+        let server = state.port.isEmpty ? state.host : "\(state.host):\(state.port)"
+        let enabled = state.enabled && !server.isEmpty
         var lines = [
             "Windows Registry Editor Version 5.00",
             "",
             #"[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings]"#,
-            String(format: #""ProxyEnable"=dword:%08x"#, state.enabled ? 1 : 0)
+            String(format: #""ProxyEnable"=dword:%08x"#, enabled ? 1 : 0)
         ]
 
-        let server = state.port.isEmpty ? state.host : "\(state.host):\(state.port)"
-
-        if state.enabled, !server.isEmpty {
+        if enabled {
             let escaped = server.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: #"\""#)
             lines.append("\"ProxyServer\"=\"\(escaped)\"")
         } else {
@@ -98,15 +99,77 @@ public enum WineProxySettings {
         defer { try? fm.removeItem(at: regFileURL) }
 
         let regWinePath = toWinePath(regFileURL.path(percentEncoded: false))
-        _ = try await Wine.runWine(
-            ["regedit", regWinePath],
-            bottle: bottle,
-            environment: [
-                "WINEDEBUG": "-all",
-                "WINEESYNC": "0",
-                "WINEMSYNC": "0"
-            ]
-        )
+        do {
+            _ = try await Wine.runWine(
+                ["regedit", regWinePath],
+                bottle: bottle,
+                environment: [
+                    "WINEDEBUG": "-all",
+                    "WINEESYNC": "0",
+                    "WINEMSYNC": "0"
+                ]
+            )
+        } catch {
+            // If Wine can't boot (e.g. wininet crash), fall back to offline registry patching.
+            try applyOffline(bottle: bottle, state: state)
+        }
         saveState(bottle: bottle, state: state)
+    }
+
+    private static func applyOffline(bottle: Bottle, state: DesiredState) throws {
+        let regURL = bottle.url.appendingPathComponent("user.reg", isDirectory: false)
+        guard fm.fileExists(atPath: regURL.path(percentEncoded: false)) else { return }
+
+        let raw = try String(contentsOf: regURL, encoding: .utf8)
+        var lines = raw
+            .split(separator: "\n", omittingEmptySubsequences: false)
+            .map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "\r")) }
+
+        let key = "[Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Internet Settings]"
+        let sectionStart = lines.firstIndex(where: { $0.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix(key) })
+
+        func isSectionHeader(_ s: String) -> Bool {
+            let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
+            return t.hasPrefix("[") && t.contains("]")
+        }
+
+        let server = state.port.isEmpty ? state.host : "\(state.host):\(state.port)"
+        let enabled = state.enabled && !server.isEmpty
+        let proxyEnableLine = String(format: #""ProxyEnable"=dword:%08x"#, enabled ? 1 : 0)
+
+        var newSectionLines = [proxyEnableLine]
+        if enabled {
+            let escaped = server.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: #"\""#)
+            newSectionLines.append("\"ProxyServer\"=\"\(escaped)\"")
+        }
+
+        if let start = sectionStart {
+            let end = (lines[(start + 1)...].firstIndex(where: { isSectionHeader($0) }) ?? lines.endIndex)
+
+            // Remove existing ProxyEnable/ProxyServer lines.
+            var kept = [String]()
+            kept.reserveCapacity(end - start)
+            kept.append(lines[start])
+            for i in (start + 1)..<end {
+                let t = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
+                if t.hasPrefix("\"ProxyEnable\"") || t.hasPrefix("\"ProxyServer\"") {
+                    continue
+                }
+                kept.append(lines[i])
+            }
+
+            // Insert our desired lines right after header.
+            kept.insert(contentsOf: newSectionLines, at: 1)
+            lines.replaceSubrange(start..<end, with: kept)
+        } else {
+            // Append section if missing.
+            if let last = lines.last, !last.isEmpty {
+                lines.append("")
+            }
+            lines.append(key)
+            lines.append(contentsOf: newSectionLines)
+        }
+
+        try lines.joined(separator: "\r\n").write(to: regURL, atomically: true, encoding: .utf8)
     }
 }
