@@ -44,6 +44,21 @@ struct BottleCreationView: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    private func normalizeProxyFields() {
+        // If user pastes "host:port" into host field, split it.
+        let host = initialProxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
+        let port = initialProxyPort.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard port.isEmpty else { return }
+
+        let parts = host.split(separator: ":", omittingEmptySubsequences: false)
+        guard parts.count == 2 else { return } // avoid IPv6 / URLs
+
+        let newHost = String(parts[0])
+        let newPort = String(parts[1])
+        if newHost != initialProxyHost { initialProxyHost = newHost }
+        if newPort != initialProxyPort { initialProxyPort = newPort }
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -101,8 +116,7 @@ struct BottleCreationView: View {
                         TextField("config.proxy.host", text: $initialProxyHost)
                             .textFieldStyle(.roundedBorder)
                             .frame(width: 180)
-                        Text(":")
-                            .foregroundStyle(.secondary)
+                            .onChange(of: initialProxyHost) { _, _ in normalizeProxyFields() }
                         TextField("config.proxy.port", text: $initialProxyPort)
                             .textFieldStyle(.roundedBorder)
                             .frame(width: 90)

@@ -108,8 +108,7 @@ struct ConfigView: View {
                         TextField("config.proxy.host", text: $proxyHost)
                             .textFieldStyle(.roundedBorder)
                             .frame(width: 160)
-                        Text(":")
-                            .foregroundStyle(.secondary)
+                            .onChange(of: proxyHost) { _, _ in normalizeProxyFields() }
                         TextField("config.proxy.port", text: $proxyPort)
                             .textFieldStyle(.roundedBorder)
                             .frame(width: 80)
@@ -376,6 +375,7 @@ struct ConfigView: View {
     }
 
     func applyProxySettings() {
+        normalizeProxyFields()
         bottle.settings.proxyEnabled = proxyEnabled
         bottle.settings.proxyHost = proxyHost
         bottle.settings.proxyPort = proxyPort
@@ -395,6 +395,19 @@ struct ConfigView: View {
                 }
             }
         }
+    }
+
+    private func normalizeProxyFields() {
+        // If user pastes "host:port" into host field, split it.
+        let host = proxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
+        let port = proxyPort.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard port.isEmpty else { return }
+
+        let parts = host.split(separator: ":", omittingEmptySubsequences: false)
+        guard parts.count == 2 else { return } // avoid IPv6 / URLs
+
+        proxyHost = String(parts[0])
+        proxyPort = String(parts[1])
     }
 }
 
