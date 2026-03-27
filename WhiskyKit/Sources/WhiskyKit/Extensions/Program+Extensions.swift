@@ -140,45 +140,47 @@ extension Program {
         let fullPath = logURL.path(percentEncoded: false)
         let displayPath = (fullPath as NSString).abbreviatingWithTildeInPath
 
-        // NSAlert does not support attributed informative text via public API.
-        // Use an accessory view with a clickable link-style text field.
+        // NSAlert informative text is plain; use an accessory view so the path is selectable and wraps.
         let labelField = NSTextField(labelWithString: logLabel)
+        labelField.alignment = .left
         labelField.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        let linkField = NSTextField(labelWithString: displayPath)
-        linkField.allowsEditingTextAttributes = true
-        linkField.isSelectable = true
-        linkField.maximumNumberOfLines = 2
-        linkField.cell?.wraps = true
-        linkField.cell?.isScrollable = false
-        linkField.cell?.lineBreakMode = .byWordWrapping
-        linkField.alignment = .left
-        linkField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        linkField.toolTip = fullPath
+        let textView = NSTextView(frame: .zero)
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.drawsBackground = false
+        textView.font = NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        textView.string = displayPath
+        textView.toolTip = fullPath
+        textView.textContainerInset = .zero
+        textView.textContainer?.lineFragmentPadding = 0
+        textView.textContainer?.widthTracksTextView = true
+        textView.textContainer?.lineBreakMode = .byCharWrapping
 
-        linkField.attributedStringValue = NSAttributedString(
-            string: displayPath,
-            attributes: [
-                .link: logURL,
-                .foregroundColor: NSColor.linkColor,
-                .underlineStyle: NSUnderlineStyle.single.rawValue
-            ]
-        )
+        let scrollView = NSScrollView(frame: .zero)
+        scrollView.drawsBackground = false
+        scrollView.borderType = .noBorder
+        scrollView.hasHorizontalScroller = false
+        scrollView.hasVerticalScroller = false
+        scrollView.documentView = textView
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.widthAnchor.constraint(equalToConstant: 480).isActive = true
+        scrollView.heightAnchor.constraint(equalToConstant: 44).isActive = true
 
-        let row = NSStackView(views: [labelField, linkField])
-        row.orientation = .horizontal
-        row.alignment = .firstBaseline
-        row.spacing = 6
-
-        let accessory = NSStackView(views: [row])
+        let accessory = NSStackView(views: [labelField, scrollView])
         accessory.orientation = .vertical
         accessory.alignment = .leading
-        accessory.spacing = 6
+        accessory.spacing = 4
         accessory.edgeInsets = NSEdgeInsets(top: 8, left: 0, bottom: 0, right: 0)
         alert.accessoryView = accessory
 
         alert.alertStyle = .critical
+        let openTitle = String(localized: latestLogURL != nil ? "button.openLatestLog" : "button.openLogs")
+        alert.addButton(withTitle: openTitle)
         alert.addButton(withTitle: String(localized: "button.ok"))
-        alert.runModal()
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            NSWorkspace.shared.open(logURL)
+        }
     }
 }
