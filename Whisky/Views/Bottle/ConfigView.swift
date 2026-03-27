@@ -232,7 +232,8 @@ struct ConfigView: View {
                 }
             }
 
-            Section("hk4e.section", isExpanded: $hk4eSectionExpanded) {
+            if bottle.settings.hk4eLaunchPatchingEnabled {
+                Section("hk4e.section", isExpanded: $hk4eSectionExpanded) {
                 ActionView(
                     text: "hk4e.gameExecutable",
                     subtitle: bottle.settings.hk4eGameExecutableURL?.prettyPath() ?? String(localized: "hk4e.notSelected"),
@@ -318,6 +319,7 @@ struct ConfigView: View {
                 Text("hk4e.description")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+                }
             }
 
             Section("nap.section") {
