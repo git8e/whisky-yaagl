@@ -37,14 +37,15 @@
 
 1. 打开仓库的 `Actions`
 2. 进入最新成功的 `Build (macOS)`
-3. 下载产物里的 `Whisky.app`
-4. 解压并去除隔离属性：
+3. 在页面底部的 `Artifacts` 下载 `Whisky.app.zip`
+4. 用 `Finder` 双击解压
+5. 将 `Whisky.app` 拖到 `/Applications`
+6. 从“应用程序”里打开
 
-```bash
-unzip -q Whisky.app.zip
-xattr -dr com.apple.quarantine "Whisky.app"
-open "Whisky.app"
-```
+如果首次打开被系统拦截：
+
+1. 打开“系统设置” -> “隐私与安全性”
+2. 找到拦截提示，点击“仍要打开”
 
 ## 首次启动
 
@@ -162,5 +163,6 @@ open "Whisky.app"
 
 - [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher)：提供了很多 HK4e 相关流程的参考实现与思路。
 - [Whisky](https://github.com/Whisky-App/Whisky)：提供了本分支的基础框架与 macOS 上的 Wine bottle 体验。
+- OpenCode (gpt-5.2)：移植实现与文档整理。
 
 也建议支持 upstream Whisky 和相关上游项目。

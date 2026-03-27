@@ -34,14 +34,15 @@ You do not need Xcode.
 
 1. Open the repository's `Actions` page.
 2. Open the latest successful `Build (macOS)` run.
-3. Download the `Whisky.app` artifact.
-4. Unzip and remove quarantine:
+3. Scroll to `Artifacts` and download `Whisky.app.zip`.
+4. Open `Finder` and unzip it (double-click).
+5. Drag `Whisky.app` into `/Applications`.
+6. Launch it from `Applications`.
 
-```bash
-unzip -q Whisky.app.zip
-xattr -dr com.apple.quarantine "Whisky.app"
-open "Whisky.app"
-```
+If macOS blocks the app on first launch:
+
+1. Open `System Settings` -> `Privacy & Security`.
+2. Find the blocked app message and click `Open Anyway`.
 
 ## First Launch
 
@@ -162,5 +163,6 @@ This project is built on top of Whisky and the work of the Wine, DXVK, MoltenVK,
 
 - [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher) for the HK4e-oriented workflow ideas and reference behavior.
 - [Whisky](https://github.com/Whisky-App/Whisky) for the base app and the macOS Wine bottle experience.
+- OpenCode (gpt-5.2) for porting work and documentation.
 
 Please also support the upstream projects that make this fork possible.
