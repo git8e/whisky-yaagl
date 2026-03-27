@@ -122,6 +122,8 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.windowsVersion = winVersion
                 bottle.settings.name = bottleName
 
+                bottle.settings.gamePreset = (gamePreset == .nap) ? .nap : .hk4e
+
                 bottle.settings.hk4eRegion = initialHK4eRegion
                 bottle.settings.hk4eSteamPatch = initialSteamPatch
                 bottle.settings.hk4eCertificateImportEnabled = initialCertImport
