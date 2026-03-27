@@ -51,6 +51,17 @@ public enum WineRuntimes {
 
     public static let all: [WineRuntime] = [
         WineRuntime(
+            id: "11.4-dxmt-signed",
+            displayName: "Wine 11.4 DXMT (signed)",
+            remoteURL: URL(
+                string:
+                    "https://github.com/dawn-winery/dawn-signed/releases/download/wine-gcenx-11.4-osx64/" +
+                    "wine-devel-11.4-osx64-signed.tar.xz"
+            ),
+            renderBackend: .dxmt,
+            archive: .init(winePathInArchive: "wine-devel-11.4-osx64-signed/Contents/Resources/wine")
+        ),
+        WineRuntime(
             id: "11.0-dxmt-signed",
             displayName: "Wine 11.0 DXMT (signed)",
             remoteURL: URL(

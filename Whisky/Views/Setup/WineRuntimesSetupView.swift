@@ -11,7 +11,7 @@ struct WineRuntimesSetupView: View {
                 Text("Wine Runtimes")
                     .font(.title)
                     .fontWeight(.bold)
-                Text("Select any runtimes to download. Wine 11.0 DXMT is recommended.")
+                Text("Select any runtimes to download. Wine 11.4 DXMT is recommended.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -72,14 +72,14 @@ struct WineRuntimesSetupView: View {
                 Button("Done") {
                     showSetup = false
                 }
-                .disabled(!vm.isInstalled("11.0-dxmt-signed"))
+                .disabled(!vm.isInstalled("11.4-dxmt-signed") && !vm.isInstalled("11.0-dxmt-signed"))
             }
         }
         .frame(width: 520, height: 420)
         .onAppear {
-            // Default behavior: start downloading Wine 11.0 DXMT on first run.
-            if !vm.isInstalled("11.0-dxmt-signed") {
-                vm.download(runtimeId: "11.0-dxmt-signed")
+            // Default behavior: start downloading Wine 11.4 DXMT on first run.
+            if !vm.isInstalled("11.4-dxmt-signed") {
+                vm.download(runtimeId: "11.4-dxmt-signed")
             }
         }
     }
