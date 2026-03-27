@@ -6,7 +6,7 @@
 import Foundation
 
 public enum HK4eGame {
-    public enum Region: String, Codable, CaseIterable {
+    public enum Region: String, Codable, CaseIterable, Sendable {
         case os
         case cn
     }
