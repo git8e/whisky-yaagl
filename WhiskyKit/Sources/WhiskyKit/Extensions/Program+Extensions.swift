@@ -134,53 +134,17 @@ extension Program {
         + message
 
         let latestLogURL = Wine.latestLogFileURL()
-        let logURL = latestLogURL ?? Wine.logsFolder
-        let logLabel = (latestLogURL != nil) ? "Log:" : "Logs:"
-
-        let fullPath = logURL.path(percentEncoded: false)
-        let displayPath = (fullPath as NSString).abbreviatingWithTildeInPath
-
-        // NSAlert informative text is plain; use an accessory view so the path is selectable and wraps.
-        let labelField = NSTextField(labelWithString: logLabel)
-        labelField.alignment = .left
-        labelField.setContentCompressionResistancePriority(.required, for: .horizontal)
-
-        let textView = NSTextView(frame: .zero)
-        textView.isEditable = false
-        textView.isSelectable = true
-        textView.drawsBackground = false
-        textView.font = NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
-        textView.string = displayPath
-        textView.toolTip = fullPath
-        textView.textContainerInset = .zero
-        textView.textContainer?.lineFragmentPadding = 0
-        textView.textContainer?.widthTracksTextView = true
-        textView.textContainer?.lineBreakMode = .byCharWrapping
-
-        let scrollView = NSScrollView(frame: .zero)
-        scrollView.drawsBackground = false
-        scrollView.borderType = .noBorder
-        scrollView.hasHorizontalScroller = false
-        scrollView.hasVerticalScroller = false
-        scrollView.documentView = textView
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.widthAnchor.constraint(equalToConstant: 480).isActive = true
-        scrollView.heightAnchor.constraint(equalToConstant: 44).isActive = true
-
-        let accessory = NSStackView(views: [labelField, scrollView])
-        accessory.orientation = .vertical
-        accessory.alignment = .leading
-        accessory.spacing = 4
-        accessory.edgeInsets = NSEdgeInsets(top: 8, left: 0, bottom: 0, right: 0)
-        alert.accessoryView = accessory
 
         alert.alertStyle = .critical
-        let openTitle = String(localized: latestLogURL != nil ? "button.openLatestLog" : "button.openLogs")
-        alert.addButton(withTitle: openTitle)
+
+        if latestLogURL != nil {
+            alert.addButton(withTitle: String(localized: "button.openLatestLog"))
+        }
         alert.addButton(withTitle: String(localized: "button.ok"))
         let response = alert.runModal()
-        if response == .alertFirstButtonReturn {
-            NSWorkspace.shared.open(logURL)
+
+        if response == .alertFirstButtonReturn, let latestLogURL {
+            NSWorkspace.shared.open(latestLogURL)
         }
     }
 }
