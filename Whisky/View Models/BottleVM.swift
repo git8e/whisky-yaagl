@@ -50,6 +50,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
         wineArchiveURL: URL? = nil,
         initialMetalHud: Bool = false,
         initialRetinaMode: Bool = false,
+        initialHK4eRegion: HK4eGame.Region = .os,
         initialSteamPatch: Bool = false,
         initialCertImport: Bool = true,
         initialEnableHDR: Bool = false,
@@ -110,6 +111,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.windowsVersion = winVersion
                 bottle.settings.name = bottleName
 
+                bottle.settings.hk4eRegion = initialHK4eRegion
                 bottle.settings.hk4eSteamPatch = initialSteamPatch
                 bottle.settings.hk4eCertificateImportEnabled = true
                 bottle.settings.hk4eEnableHDR = initialEnableHDR

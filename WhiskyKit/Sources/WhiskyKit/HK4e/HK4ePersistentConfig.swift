@@ -9,10 +9,34 @@ public enum HK4ePersistentConfig {
     private static var fm: FileManager { FileManager.default }
 
     private struct DesiredState: Codable, Equatable {
+        var region: HK4eGame.Region
         var leftCommandIsCtrl: Bool
         var customResolutionEnabled: Bool
         var customResolutionWidth: Int
         var customResolutionHeight: Int
+
+        init(
+            region: HK4eGame.Region,
+            leftCommandIsCtrl: Bool,
+            customResolutionEnabled: Bool,
+            customResolutionWidth: Int,
+            customResolutionHeight: Int
+        ) {
+            self.region = region
+            self.leftCommandIsCtrl = leftCommandIsCtrl
+            self.customResolutionEnabled = customResolutionEnabled
+            self.customResolutionWidth = customResolutionWidth
+            self.customResolutionHeight = customResolutionHeight
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.region = try container.decodeIfPresent(HK4eGame.Region.self, forKey: .region) ?? .os
+            self.leftCommandIsCtrl = try container.decode(Bool.self, forKey: .leftCommandIsCtrl)
+            self.customResolutionEnabled = try container.decode(Bool.self, forKey: .customResolutionEnabled)
+            self.customResolutionWidth = try container.decode(Int.self, forKey: .customResolutionWidth)
+            self.customResolutionHeight = try container.decode(Int.self, forKey: .customResolutionHeight)
+        }
     }
 
     private static func hk4eWorkDir(bottle: Bottle) throws -> URL {
@@ -48,6 +72,7 @@ public enum HK4ePersistentConfig {
 
     private static func desiredState(bottle: Bottle) -> DesiredState {
         DesiredState(
+            region: bottle.settings.hk4eRegion,
             leftCommandIsCtrl: bottle.settings.hk4eLeftCommandIsCtrl,
             customResolutionEnabled: bottle.settings.hk4eCustomResolutionEnabled,
             customResolutionWidth: bottle.settings.hk4eCustomResolutionWidth,
@@ -80,6 +105,15 @@ public enum HK4ePersistentConfig {
         }
     }
 
+    private static func hk4eRegistryKey(region: HK4eGame.Region) -> String {
+        switch region {
+        case .cn:
+            return #"HKEY_CURRENT_USER\Software\miHoYo\原神"#
+        case .os:
+            return #"HKEY_CURRENT_USER\Software\miHoYo\Genshin Impact"#
+        }
+    }
+
     private static func buildRegistryContent(state: DesiredState) -> String {
         var lines = [
             "Windows Registry Editor Version 5.00",
@@ -87,7 +121,7 @@ public enum HK4ePersistentConfig {
             #"[HKEY_CURRENT_USER\Software\Wine\Mac Driver]"#,
             "\"LeftCommandIsCtrl\"=\"\(state.leftCommandIsCtrl ? "y" : "n")\"",
             "",
-            #"[HKEY_CURRENT_USER\Software\miHoYo\Genshin Impact]"#
+            "[\(hk4eRegistryKey(region: state.region))]"
         ]
 
         if state.customResolutionEnabled, state.customResolutionWidth > 0, state.customResolutionHeight > 0 {

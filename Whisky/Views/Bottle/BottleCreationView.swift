@@ -28,6 +28,7 @@ struct BottleCreationView: View {
     @State private var newBottleVersion: WinVersion = .win10
     @State private var wineRuntimeId: String = "11.0-dxmt-signed"
     @State private var initialRetinaMode: Bool = false
+    @State private var initialHK4eRegion: HK4eGame.Region = .os
     @State private var initialSteamPatch: Bool = true
     @State private var initialEnableHDR: Bool = false
     @State private var initialProxyEnabled: Bool = false
@@ -85,6 +86,11 @@ struct BottleCreationView: View {
 
                 Toggle("config.retinaMode", isOn: $initialRetinaMode)
 
+                Picker("hk4e.region", selection: $initialHK4eRegion) {
+                    Text("hk4e.region.os").tag(HK4eGame.Region.os)
+                    Text("hk4e.region.cn").tag(HK4eGame.Region.cn)
+                }
+
                 Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
 
                 Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
@@ -130,6 +136,13 @@ struct BottleCreationView: View {
                     panel.begin { result in
                         if result == .OK, let url = panel.urls.first {
                             pinProgramURL = url
+
+                            let lower = url.lastPathComponent.lowercased()
+                            if lower.contains("yuanshen") {
+                                initialHK4eRegion = .cn
+                            } else if lower.contains("genshinimpact") {
+                                initialHK4eRegion = .os
+                            }
                         }
                     }
                 }
@@ -197,6 +210,7 @@ struct BottleCreationView: View {
             bottleURL: newBottleURL,
             wineRuntimeId: wineRuntimeId,
             initialRetinaMode: initialRetinaMode,
+            initialHK4eRegion: initialHK4eRegion,
             initialSteamPatch: initialSteamPatch,
             initialEnableHDR: initialEnableHDR,
             initialProxyEnabled: initialProxyEnabled,

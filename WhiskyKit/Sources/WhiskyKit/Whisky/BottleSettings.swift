@@ -152,6 +152,7 @@ public struct BottleDXVKConfig: Codable, Equatable {
 }
 
 public struct BottleHK4eConfig: Codable, Equatable {
+    var region: HK4eGame.Region = .os
     var steamPatch: Bool = false
     var customResolutionEnabled: Bool = false
     var customResolutionWidth: Int = 1920
@@ -172,6 +173,7 @@ public struct BottleHK4eConfig: Codable, Equatable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.region = try container.decodeIfPresent(HK4eGame.Region.self, forKey: .region) ?? .os
         self.steamPatch = try container.decodeIfPresent(Bool.self, forKey: .steamPatch) ?? false
         self.customResolutionEnabled = try container.decodeIfPresent(Bool.self, forKey: .customResolutionEnabled) ?? false
         self.customResolutionWidth = try container.decodeIfPresent(Int.self, forKey: .customResolutionWidth) ?? 1920
@@ -328,6 +330,11 @@ public struct BottleSettings: Codable, Equatable {
     public var hk4eSteamPatch: Bool {
         get { return hk4eConfig.steamPatch }
         set { hk4eConfig.steamPatch = newValue }
+    }
+
+    public var hk4eRegion: HK4eGame.Region {
+        get { return hk4eConfig.region }
+        set { hk4eConfig.region = newValue }
     }
 
     public var hk4eCustomResolutionEnabled: Bool {
