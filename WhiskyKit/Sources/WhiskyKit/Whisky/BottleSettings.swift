@@ -112,13 +112,6 @@ public struct BottleWineConfig: Codable, Equatable {
         self.proxyEnabled = try container.decodeIfPresent(Bool.self, forKey: .proxyEnabled) ?? false
         self.proxyHost = try container.decodeIfPresent(String.self, forKey: .proxyHost) ?? ""
         self.proxyPort = try container.decodeIfPresent(String.self, forKey: .proxyPort) ?? ""
-        if (self.proxyHost.isEmpty && self.proxyPort.isEmpty),
-           let legacyProxy = try container.decodeIfPresent(String.self, forKey: .proxyServer),
-           !legacyProxy.isEmpty {
-            let parts = legacyProxy.split(separator: ":", maxSplits: 1).map(String.init)
-            self.proxyHost = parts.first ?? ""
-            self.proxyPort = parts.count > 1 ? parts[1] : ""
-        }
         self.runtimeId = try container.decodeIfPresent(String.self, forKey: .runtimeId) ?? WineRuntimes.whiskyDefaultId
     }
     // swiftlint:enable line_length
