@@ -6,8 +6,9 @@
 import Foundation
 
 public enum HK4eGame {
-    public enum Region: String, Codable {
+    public enum Region: String, Codable, CaseIterable {
         case os
+        case cn
     }
 
     public struct Info: Codable {
@@ -16,9 +17,22 @@ public enum HK4eGame {
         public var executableName: String?
     }
 
-    public static func detect(executableURL: URL) -> Info {
+    public static func resolveRegion(executableName: String, fallback: Region) -> Region {
+        let lower = executableName.lowercased()
+        if lower.contains("yuanshen") {
+            return .cn
+        }
+        if lower.contains("genshinimpact") {
+            return .os
+        }
+        return fallback
+    }
+
+    public static func detect(bottle: Bottle, executableURL: URL) -> Info {
         let exeName = executableURL.lastPathComponent
-        return Info(region: .os, dataDirName: "GenshinImpact_Data", executableName: exeName)
+        let region = resolveRegion(executableName: exeName, fallback: bottle.settings.hk4eRegion)
+        let dataDirName = (region == .cn) ? "YuanShen_Data" : "GenshinImpact_Data"
+        return Info(region: region, dataDirName: dataDirName, executableName: exeName)
     }
 
     public static func removedFiles(for info: Info) -> [String] {

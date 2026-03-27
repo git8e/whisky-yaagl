@@ -42,7 +42,13 @@ public enum BottleMaintenance {
             // best-effort
         }
 
-        await HK4eHDR.revert(bottle: bottle, executableName: bottle.settings.hk4eGameExecutableURL?.lastPathComponent)
+        let region: HK4eGame.Region
+        if let exeURL = bottle.settings.hk4eGameExecutableURL {
+            region = HK4eGame.detect(bottle: bottle, executableURL: exeURL).region
+        } else {
+            region = bottle.settings.hk4eRegion
+        }
+        await HK4eHDR.revert(bottle: bottle, region: region)
 
         if bottle.settings.hk4eEnableNVExtension == false {
             await HK4eTweaks.revertNVExtension(bottle: bottle)

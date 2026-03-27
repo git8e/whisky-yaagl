@@ -38,9 +38,8 @@ public enum HK4eHDR {
         return dir
     }
 
-    public static func apply(bottle: Bottle, executableName: String?) async throws {
-        let isCN = (executableName?.lowercased().contains("yuanshen") ?? false)
-        let url = isCN ? hdrCNURL : hdrOSURL
+    public static func apply(bottle: Bottle, region: HK4eGame.Region) async throws {
+        let url = (region == .cn) ? hdrCNURL : hdrOSURL
 
         let (data, _) = try await URLSession(configuration: .ephemeral).data(from: url)
         let content = String(data: data, encoding: .utf8) ?? ""
@@ -54,9 +53,13 @@ public enum HK4eHDR {
         _ = try await Wine.runWine(["regedit", regWinePath], bottle: bottle, environment: ["WINEDEBUG": "-all"])
     }
 
-    public static func revert(bottle: Bottle, executableName: String?) async {
-        let isCN = (executableName?.lowercased().contains("yuanshen") ?? false)
-        let key = isCN ? #"HKEY_CURRENT_USER\Software\miHoYo\原神"# : #"HKEY_CURRENT_USER\Software\miHoYo\Genshin Impact"#
+    public static func apply(bottle: Bottle, executableName: String?) async throws {
+        let region = HK4eGame.resolveRegion(executableName: executableName ?? "", fallback: .os)
+        try await apply(bottle: bottle, region: region)
+    }
+
+    public static func revert(bottle: Bottle, region: HK4eGame.Region) async {
+        let key = (region == .cn) ? #"HKEY_CURRENT_USER\Software\miHoYo\原神"# : #"HKEY_CURRENT_USER\Software\miHoYo\Genshin Impact"#
 
         let lines: [String] = [
             "Windows Registry Editor Version 5.00",
@@ -76,5 +79,10 @@ public enum HK4eHDR {
         } catch {
             // ignore
         }
+    }
+
+    public static func revert(bottle: Bottle, executableName: String?) async {
+        let region = HK4eGame.resolveRegion(executableName: executableName ?? "", fallback: .os)
+        await revert(bottle: bottle, region: region)
     }
 }

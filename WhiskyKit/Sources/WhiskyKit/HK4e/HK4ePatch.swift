@@ -75,10 +75,10 @@ public enum HK4ePatch {
 
         let gameDir = URL(fileURLWithPath: state.gameDir, isDirectory: true)
         let exeURL = URL(fileURLWithPath: state.executablePath, isDirectory: false)
-        let info = HK4eGame.detect(executableURL: exeURL)
+        let info = HK4eGame.detect(bottle: bottle, executableURL: exeURL)
 
         if state.hdr {
-            await HK4eHDR.revert(bottle: bottle, executableName: info.executableName)
+            await HK4eHDR.revert(bottle: bottle, region: info.region)
         }
         if state.dxmt {
             HK4eDXMT.revertPrefix(prefixURL: prefixURL)
@@ -95,7 +95,7 @@ public enum HK4ePatch {
         let prefixURL = bottle.url
         let exeURL = program.url
         let gameDir = exeURL.deletingLastPathComponent()
-        let info = HK4eGame.detect(executableURL: exeURL)
+        let info = HK4eGame.detect(bottle: bottle, executableURL: exeURL)
 
         await revertIfNeeded(bottle: bottle, prefixURL: prefixURL)
 
@@ -114,7 +114,7 @@ public enum HK4ePatch {
         patchRemovedFiles(gameDir: gameDir, removed: HK4eGame.removedFiles(for: info))
 
         if bottle.settings.hk4eEnableHDR {
-            try? await HK4eHDR.apply(bottle: bottle, executableName: info.executableName)
+            try? await HK4eHDR.apply(bottle: bottle, region: info.region)
         }
 
         let state = HK4ePatchState(
@@ -196,7 +196,7 @@ public enum HK4ePatch {
         hdrApplied: Bool
     ) async {
         if hdrApplied {
-            await HK4eHDR.revert(bottle: bottle, executableName: info.executableName)
+            await HK4eHDR.revert(bottle: bottle, region: info.region)
         }
         HK4eDXMT.revertPrefix(prefixURL: prefixURL)
         revertRemovedFiles(gameDir: gameDir, removed: HK4eGame.removedFiles(for: info))

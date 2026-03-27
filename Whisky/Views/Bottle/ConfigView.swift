@@ -207,6 +207,11 @@ struct ConfigView: View {
                     }
                 }
 
+                Picker("hk4e.region", selection: $bottle.settings.hk4eRegion) {
+                    Text("hk4e.region.os").tag(HK4eGame.Region.os)
+                    Text("hk4e.region.cn").tag(HK4eGame.Region.cn)
+                }
+
                 Toggle("hk4e.leftCommandIsCtrl", isOn: $bottle.settings.hk4eLeftCommandIsCtrl)
 
                 Toggle("hk4e.steamPatch", isOn: $bottle.settings.hk4eSteamPatch)
