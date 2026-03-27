@@ -114,6 +114,16 @@ Bottle creation and bottle configuration both support proxy settings.
 - Host and port are configured separately.
 - You can enable, disable, or change it later from the bottle config page.
 
+## Compared With YAAGL
+
+This fork borrows HK4e workflow ideas from YAAGL, but adapts them to Whisky's bottle-first model (multiple bottles, preconfigured setup) instead of a single-app, per-launch patch/revert flow.
+
+- Bottle isolation: keep OS/CN and different game setups in separate bottles.
+- Configure ahead of time: DXMT injection, SteamPatch, proxy, and HK4e settings are applied during bottle creation or when toggled in Config.
+- Less launch-time work: most settings are persisted and only re-applied when missing.
+- Shared-runtime aware: changes that touch Wine runtimes are treated as runtime-level and designed to be idempotent across bottles.
+- Better troubleshooting UX: per-launch logs, one-click tools, and clearer “file not found” errors (e.g. external drives).
+
 ## Storage Location
 
 This fork stores data here:
@@ -133,19 +143,6 @@ Logs are stored in:
 - `~/Library/Logs/Whisky/`
 
 Recent versions of this fork try to keep one launch session in one log file, so startup troubleshooting is easier.
-
-## Certificate Import
-
-This fork can patch the selected Wine runtime so new prefixes import the required root certificate during setup.
-
-- The certificate payload is bundled in the app.
-- This avoids network failures during bottle creation.
-
-## What This Fork Does Not Do
-
-- It does not modify `/etc/hosts`.
-- It is not the official upstream Whisky build.
-- It is not distributed as a Homebrew cask.
 
 ## Need Help?
 
