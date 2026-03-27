@@ -50,6 +50,45 @@ struct ConfigView: View {
     @AppStorage("metalSectionExpanded") private var metalSectionExpanded: Bool = true
     @AppStorage("hk4eSectionExpanded") private var hk4eSectionExpanded: Bool = true
 
+    private enum GameRegionPreset: String, CaseIterable, Identifiable, Sendable {
+        case hk4eOs
+        case hk4eCn
+        case napOs
+        case napCn
+
+        var id: String { rawValue }
+
+        var isHK4e: Bool { self == .hk4eOs || self == .hk4eCn }
+        var isNAP: Bool { self == .napOs || self == .napCn }
+
+        var gamePreset: BottleGamePreset { isHK4e ? .hk4e : .nap }
+        var hk4eRegion: HK4eGame.Region { self == .hk4eCn ? .cn : .os }
+        var napRegion: NapGame.Region { self == .napCn ? .cn : .os }
+    }
+
+    private var gameRegionSelection: Binding<GameRegionPreset> {
+        Binding(
+            get: {
+                switch bottle.settings.gamePreset {
+                case .nap:
+                    return bottle.settings.napRegion == .cn ? .napCn : .napOs
+                case .hk4e:
+                    return bottle.settings.hk4eRegion == .cn ? .hk4eCn : .hk4eOs
+                }
+            },
+            set: { preset in
+                bottle.settings.gamePreset = preset.gamePreset
+                if preset.isHK4e {
+                    bottle.settings.hk4eRegion = preset.hk4eRegion
+                    bottle.settings.hk4eLaunchPatchingEnabled = true
+                } else {
+                    bottle.settings.napRegion = preset.napRegion
+                    bottle.settings.hk4eLaunchPatchingEnabled = false
+                }
+            }
+        )
+    }
+
     private var isDXMTRuntime: Bool {
         WineRuntimes.runtime(id: bottle.settings.wineRuntimeId)?.renderBackend == .dxmt
     }
@@ -232,140 +271,153 @@ struct ConfigView: View {
                 }
             }
 
-            if bottle.settings.hk4eLaunchPatchingEnabled {
-                Section("hk4e.section", isExpanded: $hk4eSectionExpanded) {
-                ActionView(
-                    text: "hk4e.gameExecutable",
-                    subtitle: bottle.settings.hk4eGameExecutableURL?.prettyPath() ?? String(localized: "hk4e.notSelected"),
-                    actionName: "create.browse"
-                ) {
-                    let panel = NSOpenPanel()
-                    panel.canChooseFiles = true
-                    panel.canChooseDirectories = false
-                    panel.allowsMultipleSelection = false
-                    panel.begin { result in
-                        if result == .OK, let url = panel.urls.first {
-                            bottle.settings.hk4eGameExecutableURL = url
-
-                            if !bottle.settings.pins.contains(where: { $0.url == url }) {
-                                bottle.settings.pins.append(
-                                    PinnedProgram(name: url.deletingPathExtension().lastPathComponent, url: url)
-                                )
-                            }
-                        }
-                    }
+            Section("create.gameRegion", isExpanded: $hk4eSectionExpanded) {
+                Picker("create.gameRegion", selection: gameRegionSelection) {
+                    Text("hk4e.region.os").tag(GameRegionPreset.hk4eOs)
+                    Text("hk4e.region.cn").tag(GameRegionPreset.hk4eCn)
+                    Text("nap.region.os").tag(GameRegionPreset.napOs)
+                    Text("nap.region.cn").tag(GameRegionPreset.napCn)
                 }
 
-                Picker("hk4e.region", selection: $bottle.settings.hk4eRegion) {
-                    Text("hk4e.region.os").tag(HK4eGame.Region.os)
-                    Text("hk4e.region.cn").tag(HK4eGame.Region.cn)
-                }
+                if gameRegionSelection.wrappedValue.isHK4e {
+                    ActionView(
+                        text: "hk4e.gameExecutable",
+                        subtitle: bottle.settings.hk4eGameExecutableURL?.prettyPath()
+                            ?? String(localized: "hk4e.notSelected"),
+                        actionName: "create.browse"
+                    ) {
+                        let panel = NSOpenPanel()
+                        panel.canChooseFiles = true
+                        panel.canChooseDirectories = false
+                        panel.allowsMultipleSelection = false
+                        panel.begin { result in
+                            if result == .OK, let url = panel.urls.first {
+                                bottle.settings.hk4eGameExecutableURL = url
 
-                Toggle("hk4e.leftCommandIsCtrl", isOn: $bottle.settings.hk4eLeftCommandIsCtrl)
-                    .onChange(of: bottle.settings.hk4eLeftCommandIsCtrl) { _, _ in
-                        Task(priority: .userInitiated) {
-                            try? await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
-                        }
-                    }
-
-                Toggle("hk4e.steamPatch", isOn: $bottle.settings.hk4eSteamPatch)
-                    .onChange(of: bottle.settings.hk4eSteamPatch) { _, enabled in
-                        Task(priority: .userInitiated) {
-                            if enabled {
-                                try? await SteamPatch.apply(prefixURL: bottle.url)
-                            } else {
-                                try? SteamPatch.remove(prefixURL: bottle.url)
-                            }
-                        }
-                    }
-
-                if isDXMTRuntime {
-                    Toggle("hk4e.dxmtInjection", isOn: $bottle.settings.hk4eDXMTInjectionEnabled)
-                        .onChange(of: bottle.settings.hk4eDXMTInjectionEnabled) { _, enabled in
-                            Task(priority: .userInitiated) {
-                                if enabled {
-                                    try? await HK4eDXMT.ensureInstalled(progress: nil)
-                                    HK4eDXMT.applyToRuntime(runtimeId: bottle.settings.wineRuntimeId)
-                                    try? HK4eDXMT.applyToPrefix(prefixURL: bottle.url)
-                                } else {
-                                    HK4eDXMT.revertPrefix(prefixURL: bottle.url)
-                                    HK4eDXMT.revertRuntime(runtimeId: bottle.settings.wineRuntimeId)
+                                if !bottle.settings.pins.contains(where: { $0.url == url }) {
+                                    bottle.settings.pins.append(
+                                        PinnedProgram(name: url.deletingPathExtension().lastPathComponent, url: url)
+                                    )
                                 }
                             }
                         }
-                }
-
-                Toggle("hk4e.enableHDR", isOn: $bottle.settings.hk4eEnableHDR)
-
-                Toggle("hk4e.customResolution", isOn: $bottle.settings.hk4eCustomResolutionEnabled)
-                    .onChange(of: bottle.settings.hk4eCustomResolutionEnabled) { _, _ in
-                        Task(priority: .userInitiated) {
-                            try? await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
-                        }
                     }
-                HStack(alignment: .center) {
-                    TextField("hk4e.width", value: $bottle.settings.hk4eCustomResolutionWidth, formatter: NumberFormatter())
+
+                    Toggle("hk4e.leftCommandIsCtrl", isOn: $bottle.settings.hk4eLeftCommandIsCtrl)
+                        .onChange(of: bottle.settings.hk4eLeftCommandIsCtrl) { _, _ in
+                            Task(priority: .userInitiated) {
+                                try? await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+                            }
+                        }
+
+                    Toggle("hk4e.steamPatch", isOn: $bottle.settings.hk4eSteamPatch)
+                        .onChange(of: bottle.settings.hk4eSteamPatch) { _, enabled in
+                            Task(priority: .userInitiated) {
+                                if enabled {
+                                    try? await SteamPatch.apply(prefixURL: bottle.url)
+                                } else {
+                                    try? SteamPatch.remove(prefixURL: bottle.url)
+                                }
+                            }
+                        }
+
+                    if isDXMTRuntime {
+                        Toggle("hk4e.dxmtInjection", isOn: $bottle.settings.hk4eDXMTInjectionEnabled)
+                            .onChange(of: bottle.settings.hk4eDXMTInjectionEnabled) { _, enabled in
+                                Task(priority: .userInitiated) {
+                                    if enabled {
+                                        try? await HK4eDXMT.ensureInstalled(progress: nil)
+                                        HK4eDXMT.applyToRuntime(runtimeId: bottle.settings.wineRuntimeId)
+                                        try? HK4eDXMT.applyToPrefix(prefixURL: bottle.url)
+                                    } else {
+                                        HK4eDXMT.revertPrefix(prefixURL: bottle.url)
+                                        HK4eDXMT.revertRuntime(runtimeId: bottle.settings.wineRuntimeId)
+                                    }
+                                }
+                            }
+                    }
+
+                    Toggle("hk4e.enableHDR", isOn: $bottle.settings.hk4eEnableHDR)
+
+                    Toggle("hk4e.customResolution", isOn: $bottle.settings.hk4eCustomResolutionEnabled)
+                        .onChange(of: bottle.settings.hk4eCustomResolutionEnabled) { _, _ in
+                            Task(priority: .userInitiated) {
+                                try? await HK4ePersistentConfig.applyIfNeeded(bottle: bottle)
+                            }
+                        }
+                    HStack(alignment: .center) {
+                        TextField(
+                            "hk4e.width",
+                            value: $bottle.settings.hk4eCustomResolutionWidth,
+                            formatter: NumberFormatter()
+                        )
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 90)
-                    Text("x")
-                        .frame(width: 12, height: 28, alignment: .center)
+                        Text("x")
+                            .frame(width: 12, height: 28, alignment: .center)
+                            .foregroundStyle(.secondary)
+                        TextField(
+                            "hk4e.height",
+                            value: $bottle.settings.hk4eCustomResolutionHeight,
+                            formatter: NumberFormatter()
+                        )
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 90)
+                        Spacer()
+                    }
+
+                    Text("hk4e.description")
+                        .font(.footnote)
                         .foregroundStyle(.secondary)
-                    TextField("hk4e.height", value: $bottle.settings.hk4eCustomResolutionHeight, formatter: NumberFormatter())
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 90)
-                    Spacer()
-                }
+                } else {
+                    ActionView(
+                        text: "nap.gameExecutable",
+                        subtitle: bottle.settings.napGameExecutableURL?.prettyPath()
+                            ?? String(localized: "nap.notSelected"),
+                        actionName: "create.browse"
+                    ) {
+                        let panel = NSOpenPanel()
+                        panel.canChooseFiles = true
+                        panel.canChooseDirectories = false
+                        panel.allowsMultipleSelection = false
+                        panel.begin { result in
+                            if result == .OK, let url = panel.urls.first {
+                                bottle.settings.napGameExecutableURL = url
 
-                Text("hk4e.description")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                }
-            }
-
-            Section("nap.section") {
-                ActionView(
-                    text: "nap.gameExecutable",
-                    subtitle: bottle.settings.napGameExecutableURL?.prettyPath() ?? String(localized: "nap.notSelected"),
-                    actionName: "create.browse"
-                ) {
-                    let panel = NSOpenPanel()
-                    panel.canChooseFiles = true
-                    panel.canChooseDirectories = false
-                    panel.allowsMultipleSelection = false
-                    panel.begin { result in
-                        if result == .OK, let url = panel.urls.first {
-                            bottle.settings.napGameExecutableURL = url
-
-                            if !bottle.settings.pins.contains(where: { $0.url == url }) {
-                                bottle.settings.pins.append(
-                                    PinnedProgram(name: url.deletingPathExtension().lastPathComponent, url: url)
-                                )
+                                if !bottle.settings.pins.contains(where: { $0.url == url }) {
+                                    bottle.settings.pins.append(
+                                        PinnedProgram(name: url.deletingPathExtension().lastPathComponent, url: url)
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                Picker("nap.region", selection: $bottle.settings.napRegion) {
-                    Text("nap.region.os").tag(NapGame.Region.os)
-                    Text("nap.region.cn").tag(NapGame.Region.cn)
-                }
+                    Toggle("nap.fixWebview", isOn: $bottle.settings.napFixWebview)
 
-                Toggle("nap.fixWebview", isOn: $bottle.settings.napFixWebview)
-
-                Toggle("nap.customResolution", isOn: $bottle.settings.napCustomResolutionEnabled)
-                HStack(alignment: .center) {
-                    TextField("nap.width", value: $bottle.settings.napCustomResolutionWidth, formatter: NumberFormatter())
+                    Toggle("nap.customResolution", isOn: $bottle.settings.napCustomResolutionEnabled)
+                    HStack(alignment: .center) {
+                        TextField(
+                            "nap.width",
+                            value: $bottle.settings.napCustomResolutionWidth,
+                            formatter: NumberFormatter()
+                        )
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 90)
                         .disabled(!bottle.settings.napCustomResolutionEnabled)
-                    Text("x")
-                        .frame(width: 12, height: 28, alignment: .center)
-                        .foregroundStyle(.secondary)
-                    TextField("nap.height", value: $bottle.settings.napCustomResolutionHeight, formatter: NumberFormatter())
+                        Text("x")
+                            .frame(width: 12, height: 28, alignment: .center)
+                            .foregroundStyle(.secondary)
+                        TextField(
+                            "nap.height",
+                            value: $bottle.settings.napCustomResolutionHeight,
+                            formatter: NumberFormatter()
+                        )
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 90)
                         .disabled(!bottle.settings.napCustomResolutionEnabled)
-                    Spacer()
+                        Spacer()
+                    }
                 }
             }
         }

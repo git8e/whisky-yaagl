@@ -212,8 +212,24 @@ public struct BottleNAPConfig: Codable, Equatable {
     }
 }
 
+public enum BottleGamePreset: String, Codable, Sendable {
+    case hk4e
+    case nap
+}
+
 public struct BottleSettings: Codable, Equatable {
     static let defaultFileVersion = SemanticVersion(1, 0, 0)
+
+    private enum CodingKeys: String, CodingKey {
+        case fileVersion
+        case info
+        case wineConfig
+        case metalConfig
+        case dxvkConfig
+        case hk4eConfig
+        case napConfig
+        case gamePresetConfig = "gamePreset"
+    }
 
     var fileVersion: SemanticVersion = Self.defaultFileVersion
     private var info: BottleInfo
@@ -222,6 +238,7 @@ public struct BottleSettings: Codable, Equatable {
     private var dxvkConfig: BottleDXVKConfig
     private var hk4eConfig: BottleHK4eConfig
     private var napConfig: BottleNAPConfig
+    private var gamePresetConfig: BottleGamePreset
 
     public init() {
         self.info = BottleInfo()
@@ -230,11 +247,13 @@ public struct BottleSettings: Codable, Equatable {
         self.dxvkConfig = BottleDXVKConfig()
         self.hk4eConfig = BottleHK4eConfig()
         self.napConfig = BottleNAPConfig()
+        self.gamePresetConfig = .hk4e
     }
 
     // swiftlint:disable line_length
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let decodedPreset = try container.decodeIfPresent(BottleGamePreset.self, forKey: .gamePresetConfig)
         self.fileVersion = try container.decodeIfPresent(SemanticVersion.self, forKey: .fileVersion) ?? Self.defaultFileVersion
         self.info = try container.decodeIfPresent(BottleInfo.self, forKey: .info) ?? BottleInfo()
         self.wineConfig = try container.decodeIfPresent(BottleWineConfig.self, forKey: .wineConfig) ?? BottleWineConfig()
@@ -242,6 +261,9 @@ public struct BottleSettings: Codable, Equatable {
         self.dxvkConfig = try container.decodeIfPresent(BottleDXVKConfig.self, forKey: .dxvkConfig) ?? BottleDXVKConfig()
         self.hk4eConfig = try container.decodeIfPresent(BottleHK4eConfig.self, forKey: .hk4eConfig) ?? BottleHK4eConfig()
         self.napConfig = try container.decodeIfPresent(BottleNAPConfig.self, forKey: .napConfig) ?? BottleNAPConfig()
+
+        self.gamePresetConfig = decodedPreset
+            ?? ((self.napConfig.gameExecutableURL != nil && self.hk4eConfig.gameExecutableURL == nil) ? .nap : .hk4e)
     }
     // swiftlint:enable line_length
 
@@ -261,6 +283,11 @@ public struct BottleSettings: Codable, Equatable {
     public var wineRuntimeId: String {
         get { return wineConfig.runtimeId }
         set { wineConfig.runtimeId = newValue }
+    }
+
+    public var gamePreset: BottleGamePreset {
+        get { gamePresetConfig }
+        set { gamePresetConfig = newValue }
     }
 
     /// The version of windows used by this bottle
