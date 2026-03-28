@@ -817,6 +817,28 @@
         }
       }
     },
+    "button.duplicateBottle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u590d\u5236\u5bb9\u5668"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u8907\u88fd\u5bb9\u5668"
+          }
+        }
+      }
+    },
     "button.moveBottle" : {
       "localizations" : {
         "ar" : {
@@ -949,6 +971,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "移動⋯"
+          }
+        }
+      }
+    },
+    "bottle.duplicate.name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Copy"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@\u526f\u672c"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@\u526f\u672c"
           }
         }
       }

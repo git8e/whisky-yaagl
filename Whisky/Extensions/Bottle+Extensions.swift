@@ -22,6 +22,55 @@ import WhiskyKit
 import os.log
 
 extension Bottle {
+    @MainActor
+    func duplicate() {
+        do {
+            if let bottle = BottleVM.shared.bottles.first(where: { $0.url == url }) {
+                bottle.inFlight = true
+            }
+
+            let parent = url.deletingLastPathComponent()
+            let newBottleURL = parent.appending(path: UUID().uuidString)
+
+            try FileCopy.copyItem(at: url, to: newBottleURL)
+
+            // Clear transient per-launch state.
+            let hk4ePatchState = newBottleURL
+                .appendingPathComponent("HK4e", isDirectory: true)
+                .appending(path: "patch-state.json", directoryHint: .notDirectory)
+            try? FileManager.default.removeItem(at: hk4ePatchState)
+
+            // Fix URLs inside metadata (pins, blocklist, stored executable paths).
+            let newBottle = Bottle(bottleUrl: newBottleURL, inFlight: true)
+            let oldBottleURL = url
+
+            for index in 0..<newBottle.settings.pins.count {
+                let pin = newBottle.settings.pins[index]
+                if let pinURL = pin.url {
+                    newBottle.settings.pins[index].url = pinURL.updateParentBottle(old: oldBottleURL, new: newBottleURL)
+                }
+            }
+            for index in 0..<newBottle.settings.blocklist.count {
+                let blockedURL = newBottle.settings.blocklist[index]
+                newBottle.settings.blocklist[index] = blockedURL.updateParentBottle(old: oldBottleURL, new: newBottleURL)
+            }
+            if let exe = newBottle.settings.hk4eGameExecutableURL {
+                newBottle.settings.hk4eGameExecutableURL = exe.updateParentBottle(old: oldBottleURL, new: newBottleURL)
+            }
+            if let exe = newBottle.settings.napGameExecutableURL {
+                newBottle.settings.napGameExecutableURL = exe.updateParentBottle(old: oldBottleURL, new: newBottleURL)
+            }
+
+            // Give it a new display name.
+            newBottle.settings.name = String(format: String(localized: "bottle.duplicate.name"), newBottle.settings.name)
+
+            BottleVM.shared.bottlesList.paths.append(newBottleURL)
+            BottleVM.shared.loadBottles()
+        } catch {
+            print("Failed to duplicate bottle: \(error)")
+        }
+    }
+
     func openCDrive() {
         NSWorkspace.shared.open(url.appending(path: "drive_c"))
     }
