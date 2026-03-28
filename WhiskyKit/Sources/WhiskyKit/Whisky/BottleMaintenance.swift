@@ -22,6 +22,7 @@ public enum BottleMaintenance {
     private static var fm: FileManager { FileManager.default }
 
     public static func cleanHK4eTweaks(bottle: Bottle) async {
+        try? await WineRuntimeManager.ensureIsolatedRuntime(bottle: bottle, baseRuntimeId: bottle.settings.wineRuntimeId)
         await HK4ePatch.revertIfNeeded(bottle: bottle, prefixURL: bottle.url)
 
         do {
@@ -62,6 +63,7 @@ public enum BottleMaintenance {
     }
 
     public static func resetPrefix(bottle: Bottle) async throws {
+        try? await WineRuntimeManager.ensureIsolatedRuntime(bottle: bottle, baseRuntimeId: bottle.settings.wineRuntimeId)
         // Capture a few settings that live in registry only.
         let preserveRetina: Bool = (try? await Wine.retinaMode(bottle: bottle)) ?? false
 

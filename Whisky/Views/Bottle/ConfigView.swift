@@ -119,6 +119,13 @@ struct ConfigView: View {
                         Task(priority: .userInitiated) {
                             do {
                                 try await WineRuntimeManager.ensureInstalled(runtimeId: newRuntimeId)
+
+                                // Rebuild isolated runtime to match the newly selected base runtime.
+                                try await WineRuntimeManager.ensureIsolatedRuntime(
+                                    bottle: bottle,
+                                    baseRuntimeId: newRuntimeId
+                                )
+
                                 let version = try? await Wine.wineVersion(bottle: bottle)
                                 await MainActor.run {
                                     runtimeWineVersion = version
@@ -342,11 +349,25 @@ struct ConfigView: View {
                                 Task(priority: .userInitiated) {
                                     if enabled {
                                         try? await HK4eDXMT.ensureInstalled(progress: nil)
-                                        HK4eDXMT.applyToRuntime(runtimeId: bottle.settings.wineRuntimeId)
+                                        do {
+                                            try await WineRuntimeManager.ensureIsolatedRuntime(
+                                                bottle: bottle,
+                                                baseRuntimeId: bottle.settings.wineRuntimeId
+                                            )
+                                            HK4eDXMT.applyToRuntime(runtimeRoot: WineRuntimeManager.effectiveWineRoot(bottle: bottle))
+                                        } catch {
+                                            return
+                                        }
                                         try? HK4eDXMT.applyToPrefix(prefixURL: bottle.url)
                                     } else {
                                         HK4eDXMT.revertPrefix(prefixURL: bottle.url)
-                                        HK4eDXMT.revertRuntime(runtimeId: bottle.settings.wineRuntimeId)
+                                        let isolated = WineRuntimeManager.isolatedRuntimeRoot(bottleURL: bottle.url)
+                                        let isolatedWine64 = isolated.appendingPathComponent("bin/wine64")
+                                        let isolatedWine = isolated.appendingPathComponent("bin/wine")
+                                        if FileManager.default.fileExists(atPath: isolatedWine64.path(percentEncoded: false)) ||
+                                            FileManager.default.fileExists(atPath: isolatedWine.path(percentEncoded: false)) {
+                                            HK4eDXMT.revertRuntime(runtimeRoot: isolated)
+                                        }
                                     }
                                 }
                             }

@@ -46,7 +46,7 @@ extension FileManager {
                 try FileManager.default.removeItem(at: originalURL)
             }
 
-            try FileManager.default.copyItem(at: replacementURL, to: originalURL)
+            try FileCopy.copyItem(at: replacementURL, to: originalURL, replacing: true)
         }
     }
 }

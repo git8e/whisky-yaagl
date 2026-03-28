@@ -76,13 +76,13 @@ public enum HK4eReShade {
         if fm.fileExists(atPath: dstDxgi.path(percentEncoded: false)) {
             try? fm.removeItem(at: dstDxgi)
         }
-        try? fm.copyItem(at: dxgi, to: dstDxgi)
+        try? FileCopy.copyItem(at: dxgi, to: dstDxgi, replacing: true)
 
         if fm.fileExists(atPath: compiler.path(percentEncoded: false)) {
             if fm.fileExists(atPath: dstCompiler.path(percentEncoded: false)) {
                 try? fm.removeItem(at: dstCompiler)
             }
-            try? fm.copyItem(at: compiler, to: dstCompiler)
+            try? FileCopy.copyItem(at: compiler, to: dstCompiler, replacing: true)
         }
 
         // Write ReShade.ini so it can find shaders.

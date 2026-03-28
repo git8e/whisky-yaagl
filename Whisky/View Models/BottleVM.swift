@@ -121,6 +121,13 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     }
                 )
 
+                // Create an isolated runtime copy for this bottle so runtime-level patches don't affect other bottles.
+                await MainActor.run {
+                    self.createBottleStatus = "Preparing isolated Wine runtime"
+                    self.createBottleProgress = nil
+                }
+                try await WineRuntimeManager.ensureIsolatedRuntime(bottle: bottle, baseRuntimeId: wineRuntimeId)
+
                 bottle.settings.windowsVersion = winVersion
                 bottle.settings.name = bottleName
 
@@ -164,12 +171,12 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                         "WINEMSYNC": "0"
                     ]
 
-                    if gamePreset == .hk4e, bottle.settings.hk4eCertificateImportEnabled {
-                        await MainActor.run { self.createBottleStatus = String(localized: "create.status.certificates") }
-                        do {
-                            try await HK4eWineCertificates.ensurePatched(runtimeId: wineRuntimeId)
-                        } catch {
-                            await MainActor.run {
+                        if gamePreset == .hk4e, bottle.settings.hk4eCertificateImportEnabled {
+                            await MainActor.run { self.createBottleStatus = String(localized: "create.status.certificates") }
+                            do {
+                                try await HK4eWineCertificates.ensurePatched(runtimeRoot: WineRuntimeManager.effectiveWineRoot(bottle: bottle))
+                            } catch {
+                                await MainActor.run {
                                 self.createBottleStatus = String(
                                     format: String(localized: "create.status.certificatesIgnored"),
                                     error.localizedDescription
@@ -193,7 +200,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                            runtime.renderBackend == .dxmt {
                             await MainActor.run { self.createBottleStatus = String(localized: "create.status.hk4e") }
                             try await HK4eDXMT.ensureInstalled(progress: nil)
-                            HK4eDXMT.applyToRuntime(runtimeId: wineRuntimeId)
+                            HK4eDXMT.applyToRuntime(runtimeRoot: WineRuntimeManager.effectiveWineRoot(bottle: bottle))
                             try? HK4eDXMT.applyToPrefix(prefixURL: newBottleDir)
                         }
 

@@ -20,8 +20,8 @@ public enum HK4eWineCertificates {
         string: "https://raw.githubusercontent.com/git8e/whisky-yaagl/main/assets/wine_inf_cert_str.txt"
     )!
 
-    public static func ensurePatched(runtimeId: String) async throws {
-        let wineInf = wineInfURL(runtimeId: runtimeId)
+    public static func ensurePatched(runtimeRoot: URL) async throws {
+        let wineInf = wineInfURL(runtimeRoot: runtimeRoot)
         guard fm.fileExists(atPath: wineInf.path(percentEncoded: false)) else {
             throw HK4eWineCertificatesError.wineInfMissing(wineInf.path(percentEncoded: false))
         }
@@ -36,7 +36,7 @@ public enum HK4eWineCertificates {
         // Backup once.
         let bak = wineInf.appendingPathExtension("bak")
         if !fm.fileExists(atPath: bak.path(percentEncoded: false)) {
-            try fm.copyItem(at: wineInf, to: bak)
+            try FileCopy.copyItem(at: wineInf, to: bak)
         }
 
         var out = current
@@ -49,14 +49,14 @@ public enum HK4eWineCertificates {
         try out.write(to: wineInf, atomically: true, encoding: .utf8)
     }
 
-    public static func revert(runtimeId: String) throws {
-        let wineInf = wineInfURL(runtimeId: runtimeId)
+    public static func revert(runtimeRoot: URL) throws {
+        let wineInf = wineInfURL(runtimeRoot: runtimeRoot)
         let bak = wineInf.appendingPathExtension("bak")
         if fm.fileExists(atPath: bak.path(percentEncoded: false)) {
             if fm.fileExists(atPath: wineInf.path(percentEncoded: false)) {
                 try? fm.removeItem(at: wineInf)
             }
-            try fm.copyItem(at: bak, to: wineInf)
+            try FileCopy.copyItem(at: bak, to: wineInf, replacing: true)
             return
         }
 
@@ -71,9 +71,8 @@ public enum HK4eWineCertificates {
         }
     }
 
-    private static func wineInfURL(runtimeId: String) -> URL {
-        let root = WineRuntimeManager.wineRoot(runtimeId: runtimeId)
-        return root
+    private static func wineInfURL(runtimeRoot: URL) -> URL {
+        return runtimeRoot
             .appending(path: "share", directoryHint: .isDirectory)
             .appending(path: "wine", directoryHint: .isDirectory)
             .appending(path: "wine.inf", directoryHint: .notDirectory)
