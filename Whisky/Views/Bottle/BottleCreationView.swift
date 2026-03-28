@@ -78,13 +78,13 @@ struct BottleCreationView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    private var gameExecutableOptionalKey: String {
+    private var gameExecutableOptionalKey: LocalizedStringKey {
         if gameRegionPreset.isHK4e { return "hk4e.gameExecutableOptional" }
         if gameRegionPreset.isNAP { return "nap.gameExecutableOptional" }
         return "hkrpg.gameExecutableOptional"
     }
 
-    private var gameNotSelectedKey: String {
+    private var gameNotSelectedKey: String.LocalizationValue {
         if gameRegionPreset.isHK4e { return "hk4e.notSelected" }
         if gameRegionPreset.isNAP { return "nap.notSelected" }
         return "hkrpg.notSelected"
