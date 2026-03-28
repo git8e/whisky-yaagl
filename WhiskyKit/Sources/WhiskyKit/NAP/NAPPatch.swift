@@ -66,12 +66,26 @@ public enum NAPPatch {
         let gameDir = exeURL.deletingLastPathComponent()
         let region = bottle.settings.napRegion
 
+        let runtime = WineRuntimes.runtime(id: bottle.settings.wineRuntimeId)
+        let usesDXMT = (runtime?.renderBackend == .dxmt)
+
         let removedFiles = NapGame.removedFiles(executableURL: exeURL)
         patchRemovedFiles(gameDir: gameDir, removed: removedFiles)
         defer { revertRemovedFiles(gameDir: gameDir, removed: removedFiles) }
 
         if bottle.settings.napFixWebview {
             await NapWebviewFix.applyIfNeeded(bottle: bottle, region: region)
+        }
+
+        if usesDXMT {
+            try? await NAPDXMT.ensureInstalled()
+            NAPDXMT.applyToRuntime(runtimeRoot: WineRuntimeManager.effectiveWineRoot(bottle: bottle))
+            try? NAPDXMT.applyToPrefix(prefixURL: bottle.url)
+        }
+
+        var mergedEnv = environment
+        if usesDXMT && NAPDXMT.useNativeDlls() {
+            mergedEnv["WINEDLLOVERRIDES"] = "d3d11,dxgi=n,b"
         }
 
         var resolutionArgs: [String] = []
@@ -136,7 +150,7 @@ public enum NAPPatch {
                 name: exeURL.lastPathComponent,
                 args: ["cmd", "/c", batWine],
                 bottle: bottle,
-                environment: environment,
+                environment: mergedEnv,
                 directory: work
             ) {
                 if case .terminated(let p) = output {
