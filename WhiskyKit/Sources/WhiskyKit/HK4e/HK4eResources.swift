@@ -53,7 +53,7 @@ public enum HK4eDownloader {
         }
     }
 
-    private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
+    private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
         let destination: URL
         let progress: (@Sendable (Double) -> Void)?
         var continuation: CheckedContinuation<Void, Error>?
