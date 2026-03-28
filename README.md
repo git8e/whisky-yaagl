@@ -28,6 +28,10 @@ This is not an official Whisky build.
 - Apple Silicon Mac
 - macOS 14 or later
 
+## Is it safe?
+
+Use it at your own risk. Or enjoying it with a new f2p account.
+
 ## Download
 
 1. Open the repository's `Actions` page.
