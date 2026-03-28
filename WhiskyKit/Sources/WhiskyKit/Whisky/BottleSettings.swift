@@ -468,6 +468,11 @@ public struct BottleSettings: Codable, Equatable {
         set { napConfig.region = newValue }
     }
 
+    public var napLaunchFixBlockNetwork: Bool {
+        get { return napConfig.launchFixBlockNetwork }
+        set { napConfig.launchFixBlockNetwork = newValue }
+    }
+
     public var napCustomResolutionEnabled: Bool {
         get { return napConfig.customResolutionEnabled }
         set { napConfig.customResolutionEnabled = newValue }
