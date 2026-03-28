@@ -45,6 +45,8 @@ struct BottleCreationView: View {
 
     @State private var gameRegionPreset: GameRegionPreset = .hk4eOs
 
+    @State private var initialHK4eLaunchFixBlockNetwork: Bool = false
+    @State private var initialNapLaunchFixBlockNetwork: Bool = true
     @State private var initialSteamPatch: Bool = true
     @State private var initialEnableHDR: Bool = false
 
@@ -132,19 +134,24 @@ struct BottleCreationView: View {
                 }
 
                 if gameRegionPreset.isHK4e {
+                    Toggle("hk4e.launchFixBlockNetwork", isOn: $initialHK4eLaunchFixBlockNetwork)
                     Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
                     Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
                 } else {
+                    Toggle("nap.launchFixBlockNetwork", isOn: $initialNapLaunchFixBlockNetwork)
                     Toggle("nap.fixWebview", isOn: $initialNapFixWebview)
                 }
 
                 Toggle("config.proxy.enable", isOn: $initialProxyEnabled)
                 if initialProxyEnabled {
-                    HStack(alignment: .center) {
+                    HStack(alignment: .center, spacing: 2) {
                         TextField("", text: $initialProxyHost, prompt: Text("config.proxy.host"))
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 188)
+                            .frame(width: 182)
                             .onChange(of: initialProxyHost) { _, _ in normalizeProxyFields() }
+                        Text(":")
+                            .foregroundStyle(.secondary)
+                            .frame(width: 6)
                         TextField("", text: $initialProxyPort, prompt: Text("config.proxy.port"))
                             .textFieldStyle(.roundedBorder)
                             .frame(width: 96)
@@ -267,6 +274,8 @@ struct BottleCreationView: View {
 
     func submit() {
         let preset = gameRegionPreset.gamePreset
+        let hk4eLaunchFixBlockNetwork = (preset == .hk4e) ? initialHK4eLaunchFixBlockNetwork : false
+        let napLaunchFixBlockNetwork = (preset == .nap) ? initialNapLaunchFixBlockNetwork : false
         let hk4eSteamPatch = (preset == .hk4e) ? initialSteamPatch : false
         let hk4eEnableHDR = (preset == .hk4e) ? initialEnableHDR : false
         let hk4eCustomResolutionEnabled = (preset == .hk4e) ? initialCustomResolutionEnabled : false
@@ -282,9 +291,11 @@ struct BottleCreationView: View {
             initialRetinaMode: initialRetinaMode,
             gamePreset: preset,
             initialHK4eRegion: gameRegionPreset.hk4eRegion,
+            initialLaunchFixBlockNetwork: hk4eLaunchFixBlockNetwork,
             initialSteamPatch: hk4eSteamPatch,
             initialEnableHDR: hk4eEnableHDR,
             initialNapRegion: gameRegionPreset.napRegion,
+            initialNapLaunchFixBlockNetwork: napLaunchFixBlockNetwork,
             initialNapFixWebview: napFixWebview,
             initialProxyEnabled: initialProxyEnabled,
             initialProxyHost: initialProxyHost,

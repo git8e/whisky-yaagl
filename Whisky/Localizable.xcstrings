@@ -21323,6 +21323,50 @@
         }
       }
     },
+    "hk4e.launchFixBlockNetwork" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch Fix (block network)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u542f\u52a8\u4fee\u590d\uff08\u65ad\u7f51\uff09"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u555f\u52d5\u4fee\u5fa9\uff08\u65b7\u7db2\uff09"
+          }
+        }
+      }
+    },
+    "nap.launchFixBlockNetwork" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch Fix (block network)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u542f\u52a8\u4fee\u590d\uff08\u65ad\u7f51\uff09"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u555f\u52d5\u4fee\u5fa9\uff08\u65b7\u7db2\uff09"
+          }
+        }
+      }
+    },
     "hk4e.dxmtInjection" : {
       "localizations" : {
         "en" : {

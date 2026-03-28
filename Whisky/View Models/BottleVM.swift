@@ -57,10 +57,12 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
         initialRetinaMode: Bool = false,
         gamePreset: GamePreset = .hk4e,
         initialHK4eRegion: HK4eGame.Region = .os,
+        initialLaunchFixBlockNetwork: Bool = false,
         initialSteamPatch: Bool = false,
         initialCertImport: Bool = true,
         initialEnableHDR: Bool = false,
         initialNapRegion: NapGame.Region = .os,
+        initialNapLaunchFixBlockNetwork: Bool = true,
         initialNapFixWebview: Bool = true,
         initialProxyEnabled: Bool = false,
         initialProxyHost: String = "",
@@ -125,12 +127,14 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.gamePreset = (gamePreset == .nap) ? .nap : .hk4e
 
                 bottle.settings.hk4eRegion = initialHK4eRegion
+                bottle.settings.hk4eLaunchFixBlockNetwork = initialLaunchFixBlockNetwork
                 bottle.settings.hk4eSteamPatch = initialSteamPatch
                 bottle.settings.hk4eCertificateImportEnabled = initialCertImport
                 bottle.settings.hk4eEnableHDR = initialEnableHDR
                 bottle.settings.hk4eLaunchPatchingEnabled = (gamePreset == .hk4e)
 
                 bottle.settings.napRegion = initialNapRegion
+                bottle.settings.napLaunchFixBlockNetwork = initialNapLaunchFixBlockNetwork
                 bottle.settings.napFixWebview = initialNapFixWebview
                 bottle.settings.napCustomResolutionEnabled = initialNapCustomResolutionEnabled
                 bottle.settings.napCustomResolutionWidth = initialNapCustomResolutionWidth

@@ -7,6 +7,9 @@ import Foundation
 
 public enum NAPPatch {
     private static var fm: FileManager { FileManager.default }
+    private static let launchFixBlockNetworkSeconds: UInt64 = 10
+    private static let launchFixProxyHost = "127.0.0.1"
+    private static let launchFixProxyPort = "1"
 
     private static func toWinePath(_ absPath: String) -> String {
         "Z:" + absPath.replacingOccurrences(of: "/", with: "\\")
@@ -108,6 +111,26 @@ public enum NAPPatch {
 
         var exitCode: Int32 = 0
         do {
+            if bottle.settings.napLaunchFixBlockNetwork {
+                let host = bottle.settings.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
+                let port = bottle.settings.proxyPort.trimmingCharacters(in: .whitespacesAndNewlines)
+                let server = port.isEmpty ? host : "\(host):\(port)"
+                let existingProxyEnabled = bottle.settings.proxyEnabled && !server.isEmpty
+
+                if !existingProxyEnabled {
+                    try? await WineProxySettings.applyTemporaryOverride(
+                        bottle: bottle,
+                        enabled: true,
+                        host: launchFixProxyHost,
+                        port: launchFixProxyPort
+                    )
+                    Task.detached(priority: .utility) {
+                        try? await Task.sleep(nanoseconds: launchFixBlockNetworkSeconds * 1_000_000_000)
+                        try? await WineProxySettings.restoreDesiredState(bottle: bottle)
+                    }
+                }
+            }
+
             for await output in try Wine.runWineProcess(
                 name: exeURL.lastPathComponent,
                 args: ["cmd", "/c", batWine],
