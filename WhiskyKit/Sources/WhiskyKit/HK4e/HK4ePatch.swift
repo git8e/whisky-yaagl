@@ -8,6 +8,9 @@ import Foundation
 public enum HK4ePatch {
     private static var fm: FileManager { FileManager.default }
     private static let cloudArgs = ["-platform_type", "CLOUD_THIRD_PARTY_PC", "-is_cloud", "1"]
+    private static let launchFixBlockNetworkSeconds: UInt64 = 10
+    private static let launchFixProxyHost = "127.0.0.1"
+    private static let launchFixProxyPort = "1"
 
     private static func toWinePath(_ absPath: String) -> String {
         return "Z:" + absPath.replacingOccurrences(of: "/", with: "\\")
@@ -177,6 +180,28 @@ public enum HK4ePatch {
                 launchArgs = [#"C:\windows\system32\steam.exe"#, exeWine]
             } else {
                 launchArgs = ["cmd", "/c", batWine]
+            }
+
+            if bottle.settings.hk4eLaunchFixBlockNetwork {
+                // YAAGL launch fix: temporarily block network for a short window.
+                // Instead of editing /etc/hosts, use an invalid Windows proxy.
+                let host = bottle.settings.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
+                let port = bottle.settings.proxyPort.trimmingCharacters(in: .whitespacesAndNewlines)
+                let server = port.isEmpty ? host : "\(host):\(port)"
+                let existingProxyEnabled = bottle.settings.proxyEnabled && !server.isEmpty
+
+                if !existingProxyEnabled {
+                    try? await WineProxySettings.applyTemporaryOverride(
+                        bottle: bottle,
+                        enabled: true,
+                        host: launchFixProxyHost,
+                        port: launchFixProxyPort
+                    )
+                    Task.detached(priority: .utility) {
+                        try? await Task.sleep(nanoseconds: launchFixBlockNetworkSeconds * 1_000_000_000)
+                        try? await WineProxySettings.restoreDesiredState(bottle: bottle)
+                    }
+                }
             }
 
             for await output in try Wine.runWineProcess(

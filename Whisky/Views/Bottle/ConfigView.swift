@@ -188,19 +188,25 @@ struct ConfigView: View {
                         }
                 }
                 if proxyEnabled {
-                    HStack {
+                    HStack(spacing: 8) {
                         Text(String(localized: "config.proxy.server"))
                             .lineLimit(1)
                             .truncationMode(.tail)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        TextField("", text: $proxyHost, prompt: Text("config.proxy.host"))
-                            .textFieldStyle(.roundedBorder)
-                            .frame(width: 168)
-                            .onChange(of: proxyHost) { _, _ in normalizeProxyFields() }
-                        TextField("", text: $proxyPort, prompt: Text("config.proxy.port"))
-                            .textFieldStyle(.roundedBorder)
-                            .frame(width: 88)
-                            .onSubmit { applyProxySettings() }
+
+                        HStack(spacing: 2) {
+                            TextField("", text: $proxyHost, prompt: Text("config.proxy.host"))
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 162)
+                                .onChange(of: proxyHost) { _, _ in normalizeProxyFields() }
+                            Text(":")
+                                .foregroundStyle(.secondary)
+                                .frame(width: 6)
+                            TextField("", text: $proxyPort, prompt: Text("config.proxy.port"))
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 86)
+                                .onSubmit { applyProxySettings() }
+                        }
                         Button("config.proxy.apply") {
                             applyProxySettings()
                         }
@@ -310,6 +316,15 @@ struct ConfigView: View {
                             }
                         }
 
+                    Toggle("hk4e.launchFixBlockNetwork", isOn: $bottle.settings.hk4eLaunchFixBlockNetwork)
+                        .onChange(of: bottle.settings.hk4eLaunchFixBlockNetwork) { _, enabled in
+                            // If launch fix is turned off, actively restore the bottle's persistent proxy settings.
+                            guard enabled == false else { return }
+                            Task(priority: .userInitiated) {
+                                try? await WineProxySettings.restoreDesiredState(bottle: bottle)
+                            }
+                        }
+
                     Toggle("hk4e.steamPatch", isOn: $bottle.settings.hk4eSteamPatch)
                         .onChange(of: bottle.settings.hk4eSteamPatch) { _, enabled in
                             Task(priority: .userInitiated) {
@@ -392,6 +407,14 @@ struct ConfigView: View {
                             }
                         }
                     }
+
+                    Toggle("nap.launchFixBlockNetwork", isOn: $bottle.settings.napLaunchFixBlockNetwork)
+                        .onChange(of: bottle.settings.napLaunchFixBlockNetwork) { _, enabled in
+                            guard enabled == false else { return }
+                            Task(priority: .userInitiated) {
+                                try? await WineProxySettings.restoreDesiredState(bottle: bottle)
+                            }
+                        }
 
                     Toggle("nap.fixWebview", isOn: $bottle.settings.napFixWebview)
 

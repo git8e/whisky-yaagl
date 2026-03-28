@@ -88,12 +88,7 @@ public enum WineProxySettings {
         return lines.joined(separator: "\r\n")
     }
 
-    public static func applyIfNeeded(bottle: Bottle) async throws {
-        let state = desiredState(bottle: bottle)
-        if loadState(bottle: bottle) == state {
-            return
-        }
-
+    private static func apply(state: DesiredState, bottle: Bottle, persistState: Bool) async throws {
         let regFileURL = try regURL(bottle: bottle)
         try writeUTF16LEFile(url: regFileURL, text: buildRegistryContent(state: state))
         defer { try? fm.removeItem(at: regFileURL) }
@@ -113,7 +108,36 @@ public enum WineProxySettings {
             // If Wine can't boot (e.g. wininet crash), fall back to offline registry patching.
             try applyOffline(bottle: bottle, state: state)
         }
-        saveState(bottle: bottle, state: state)
+
+        if persistState {
+            saveState(bottle: bottle, state: state)
+        }
+    }
+
+    public static func applyIfNeeded(bottle: Bottle) async throws {
+        let state = desiredState(bottle: bottle)
+        if loadState(bottle: bottle) == state {
+            return
+        }
+
+        try await apply(state: state, bottle: bottle, persistState: true)
+    }
+
+    // MARK: - Temporary overrides (YAAGL-style launch fix)
+
+    public static func applyTemporaryOverride(
+        bottle: Bottle,
+        enabled: Bool,
+        host: String,
+        port: String
+    ) async throws {
+        let state = DesiredState(enabled: enabled, host: host, port: port)
+        try await apply(state: state, bottle: bottle, persistState: false)
+    }
+
+    public static func restoreDesiredState(bottle: Bottle) async throws {
+        let state = desiredState(bottle: bottle)
+        try await apply(state: state, bottle: bottle, persistState: true)
     }
 
     private static func applyOffline(bottle: Bottle, state: DesiredState) throws {
