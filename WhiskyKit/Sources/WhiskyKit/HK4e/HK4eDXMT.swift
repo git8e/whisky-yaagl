@@ -151,7 +151,7 @@ public enum HK4eDXMT {
             if fm.fileExists(atPath: dst.path(percentEncoded: false)) {
                 try? fm.removeItem(at: dst)
             }
-            try? fm.copyItem(at: src, to: dst)
+            try? FileCopy.copyItem(at: src, to: dst, replacing: true)
         }
     }
 
@@ -167,8 +167,8 @@ public enum HK4eDXMT {
         }
     }
 
-    public static func applyToRuntime(runtimeId: String) {
-        let root = WineRuntimeManager.wineRoot(runtimeId: runtimeId)
+    public static func applyToRuntime(runtimeRoot: URL) {
+        let root = runtimeRoot
         let builtinDir = root.appendingPathComponent("lib/wine/x86_64-windows", isDirectory: true)
 
         // For DXMT >= 0.74, patch builtin D3D DLLs into the runtime.
@@ -190,8 +190,8 @@ public enum HK4eDXMT {
         copyWithBackup(src: winemetalSOSrc, dst: winemetalSODst)
     }
 
-    public static func revertRuntime(runtimeId: String) {
-        let root = WineRuntimeManager.wineRoot(runtimeId: runtimeId)
+    public static func revertRuntime(runtimeRoot: URL) {
+        let root = runtimeRoot
         let targets = [
             root.appendingPathComponent("lib/wine/x86_64-windows/d3d10core.dll", isDirectory: false),
             root.appendingPathComponent("lib/wine/x86_64-windows/d3d11.dll", isDirectory: false),
@@ -221,7 +221,7 @@ public enum HK4eDXMT {
         if fm.fileExists(atPath: dst.path(percentEncoded: false)) {
             try? fm.removeItem(at: dst)
         }
-        try? fm.copyItem(at: src, to: dst)
+        try? FileCopy.copyItem(at: src, to: dst, replacing: true)
     }
 
     public static func revertPrefix(prefixURL: URL) {

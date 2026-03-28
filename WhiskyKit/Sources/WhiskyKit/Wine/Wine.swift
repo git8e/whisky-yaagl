@@ -81,7 +81,7 @@ public class Wine {
             fileHandle.writeInfo(for: bottle)
         }
 
-        let wineBinary = WineRuntimeManager.wineBinary(runtimeId: bottle.settings.wineRuntimeId)
+        let wineBinary = WineRuntimeManager.wineBinary(bottle: bottle)
 
         return try runWineProcess(
             name: name, args: args,
@@ -102,7 +102,7 @@ public class Wine {
             fileHandle.writeInfo(for: bottle)
         }
 
-        let wineserverBinary = WineRuntimeManager.wineserverBinary(runtimeId: bottle.settings.wineRuntimeId)
+        let wineserverBinary = WineRuntimeManager.wineserverBinary(bottle: bottle)
 
         return try runWineserverProcess(
             name: name, args: args,
@@ -130,7 +130,7 @@ public class Wine {
     public static func generateRunCommand(
         at url: URL, bottle: Bottle, args: String, environment: [String: String]
     ) -> String {
-        let wineBinary = WineRuntimeManager.wineBinary(runtimeId: bottle.settings.wineRuntimeId)
+        let wineBinary = WineRuntimeManager.wineBinary(bottle: bottle)
         var wineCmd = "\(wineBinary.esc) start /unix \(url.esc) \(args)"
         let env = constructWineEnvironment(for: bottle, environment: environment)
         for environment in env {
@@ -141,8 +141,8 @@ public class Wine {
     }
 
     public static func generateTerminalEnvironmentCommand(bottle: Bottle) -> String {
-        let binFolder = WineRuntimeManager.binFolder(runtimeId: bottle.settings.wineRuntimeId)
-        let wineBinaryName = WineRuntimeManager.wineBinary(runtimeId: bottle.settings.wineRuntimeId).lastPathComponent
+        let binFolder = WineRuntimeManager.binFolder(bottle: bottle)
+        let wineBinaryName = WineRuntimeManager.wineBinary(bottle: bottle).lastPathComponent
         var cmd = """
         export PATH=\"\(binFolder.path):$PATH\"
         export WINE=\"\(wineBinaryName)\"
@@ -198,6 +198,11 @@ public class Wine {
         }
 
         if let bottle = bottle {
+            // Ensure runtime isolation before any Wine command runs.
+            try await WineRuntimeManager.ensureIsolatedRuntime(
+                bottle: bottle,
+                baseRuntimeId: bottle.settings.wineRuntimeId
+            )
             if log, Self.currentLogSessionURL == nil {
                 fileHandle?.writeInfo(for: bottle)
             }
@@ -206,7 +211,7 @@ public class Wine {
 
         let executableURL: URL = {
             if let bottle {
-                return WineRuntimeManager.wineBinary(runtimeId: bottle.settings.wineRuntimeId)
+                return WineRuntimeManager.wineBinary(bottle: bottle)
             }
             return defaultWineBinary
         }()
@@ -284,7 +289,8 @@ public class Wine {
         if let runtime = WineRuntimes.runtime(id: bottle.settings.wineRuntimeId), runtime.renderBackend == .dxmt {
             result["DXMT_LOG_PATH"] = WhiskyPaths.applicationSupportRoot.path(percentEncoded: false)
             result["DXMT_CONFIG"] = "d3d11.preferredMaxFrameRate=60;"
-            result["DXMT_CONFIG_FILE"] = WhiskyPaths.applicationSupportRoot.appending(path: "dxmt.conf").path(percentEncoded: false)
+            // Keep DXMT config per-bottle to avoid cross-bottle side effects.
+            result["DXMT_CONFIG_FILE"] = bottle.url.appending(path: "dxmt.conf").path(percentEncoded: false)
             result["GST_PLUGIN_FEATURE_RANK"] = "atdec:MAX,avdec_h264:MAX"
         }
         bottle.settings.environmentVariables(wineEnv: &result)
@@ -495,10 +501,10 @@ extension Wine {
             fileHandle.writeInfo(for: bottle)
         }
 
-        let regeditBinary = WineRuntimeManager.binFolder(runtimeId: bottle.settings.wineRuntimeId).appending(path: "regedit")
+        let regeditBinary = WineRuntimeManager.binFolder(bottle: bottle).appending(path: "regedit")
         let executableURL = FileManager.default.fileExists(atPath: regeditBinary.path(percentEncoded: false))
             ? regeditBinary
-            : WineRuntimeManager.wineBinary(runtimeId: bottle.settings.wineRuntimeId)
+            : WineRuntimeManager.wineBinary(bottle: bottle)
         let args: [String] = executableURL == regeditBinary ? [] : ["regedit"]
 
         var result: [String] = []

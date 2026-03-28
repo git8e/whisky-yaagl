@@ -50,7 +50,7 @@ public enum HK4eDXVK {
             if fm.fileExists(atPath: dst.path(percentEncoded: false)) {
                 try? fm.removeItem(at: dst)
             }
-            try? fm.copyItem(at: src, to: dst)
+            try? FileCopy.copyItem(at: src, to: dst, replacing: true)
         }
     }
 

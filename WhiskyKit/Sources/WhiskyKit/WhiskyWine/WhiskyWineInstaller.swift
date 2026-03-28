@@ -54,7 +54,7 @@ public class WhiskyWineInstaller {
                 let entries = try fm.contentsOfDirectory(at: legacy, includingPropertiesForKeys: nil)
                 for entry in entries {
                     let dst = target.appendingPathComponent(entry.lastPathComponent, isDirectory: entry.hasDirectoryPath)
-                    try? fm.copyItem(at: entry, to: dst)
+                    try? FileCopy.copyItem(at: entry, to: dst, replacing: true)
                 }
             } catch {
                 // ignore
@@ -105,7 +105,7 @@ public class WhiskyWineInstaller {
                 if fm.fileExists(atPath: dest.path(percentEncoded: false)) {
                     try fm.removeItem(at: dest)
                 }
-                try fm.copyItem(at: entry, to: dest)
+                try FileCopy.copyItem(at: entry, to: dest, replacing: true)
             }
 
             try? fm.removeItem(at: from)

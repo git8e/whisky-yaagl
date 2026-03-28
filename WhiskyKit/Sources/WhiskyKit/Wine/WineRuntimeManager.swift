@@ -21,6 +21,10 @@ import Foundation
 public enum WineRuntimeManager {
     private static var fm: FileManager { FileManager.default }
 
+    // Per-bottle isolated runtime folder name (stored inside the bottle directory).
+    public static let isolatedRuntimeFolderName = "WineRuntime"
+    private static let isolatedRuntimeMarkerFileName = ".base-runtime-id"
+
     private static let whiskyWineLibrariesURL = URL(string: "https://data.getwhisky.app/Wine/Libraries.tar.gz")!
 
     private static var versionsFolder: URL {
@@ -32,6 +36,70 @@ public enum WineRuntimeManager {
             return WhiskyWineInstaller.libraryFolder.appending(path: "Wine", directoryHint: .isDirectory)
         }
         return versionsFolder.appending(path: runtimeId, directoryHint: .isDirectory)
+    }
+
+    public static func isolatedRuntimeRoot(bottleURL: URL) -> URL {
+        bottleURL.appendingPathComponent(isolatedRuntimeFolderName, isDirectory: true)
+    }
+
+    public static func effectiveWineRoot(bottle: Bottle) -> URL {
+        let isolated = isolatedRuntimeRoot(bottleURL: bottle.url)
+        let wine64 = isolated.appendingPathComponent("bin/wine64", isDirectory: false)
+        let wine = isolated.appendingPathComponent("bin/wine", isDirectory: false)
+        if fm.fileExists(atPath: wine64.path(percentEncoded: false)) || fm.fileExists(atPath: wine.path(percentEncoded: false)) {
+            return isolated
+        }
+        return wineRoot(runtimeId: bottle.settings.wineRuntimeId)
+    }
+
+    public static func binFolder(bottle: Bottle) -> URL {
+        effectiveWineRoot(bottle: bottle).appending(path: "bin", directoryHint: .isDirectory)
+    }
+
+    public static func wineBinary(bottle: Bottle) -> URL {
+        let bin = binFolder(bottle: bottle)
+        let wine64 = bin.appending(path: "wine64")
+        if fm.fileExists(atPath: wine64.path(percentEncoded: false)) {
+            return wine64
+        }
+        return bin.appending(path: "wine")
+    }
+
+    public static func wineserverBinary(bottle: Bottle) -> URL {
+        return binFolder(bottle: bottle).appending(path: "wineserver")
+    }
+
+    public static func ensureIsolatedRuntime(
+        bottle: Bottle,
+        baseRuntimeId: String,
+        status: (@Sendable (String) -> Void)? = nil,
+        progress: (@Sendable (Double) -> Void)? = nil
+    ) async throws {
+        // Make sure the base runtime exists.
+        try await ensureInstalled(runtimeId: baseRuntimeId, status: status, progress: progress)
+
+        let src = wineRoot(runtimeId: baseRuntimeId)
+        let dst = isolatedRuntimeRoot(bottleURL: bottle.url)
+        let marker = dst.appendingPathComponent(isolatedRuntimeMarkerFileName, isDirectory: false)
+
+        let dstWine64 = dst.appendingPathComponent("bin/wine64", isDirectory: false)
+        let dstWine = dst.appendingPathComponent("bin/wine", isDirectory: false)
+
+        if fm.fileExists(atPath: marker.path(percentEncoded: false)),
+           let current = try? String(contentsOf: marker, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
+           current == baseRuntimeId,
+           (fm.fileExists(atPath: dstWine64.path(percentEncoded: false)) || fm.fileExists(atPath: dstWine.path(percentEncoded: false))) {
+            return
+        }
+
+        status?("Preparing isolated Wine runtime")
+        if fm.fileExists(atPath: dst.path(percentEncoded: false)) {
+            try? fm.removeItem(at: dst)
+        }
+
+        try FileCopy.copyItem(at: src, to: dst)
+        try (baseRuntimeId + "\n").write(to: marker, atomically: true, encoding: .utf8)
+        removeQuarantineRecursively(path: dst.path(percentEncoded: false))
     }
 
     public static func binFolder(runtimeId: String) -> URL {
@@ -83,7 +151,7 @@ public enum WineRuntimeManager {
             if fm.fileExists(atPath: tempCopy.path(percentEncoded: false)) {
                 try? fm.removeItem(at: tempCopy)
             }
-            try fm.copyItem(at: archive, to: tempCopy)
+            try FileCopy.copyItem(at: archive, to: tempCopy, replacing: true)
             WhiskyWineInstaller.install(from: tempCopy)
 
             removeQuarantineRecursively(path: wineRoot(runtimeId: runtimeId).path(percentEncoded: false))
@@ -255,7 +323,7 @@ public enum WineRuntimeManager {
             if fm.fileExists(atPath: target.path(percentEncoded: false)) {
                 try fm.removeItem(at: target)
             }
-            try fm.copyItem(at: entry, to: target)
+            try FileCopy.copyItem(at: entry, to: target, replacing: true)
         }
     }
 

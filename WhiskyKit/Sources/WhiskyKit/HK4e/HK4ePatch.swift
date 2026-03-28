@@ -107,6 +107,9 @@ public enum HK4ePatch {
         let usesDXMT = (runtime?.renderBackend == .dxmt) && bottle.settings.hk4eDXMTInjectionEnabled
         let supportsHK4ePatching = (runtime != nil) && (runtimeId != WineRuntimes.whiskyDefaultId)
 
+        // Ensure this bottle uses an isolated runtime copy.
+        try await WineRuntimeManager.ensureIsolatedRuntime(bottle: bottle, baseRuntimeId: runtimeId)
+
         await revertIfNeeded(bottle: bottle, prefixURL: prefixURL)
 
         let state: HK4ePatchState?
@@ -117,7 +120,9 @@ public enum HK4ePatch {
 
             if usesDXMT {
                 try await HK4eDXMT.ensureInstalled()
-                HK4eDXMT.applyToRuntime(runtimeId: runtimeId)
+                // Ensure per-bottle runtime exists before runtime-level patching.
+                try await WineRuntimeManager.ensureIsolatedRuntime(bottle: bottle, baseRuntimeId: runtimeId)
+                HK4eDXMT.applyToRuntime(runtimeRoot: WineRuntimeManager.effectiveWineRoot(bottle: bottle))
                 try? HK4eDXMT.applyToPrefix(prefixURL: prefixURL)
             }
 

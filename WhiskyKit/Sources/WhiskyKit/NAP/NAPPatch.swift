@@ -61,6 +61,7 @@ public enum NAPPatch {
 
     public static func applyAndRun(program: Program, args: [String], environment: [String: String]) async throws {
         let bottle = program.bottle
+        try await WineRuntimeManager.ensureIsolatedRuntime(bottle: bottle, baseRuntimeId: bottle.settings.wineRuntimeId)
         let exeURL = program.url
         let gameDir = exeURL.deletingLastPathComponent()
         let region = bottle.settings.napRegion
