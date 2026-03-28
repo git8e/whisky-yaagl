@@ -78,6 +78,18 @@ struct BottleCreationView: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    private var gameExecutableOptionalKey: String {
+        if gameRegionPreset.isHK4e { return "hk4e.gameExecutableOptional" }
+        if gameRegionPreset.isNAP { return "nap.gameExecutableOptional" }
+        return "hkrpg.gameExecutableOptional"
+    }
+
+    private var gameNotSelectedKey: String {
+        if gameRegionPreset.isHK4e { return "hk4e.notSelected" }
+        if gameRegionPreset.isNAP { return "nap.notSelected" }
+        return "hkrpg.notSelected"
+    }
+
     private func normalizeProxyFields() {
         // If user pastes "host:port" into host field, split it.
         let host = initialProxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -96,152 +108,16 @@ struct BottleCreationView: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("create.name", text: $newBottleName)
-                    .onChange(of: newBottleName) { _, name in
-                        nameValid = !name.isEmpty
-                    }
-
-                Picker("create.win", selection: $newBottleVersion) {
-                    ForEach(WinVersion.allCases.reversed(), id: \.self) {
-                        Text($0.pretty())
-                    }
-                }
-
-                Picker("create.wineRuntime", selection: $wineRuntimeId) {
-                    ForEach(WineRuntimes.all, id: \.id) { runtime in
-                        let installed = WineRuntimeManager.isInstalled(runtimeId: runtime.id)
-                        Text(installed ? "\(runtime.displayName)" : "\(runtime.displayName) (Not Installed)")
-                            .tag(runtime.id)
-                    }
-                }
-
-                ActionView(
-                    text: "create.path",
-                    subtitle: newBottleURL.prettyPath(),
-                    actionName: "create.browse"
-                ) {
-                    let panel = NSOpenPanel()
-                    panel.canChooseFiles = false
-                    panel.canChooseDirectories = true
-                    panel.allowsMultipleSelection = false
-                    panel.canCreateDirectories = true
-                    panel.directoryURL = BottleData.defaultBottleDir
-                    panel.begin { result in
-                        if result == .OK, let url = panel.urls.first {
-                            newBottleURL = url
-                        }
-                    }
-                }
-
+                nameField
+                windowsPicker
+                runtimePicker
+                bottlePathPicker
                 Toggle("config.retinaMode", isOn: $initialRetinaMode)
-
-                Picker("create.gameRegion", selection: $gameRegionPreset) {
-                    Text("hk4e.region.os").tag(GameRegionPreset.hk4eOs)
-                    Text("hk4e.region.cn").tag(GameRegionPreset.hk4eCn)
-                    Text("nap.region.os").tag(GameRegionPreset.napOs)
-                    Text("nap.region.cn").tag(GameRegionPreset.napCn)
-                    Text("hkrpg.region.os").tag(GameRegionPreset.hkrpgOs)
-                    Text("hkrpg.region.cn").tag(GameRegionPreset.hkrpgCn)
-                }
-
-                if gameRegionPreset.isHK4e {
-                    Toggle("hk4e.launchFixBlockNetwork", isOn: $initialHK4eLaunchFixBlockNetwork)
-                    Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
-                    Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
-                } else if gameRegionPreset.isNAP {
-                    Toggle("nap.launchFixBlockNetwork", isOn: $initialNapLaunchFixBlockNetwork)
-                    Toggle("nap.fixWebview", isOn: $initialNapFixWebview)
-                } else {
-                    Toggle("hkrpg.launchFixBlockNetwork", isOn: $initialHKRPGLaunchFixBlockNetwork)
-                }
-
-                Toggle("config.proxy.enable", isOn: $initialProxyEnabled)
-                if initialProxyEnabled {
-                    HStack(alignment: .center, spacing: 2) {
-                        TextField("", text: $initialProxyHost, prompt: Text("config.proxy.host"))
-                            .textFieldStyle(.roundedBorder)
-                            .frame(width: 182)
-                            .onChange(of: initialProxyHost) { _, _ in normalizeProxyFields() }
-                        Text(":")
-                            .foregroundStyle(.secondary)
-                            .frame(width: 6)
-                        TextField("", text: $initialProxyPort, prompt: Text("config.proxy.port"))
-                            .textFieldStyle(.roundedBorder)
-                            .frame(width: 96)
-                    }
-                }
-
-                if gameRegionPreset.isHK4e {
-                    Toggle("hk4e.customResolution", isOn: $initialCustomResolutionEnabled)
-                    if initialCustomResolutionEnabled {
-                        HStack(alignment: .center) {
-                            TextField("hk4e.width", value: $initialCustomResolutionWidth, formatter: NumberFormatter())
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 90)
-                            Text("x")
-                                .frame(width: 12, height: 28, alignment: .center)
-                                .foregroundStyle(.secondary)
-                            TextField("hk4e.height", value: $initialCustomResolutionHeight, formatter: NumberFormatter())
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 90)
-                        }
-                    }
-                } else if gameRegionPreset.isNAP {
-                    Toggle("nap.customResolution", isOn: $initialNapCustomResolutionEnabled)
-                    if initialNapCustomResolutionEnabled {
-                        HStack(alignment: .center) {
-                            TextField("nap.width", value: $initialNapCustomResolutionWidth, formatter: NumberFormatter())
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 90)
-                            Text("x")
-                                .frame(width: 12, height: 28, alignment: .center)
-                                .foregroundStyle(.secondary)
-                            TextField("nap.height", value: $initialNapCustomResolutionHeight, formatter: NumberFormatter())
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 90)
-                        }
-                    }
-                }
-
-                let exeText: String = {
-                    if gameRegionPreset.isHK4e { return "hk4e.gameExecutableOptional" }
-                    if gameRegionPreset.isNAP { return "nap.gameExecutableOptional" }
-                    return "hkrpg.gameExecutableOptional"
-                }()
-
-                let exeNotSelected: String = {
-                    if gameRegionPreset.isHK4e { return "hk4e.notSelected" }
-                    if gameRegionPreset.isNAP { return "nap.notSelected" }
-                    return "hkrpg.notSelected"
-                }()
-
-                ActionView(
-                    text: exeText,
-                    subtitle: pinProgramURL?.path(percentEncoded: false)
-                        ?? String(localized: exeNotSelected),
-                    actionName: "create.browse"
-                ) {
-                    let panel = NSOpenPanel()
-                    panel.canChooseFiles = true
-                    panel.canChooseDirectories = false
-                    panel.allowsMultipleSelection = false
-                    panel.begin { result in
-                        if result == .OK, let url = panel.urls.first {
-                            pinProgramURL = url
-
-                            let lower = url.lastPathComponent.lowercased()
-                            if lower.contains("zenlesszonezero") {
-                                gameRegionPreset = .napOs
-                            } else if lower.contains("starrail") {
-                                gameRegionPreset = .hkrpgOs
-                            } else if lower.contains("yuanshen") {
-                                gameRegionPreset = .hk4eCn
-                            } else if lower.contains("genshinimpact") {
-                                gameRegionPreset = .hk4eOs
-                            }
-                        }
-                    }
-                }
+                regionPicker
+                gameSpecificToggles
+                proxySettings
+                resolutionSettings
+                executablePicker
 
                 if bottleVM.isCreatingBottle {
                     Section("create.progress.title") {
@@ -297,6 +173,159 @@ struct BottleCreationView: View {
         }
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: ViewWidth.small)
+    }
+
+    private var nameField: some View {
+        TextField("create.name", text: $newBottleName)
+            .onChange(of: newBottleName) { _, name in
+                nameValid = !name.isEmpty
+            }
+    }
+
+    private var windowsPicker: some View {
+        Picker("create.win", selection: $newBottleVersion) {
+            ForEach(WinVersion.allCases.reversed(), id: \.self) {
+                Text($0.pretty())
+            }
+        }
+    }
+
+    private var runtimePicker: some View {
+        Picker("create.wineRuntime", selection: $wineRuntimeId) {
+            ForEach(WineRuntimes.all, id: \.id) { runtime in
+                let installed = WineRuntimeManager.isInstalled(runtimeId: runtime.id)
+                Text(installed ? "\(runtime.displayName)" : "\(runtime.displayName) (Not Installed)")
+                    .tag(runtime.id)
+            }
+        }
+    }
+
+    private var bottlePathPicker: some View {
+        ActionView(
+            text: "create.path",
+            subtitle: newBottleURL.prettyPath(),
+            actionName: "create.browse"
+        ) {
+            let panel = NSOpenPanel()
+            panel.canChooseFiles = false
+            panel.canChooseDirectories = true
+            panel.allowsMultipleSelection = false
+            panel.canCreateDirectories = true
+            panel.directoryURL = BottleData.defaultBottleDir
+            panel.begin { result in
+                if result == .OK, let url = panel.urls.first {
+                    newBottleURL = url
+                }
+            }
+        }
+    }
+
+    private var regionPicker: some View {
+        Picker("create.gameRegion", selection: $gameRegionPreset) {
+            Text("hk4e.region.os").tag(GameRegionPreset.hk4eOs)
+            Text("hk4e.region.cn").tag(GameRegionPreset.hk4eCn)
+            Text("nap.region.os").tag(GameRegionPreset.napOs)
+            Text("nap.region.cn").tag(GameRegionPreset.napCn)
+            Text("hkrpg.region.os").tag(GameRegionPreset.hkrpgOs)
+            Text("hkrpg.region.cn").tag(GameRegionPreset.hkrpgCn)
+        }
+    }
+
+    @ViewBuilder
+    private var gameSpecificToggles: some View {
+        if gameRegionPreset.isHK4e {
+            Toggle("hk4e.launchFixBlockNetwork", isOn: $initialHK4eLaunchFixBlockNetwork)
+            Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
+            Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
+        } else if gameRegionPreset.isNAP {
+            Toggle("nap.launchFixBlockNetwork", isOn: $initialNapLaunchFixBlockNetwork)
+            Toggle("nap.fixWebview", isOn: $initialNapFixWebview)
+        } else {
+            Toggle("hkrpg.launchFixBlockNetwork", isOn: $initialHKRPGLaunchFixBlockNetwork)
+        }
+    }
+
+    @ViewBuilder
+    private var proxySettings: some View {
+        Toggle("config.proxy.enable", isOn: $initialProxyEnabled)
+        if initialProxyEnabled {
+            HStack(alignment: .center, spacing: 2) {
+                TextField("", text: $initialProxyHost, prompt: Text("config.proxy.host"))
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 182)
+                    .onChange(of: initialProxyHost) { _, _ in normalizeProxyFields() }
+                Text(":")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 6)
+                TextField("", text: $initialProxyPort, prompt: Text("config.proxy.port"))
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 96)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var resolutionSettings: some View {
+        if gameRegionPreset.isHK4e {
+            Toggle("hk4e.customResolution", isOn: $initialCustomResolutionEnabled)
+            if initialCustomResolutionEnabled {
+                HStack(alignment: .center) {
+                    TextField("hk4e.width", value: $initialCustomResolutionWidth, formatter: NumberFormatter())
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 90)
+                    Text("x")
+                        .frame(width: 12, height: 28, alignment: .center)
+                        .foregroundStyle(.secondary)
+                    TextField("hk4e.height", value: $initialCustomResolutionHeight, formatter: NumberFormatter())
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 90)
+                }
+            }
+        } else if gameRegionPreset.isNAP {
+            Toggle("nap.customResolution", isOn: $initialNapCustomResolutionEnabled)
+            if initialNapCustomResolutionEnabled {
+                HStack(alignment: .center) {
+                    TextField("nap.width", value: $initialNapCustomResolutionWidth, formatter: NumberFormatter())
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 90)
+                    Text("x")
+                        .frame(width: 12, height: 28, alignment: .center)
+                        .foregroundStyle(.secondary)
+                    TextField("nap.height", value: $initialNapCustomResolutionHeight, formatter: NumberFormatter())
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 90)
+                }
+            }
+        }
+    }
+
+    private var executablePicker: some View {
+        ActionView(
+            text: gameExecutableOptionalKey,
+            subtitle: pinProgramURL?.path(percentEncoded: false) ?? String(localized: gameNotSelectedKey),
+            actionName: "create.browse"
+        ) {
+            let panel = NSOpenPanel()
+            panel.canChooseFiles = true
+            panel.canChooseDirectories = false
+            panel.allowsMultipleSelection = false
+            panel.begin { result in
+                if result == .OK, let url = panel.urls.first {
+                    pinProgramURL = url
+
+                    let lower = url.lastPathComponent.lowercased()
+                    if lower.contains("zenlesszonezero") {
+                        gameRegionPreset = .napOs
+                    } else if lower.contains("starrail") {
+                        gameRegionPreset = .hkrpgOs
+                    } else if lower.contains("yuanshen") {
+                        gameRegionPreset = .hk4eCn
+                    } else if lower.contains("genshinimpact") {
+                        gameRegionPreset = .hk4eOs
+                    }
+                }
+            }
+        }
     }
 
     func submit() {
