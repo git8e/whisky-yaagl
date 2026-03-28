@@ -8,7 +8,7 @@ import Foundation
 public enum HK4eTweaks {
     public static func setLeftCommandIsCtrl(bottle: Bottle, enabled: Bool) async throws {
         let key = #"HKEY_CURRENT_USER\Software\Wine\Mac Driver"#
-        try await HK4eRegistry.addString(
+        try await WineRegistry.addString(
             bottle: bottle,
             key: key,
             name: "LeftCommandIsCtrl",
@@ -19,19 +19,19 @@ public enum HK4eTweaks {
     // Mirrors YAAGL's setNVExtension.
     public static func applyNVExtension(bottle: Bottle) async throws {
         let guid = "{41FCC608-8496-4DEF-B43E-7D9BD675A6FF}"
-        try await HK4eRegistry.addBinary(
+        try await WineRegistry.addBinary(
             bottle: bottle,
             key: #"HKEY_LOCAL_MACHINE\SOFTWARE\NVIDIA Corporation\Global"#,
             name: guid,
             hex: "1"
         )
-        try await HK4eRegistry.addBinary(
+        try await WineRegistry.addBinary(
             bottle: bottle,
             key: #"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\nvlddmkm"#,
             name: guid,
             hex: "1"
         )
-        try await HK4eRegistry.addString(
+        try await WineRegistry.addString(
             bottle: bottle,
             key: #"HKEY_LOCAL_MACHINE\SOFTWARE\NVIDIA Corporation\Global\NGXCore"#,
             name: "FullPath",
@@ -41,17 +41,17 @@ public enum HK4eTweaks {
 
     public static func revertNVExtension(bottle: Bottle) async {
         let guid = "{41FCC608-8496-4DEF-B43E-7D9BD675A6FF}"
-        try? await HK4eRegistry.deleteValue(
+        try? await WineRegistry.deleteValue(
             bottle: bottle,
             key: #"HKEY_LOCAL_MACHINE\SOFTWARE\NVIDIA Corporation\Global"#,
             name: guid
         )
-        try? await HK4eRegistry.deleteValue(
+        try? await WineRegistry.deleteValue(
             bottle: bottle,
             key: #"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\nvlddmkm"#,
             name: guid
         )
-        try? await HK4eRegistry.deleteValue(
+        try? await WineRegistry.deleteValue(
             bottle: bottle,
             key: #"HKEY_LOCAL_MACHINE\SOFTWARE\NVIDIA Corporation\Global\NGXCore"#,
             name: "FullPath"

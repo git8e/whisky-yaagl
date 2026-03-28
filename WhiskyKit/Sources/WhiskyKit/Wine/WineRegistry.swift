@@ -1,11 +1,11 @@
 //
-//  HK4eRegistry.swift
+//  WineRegistry.swift
 //  WhiskyKit
 //
 
 import Foundation
 
-public enum HK4eRegistry {
+public enum WineRegistry {
     private static func quietEnv() -> [String: String] {
         ["WINEDEBUG": "-all"]
     }
