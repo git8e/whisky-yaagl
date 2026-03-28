@@ -41,6 +41,11 @@ struct BottleListEntry: View {
                 }
             }
             .contextMenu {
+                Button("button.duplicateBottle", systemImage: "doc.on.doc") {
+                    bottle.duplicate()
+                }
+                .disabled(!bottle.isAvailable)
+                .labelStyle(.titleAndIcon)
                 Button("button.rename", systemImage: "pencil.line") {
                     showBottleRename.toggle()
                 }
