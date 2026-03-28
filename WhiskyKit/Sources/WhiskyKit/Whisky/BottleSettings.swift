@@ -217,9 +217,31 @@ public struct BottleNAPConfig: Codable, Equatable {
     }
 }
 
+public struct BottleHKRPGConfig: Codable, Equatable {
+    var region: HKRPGGame.Region = .os
+    var launchFixBlockNetwork: Bool = false
+    var gameExecutableURL: URL?
+
+    // Mirrors YAAGL behavior: these are applied at launch.
+    var launchPatchingEnabled: Bool = true
+    var fixWebview: Bool = true
+
+    public init() {}
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.region = try container.decodeIfPresent(HKRPGGame.Region.self, forKey: .region) ?? .os
+        self.launchFixBlockNetwork = try container.decodeIfPresent(Bool.self, forKey: .launchFixBlockNetwork) ?? false
+        self.gameExecutableURL = try container.decodeIfPresent(URL.self, forKey: .gameExecutableURL)
+        self.launchPatchingEnabled = try container.decodeIfPresent(Bool.self, forKey: .launchPatchingEnabled) ?? true
+        self.fixWebview = try container.decodeIfPresent(Bool.self, forKey: .fixWebview) ?? true
+    }
+}
+
 public enum BottleGamePreset: String, Codable, Sendable {
     case hk4e
     case nap
+    case hkrpg
 }
 
 public struct BottleSettings: Codable, Equatable {
@@ -233,6 +255,7 @@ public struct BottleSettings: Codable, Equatable {
         case dxvkConfig
         case hk4eConfig
         case napConfig
+        case hkrpgConfig
         case gamePresetConfig = "gamePreset"
     }
 
@@ -243,6 +266,7 @@ public struct BottleSettings: Codable, Equatable {
     private var dxvkConfig: BottleDXVKConfig
     private var hk4eConfig: BottleHK4eConfig
     private var napConfig: BottleNAPConfig
+    private var hkrpgConfig: BottleHKRPGConfig
     private var gamePresetConfig: BottleGamePreset
 
     public init() {
@@ -252,6 +276,7 @@ public struct BottleSettings: Codable, Equatable {
         self.dxvkConfig = BottleDXVKConfig()
         self.hk4eConfig = BottleHK4eConfig()
         self.napConfig = BottleNAPConfig()
+        self.hkrpgConfig = BottleHKRPGConfig()
         self.gamePresetConfig = .hk4e
     }
 
@@ -264,11 +289,29 @@ public struct BottleSettings: Codable, Equatable {
         self.wineConfig = try container.decodeIfPresent(BottleWineConfig.self, forKey: .wineConfig) ?? BottleWineConfig()
         self.metalConfig = try container.decodeIfPresent(BottleMetalConfig.self, forKey: .metalConfig) ?? BottleMetalConfig()
         self.dxvkConfig = try container.decodeIfPresent(BottleDXVKConfig.self, forKey: .dxvkConfig) ?? BottleDXVKConfig()
-        self.hk4eConfig = try container.decodeIfPresent(BottleHK4eConfig.self, forKey: .hk4eConfig) ?? BottleHK4eConfig()
-        self.napConfig = try container.decodeIfPresent(BottleNAPConfig.self, forKey: .napConfig) ?? BottleNAPConfig()
 
-        self.gamePresetConfig = decodedPreset
-            ?? ((self.napConfig.gameExecutableURL != nil && self.hk4eConfig.gameExecutableURL == nil) ? .nap : .hk4e)
+        let hk4eConfig = try container.decodeIfPresent(BottleHK4eConfig.self, forKey: .hk4eConfig) ?? BottleHK4eConfig()
+        let napConfig = try container.decodeIfPresent(BottleNAPConfig.self, forKey: .napConfig) ?? BottleNAPConfig()
+        let hkrpgConfig = try container.decodeIfPresent(BottleHKRPGConfig.self, forKey: .hkrpgConfig) ?? BottleHKRPGConfig()
+
+        self.hk4eConfig = hk4eConfig
+        self.napConfig = napConfig
+        self.hkrpgConfig = hkrpgConfig
+
+        let inferredPreset: BottleGamePreset = {
+            if hkrpgConfig.gameExecutableURL != nil,
+               hk4eConfig.gameExecutableURL == nil,
+               napConfig.gameExecutableURL == nil {
+                return .hkrpg
+            }
+            if napConfig.gameExecutableURL != nil,
+               hk4eConfig.gameExecutableURL == nil {
+                return .nap
+            }
+            return .hk4e
+        }()
+
+        self.gamePresetConfig = decodedPreset ?? inferredPreset
     }
     // swiftlint:enable line_length
 
@@ -461,6 +504,31 @@ public struct BottleSettings: Codable, Equatable {
     public var hk4eReshadeEnabled: Bool {
         get { return hk4eConfig.reshadeEnabled }
         set { hk4eConfig.reshadeEnabled = newValue }
+    }
+
+    public var hkrpgRegion: HKRPGGame.Region {
+        get { return hkrpgConfig.region }
+        set { hkrpgConfig.region = newValue }
+    }
+
+    public var hkrpgLaunchFixBlockNetwork: Bool {
+        get { return hkrpgConfig.launchFixBlockNetwork }
+        set { hkrpgConfig.launchFixBlockNetwork = newValue }
+    }
+
+    public var hkrpgLaunchPatchingEnabled: Bool {
+        get { return hkrpgConfig.launchPatchingEnabled }
+        set { hkrpgConfig.launchPatchingEnabled = newValue }
+    }
+
+    public var hkrpgFixWebview: Bool {
+        get { return hkrpgConfig.fixWebview }
+        set { hkrpgConfig.fixWebview = newValue }
+    }
+
+    public var hkrpgGameExecutableURL: URL? {
+        get { return hkrpgConfig.gameExecutableURL }
+        set { hkrpgConfig.gameExecutableURL = newValue }
     }
 
     public var napRegion: NapGame.Region {
