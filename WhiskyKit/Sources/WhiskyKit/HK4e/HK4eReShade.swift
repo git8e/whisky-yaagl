@@ -36,8 +36,8 @@ public enum HK4eReShade {
             p2 = { frac in cb(0.7 + frac * 0.3) }
         }
 
-        try await HK4eDownloader.downloadOnce(url: setupURL, destination: setupExe, progress: p1)
-        try await HK4eDownloader.downloadOnce(url: compilerURL, destination: compiler, progress: p2)
+        try await RemoteDownloader.downloadOnce(url: setupURL, destination: setupExe, progress: p1)
+        try await RemoteDownloader.downloadOnce(url: compilerURL, destination: compiler, progress: p2)
 
         // Extract embedded zip from the setup EXE.
         let zipURL = dir.appending(path: "install.zip")
