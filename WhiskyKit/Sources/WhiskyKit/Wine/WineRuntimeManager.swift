@@ -207,65 +207,8 @@ public enum WineRuntimeManager {
             return destination
         }
 
-        let delegate = DownloadDelegate(destination: destination, progress: progress)
-        let config = URLSessionConfiguration.ephemeral
-        let session = URLSession(configuration: config, delegate: delegate, delegateQueue: nil)
-        defer { session.invalidateAndCancel() }
-
-        let task = session.downloadTask(with: url)
-        return try await withCheckedThrowingContinuation { cont in
-            delegate.continuation = cont
-            task.resume()
-        }
-    }
-
-    private final class DownloadDelegate: NSObject, URLSessionDownloadDelegate, @unchecked Sendable {
-        let destination: URL
-        let progress: (@Sendable (Double) -> Void)?
-        var continuation: CheckedContinuation<URL, Error>?
-
-        init(destination: URL, progress: (@Sendable (Double) -> Void)?) {
-            self.destination = destination
-            self.progress = progress
-        }
-
-        func urlSession(
-            _ session: URLSession,
-            downloadTask: URLSessionDownloadTask,
-            didWriteData bytesWritten: Int64,
-            totalBytesWritten: Int64,
-            totalBytesExpectedToWrite: Int64
-        ) {
-            guard totalBytesExpectedToWrite > 0 else { return }
-            let frac = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-            progress?(min(max(frac, 0.0), 1.0))
-        }
-
-        func urlSession(
-            _ session: URLSession,
-            downloadTask: URLSessionDownloadTask,
-            didFinishDownloadingTo location: URL
-        ) {
-            do {
-                if WineRuntimeManager.fm.fileExists(atPath: destination.path(percentEncoded: false)) {
-                    continuation?.resume(returning: destination)
-                    continuation = nil
-                    return
-                }
-                try WineRuntimeManager.fm.moveItem(at: location, to: destination)
-                continuation?.resume(returning: destination)
-                continuation = nil
-            } catch {
-                continuation?.resume(throwing: error)
-                continuation = nil
-            }
-        }
-
-        func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-            guard let error else { return }
-            continuation?.resume(throwing: error)
-            continuation = nil
-        }
+        try await RemoteDownloader.downloadOnce(url: url, destination: destination, progress: progress)
+        return destination
     }
 
     private static func install(runtime: WineRuntime, fromArchive archiveURL: URL) throws {

@@ -89,7 +89,7 @@ public enum HK4eDXMT {
         clearDXMTDir()
 
         let archiveLocalURL = HK4eResources.dxmtDir.appending(path: archiveName)
-        try await HK4eDownloader.downloadOnce(url: archiveURL, destination: archiveLocalURL) { frac in
+        try await RemoteDownloader.downloadOnce(url: archiveURL, destination: archiveLocalURL) { frac in
             progress?(min(max(frac * 0.9, 0.0), 0.9))
         }
 

@@ -30,7 +30,7 @@ public enum HK4eDXVK {
                     cb((Double(idx) + frac) / Double(count))
                 }
             }
-            try await HK4eDownloader.downloadOnce(url: url, destination: dst, progress: per)
+            try await RemoteDownloader.downloadOnce(url: url, destination: dst, progress: per)
         }
         progress?(1)
     }
