@@ -55,15 +55,23 @@ struct ConfigView: View {
         case hk4eCn
         case napOs
         case napCn
+        case hkrpgOs
+        case hkrpgCn
 
         var id: String { rawValue }
 
         var isHK4e: Bool { self == .hk4eOs || self == .hk4eCn }
         var isNAP: Bool { self == .napOs || self == .napCn }
+        var isHKRPG: Bool { self == .hkrpgOs || self == .hkrpgCn }
 
-        var gamePreset: BottleGamePreset { isHK4e ? .hk4e : .nap }
+        var gamePreset: BottleGamePreset {
+            if isHK4e { return .hk4e }
+            if isNAP { return .nap }
+            return .hkrpg
+        }
         var hk4eRegion: HK4eGame.Region { self == .hk4eCn ? .cn : .os }
         var napRegion: NapGame.Region { self == .napCn ? .cn : .os }
+        var hkrpgRegion: HKRPGGame.Region { self == .hkrpgCn ? .cn : .os }
     }
 
     private var gameRegionSelection: Binding<GameRegionPreset> {
@@ -74,6 +82,8 @@ struct ConfigView: View {
                     return bottle.settings.napRegion == .cn ? .napCn : .napOs
                 case .hk4e:
                     return bottle.settings.hk4eRegion == .cn ? .hk4eCn : .hk4eOs
+                case .hkrpg:
+                    return bottle.settings.hkrpgRegion == .cn ? .hkrpgCn : .hkrpgOs
                 }
             },
             set: { preset in
@@ -81,8 +91,14 @@ struct ConfigView: View {
                 if preset.isHK4e {
                     bottle.settings.hk4eRegion = preset.hk4eRegion
                     bottle.settings.hk4eLaunchPatchingEnabled = true
-                } else {
+                    bottle.settings.hkrpgLaunchPatchingEnabled = false
+                } else if preset.isNAP {
                     bottle.settings.napRegion = preset.napRegion
+                    bottle.settings.hk4eLaunchPatchingEnabled = false
+                    bottle.settings.hkrpgLaunchPatchingEnabled = false
+                } else {
+                    bottle.settings.hkrpgRegion = preset.hkrpgRegion
+                    bottle.settings.hkrpgLaunchPatchingEnabled = true
                     bottle.settings.hk4eLaunchPatchingEnabled = false
                 }
             }
@@ -290,6 +306,8 @@ struct ConfigView: View {
                     Text("hk4e.region.cn").tag(GameRegionPreset.hk4eCn)
                     Text("nap.region.os").tag(GameRegionPreset.napOs)
                     Text("nap.region.cn").tag(GameRegionPreset.napCn)
+                    Text("hkrpg.region.os").tag(GameRegionPreset.hkrpgOs)
+                    Text("hkrpg.region.cn").tag(GameRegionPreset.hkrpgCn)
                 }
 
                 if gameRegionSelection.wrappedValue.isHK4e {
@@ -405,7 +423,7 @@ struct ConfigView: View {
                     Text("hk4e.description")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
-                } else {
+                } else if gameRegionSelection.wrappedValue.isNAP {
                     ActionView(
                         text: "nap.gameExecutable",
                         subtitle: bottle.settings.napGameExecutableURL?.prettyPath()
@@ -462,6 +480,37 @@ struct ConfigView: View {
                         .disabled(!bottle.settings.napCustomResolutionEnabled)
                         Spacer()
                     }
+                } else {
+                    ActionView(
+                        text: "hkrpg.gameExecutable",
+                        subtitle: bottle.settings.hkrpgGameExecutableURL?.prettyPath()
+                            ?? String(localized: "hkrpg.notSelected"),
+                        actionName: "create.browse"
+                    ) {
+                        let panel = NSOpenPanel()
+                        panel.canChooseFiles = true
+                        panel.canChooseDirectories = false
+                        panel.allowsMultipleSelection = false
+                        panel.begin { result in
+                            if result == .OK, let url = panel.urls.first {
+                                bottle.settings.hkrpgGameExecutableURL = url
+
+                                if !bottle.settings.pins.contains(where: { $0.url == url }) {
+                                    bottle.settings.pins.append(
+                                        PinnedProgram(name: url.deletingPathExtension().lastPathComponent, url: url)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Toggle("hkrpg.launchFixBlockNetwork", isOn: $bottle.settings.hkrpgLaunchFixBlockNetwork)
+                        .onChange(of: bottle.settings.hkrpgLaunchFixBlockNetwork) { _, enabled in
+                            guard enabled == false else { return }
+                            Task(priority: .userInitiated) {
+                                try? await WineProxySettings.restoreDesiredState(bottle: bottle)
+                            }
+                        }
                 }
             }
         }

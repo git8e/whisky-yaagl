@@ -34,19 +34,28 @@ struct BottleCreationView: View {
         case hk4eCn
         case napOs
         case napCn
+        case hkrpgOs
+        case hkrpgCn
 
         var isHK4e: Bool { self == .hk4eOs || self == .hk4eCn }
         var isNAP: Bool { self == .napOs || self == .napCn }
+        var isHKRPG: Bool { self == .hkrpgOs || self == .hkrpgCn }
 
-        var gamePreset: BottleVM.GamePreset { isHK4e ? .hk4e : .nap }
+        var gamePreset: BottleVM.GamePreset {
+            if isHK4e { return .hk4e }
+            if isNAP { return .nap }
+            return .hkrpg
+        }
         var hk4eRegion: HK4eGame.Region { self == .hk4eCn ? .cn : .os }
         var napRegion: NapGame.Region { self == .napCn ? .cn : .os }
+        var hkrpgRegion: HKRPGGame.Region { self == .hkrpgCn ? .cn : .os }
     }
 
     @State private var gameRegionPreset: GameRegionPreset = .hk4eOs
 
     @State private var initialHK4eLaunchFixBlockNetwork: Bool = false
     @State private var initialNapLaunchFixBlockNetwork: Bool = true
+    @State private var initialHKRPGLaunchFixBlockNetwork: Bool = false
     @State private var initialSteamPatch: Bool = true
     @State private var initialEnableHDR: Bool = false
 
@@ -131,15 +140,19 @@ struct BottleCreationView: View {
                     Text("hk4e.region.cn").tag(GameRegionPreset.hk4eCn)
                     Text("nap.region.os").tag(GameRegionPreset.napOs)
                     Text("nap.region.cn").tag(GameRegionPreset.napCn)
+                    Text("hkrpg.region.os").tag(GameRegionPreset.hkrpgOs)
+                    Text("hkrpg.region.cn").tag(GameRegionPreset.hkrpgCn)
                 }
 
                 if gameRegionPreset.isHK4e {
                     Toggle("hk4e.launchFixBlockNetwork", isOn: $initialHK4eLaunchFixBlockNetwork)
                     Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
                     Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
-                } else {
+                } else if gameRegionPreset.isNAP {
                     Toggle("nap.launchFixBlockNetwork", isOn: $initialNapLaunchFixBlockNetwork)
                     Toggle("nap.fixWebview", isOn: $initialNapFixWebview)
+                } else {
+                    Toggle("hkrpg.launchFixBlockNetwork", isOn: $initialHKRPGLaunchFixBlockNetwork)
                 }
 
                 Toggle("config.proxy.enable", isOn: $initialProxyEnabled)
@@ -173,7 +186,7 @@ struct BottleCreationView: View {
                                 .frame(width: 90)
                         }
                     }
-                } else {
+                } else if gameRegionPreset.isNAP {
                     Toggle("nap.customResolution", isOn: $initialNapCustomResolutionEnabled)
                     if initialNapCustomResolutionEnabled {
                         HStack(alignment: .center) {
@@ -190,10 +203,22 @@ struct BottleCreationView: View {
                     }
                 }
 
+                let exeText: String = {
+                    if gameRegionPreset.isHK4e { return "hk4e.gameExecutableOptional" }
+                    if gameRegionPreset.isNAP { return "nap.gameExecutableOptional" }
+                    return "hkrpg.gameExecutableOptional"
+                }()
+
+                let exeNotSelected: String = {
+                    if gameRegionPreset.isHK4e { return "hk4e.notSelected" }
+                    if gameRegionPreset.isNAP { return "nap.notSelected" }
+                    return "hkrpg.notSelected"
+                }()
+
                 ActionView(
-                    text: gameRegionPreset.isHK4e ? "hk4e.gameExecutableOptional" : "nap.gameExecutableOptional",
+                    text: exeText,
                     subtitle: pinProgramURL?.path(percentEncoded: false)
-                        ?? String(localized: gameRegionPreset.isHK4e ? "hk4e.notSelected" : "nap.notSelected"),
+                        ?? String(localized: exeNotSelected),
                     actionName: "create.browse"
                 ) {
                     let panel = NSOpenPanel()
@@ -207,6 +232,8 @@ struct BottleCreationView: View {
                             let lower = url.lastPathComponent.lowercased()
                             if lower.contains("zenlesszonezero") {
                                 gameRegionPreset = .napOs
+                            } else if lower.contains("starrail") {
+                                gameRegionPreset = .hkrpgOs
                             } else if lower.contains("yuanshen") {
                                 gameRegionPreset = .hk4eCn
                             } else if lower.contains("genshinimpact") {
@@ -276,6 +303,7 @@ struct BottleCreationView: View {
         let preset = gameRegionPreset.gamePreset
         let hk4eLaunchFixBlockNetwork = (preset == .hk4e) ? initialHK4eLaunchFixBlockNetwork : false
         let napLaunchFixBlockNetwork = (preset == .nap) ? initialNapLaunchFixBlockNetwork : false
+        let hkrpgLaunchFixBlockNetwork = (preset == .hkrpg) ? initialHKRPGLaunchFixBlockNetwork : false
         let hk4eSteamPatch = (preset == .hk4e) ? initialSteamPatch : false
         let hk4eEnableHDR = (preset == .hk4e) ? initialEnableHDR : false
         let hk4eCustomResolutionEnabled = (preset == .hk4e) ? initialCustomResolutionEnabled : false
@@ -297,6 +325,8 @@ struct BottleCreationView: View {
             initialNapRegion: gameRegionPreset.napRegion,
             initialNapLaunchFixBlockNetwork: napLaunchFixBlockNetwork,
             initialNapFixWebview: napFixWebview,
+            initialHKRPGRegion: gameRegionPreset.hkrpgRegion,
+            initialHKRPGLaunchFixBlockNetwork: hkrpgLaunchFixBlockNetwork,
             initialProxyEnabled: initialProxyEnabled,
             initialProxyHost: initialProxyHost,
             initialProxyPort: initialProxyPort,
