@@ -21345,6 +21345,50 @@
         }
       }
     },
+    "hkrpg.region.os" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Star Rail (hkrpgos)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Star Rail (hkrpgos)"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Star Rail (hkrpgos)"
+          }
+        }
+      }
+    },
+    "hkrpg.region.cn" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u661f\u7a79\u94c1\u9053 (hkrpgcn)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u661f\u7a79\u94c1\u9053 (hkrpgcn)"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u661f\u7a79\u9435\u9053 (hkrpgcn)"
+          }
+        }
+      }
+    },
     "hk4e.steamPatch" : {
       "localizations" : {
         "en" : {
@@ -21390,6 +21434,28 @@
       }
     },
     "nap.launchFixBlockNetwork" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch Fix(test)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch Fix(test)"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch Fix(test)"
+          }
+        }
+      }
+    },
+    "hkrpg.launchFixBlockNetwork" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -21715,6 +21781,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "遊戲可執行檔（可選）"
+          }
+        }
+      }
+    },
+    "hkrpg.gameExecutable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game Executable"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u6e38\u620f\u53ef\u6267\u884c\u6587\u4ef6"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u904a\u6232\u53ef\u57f7\u884c\u6a94"
+          }
+        }
+      }
+    },
+    "hkrpg.gameExecutableOptional" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game Executable (Optional)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u6e38\u620f\u53ef\u6267\u884c\u6587\u4ef6\uff08\u53ef\u9009\uff09"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u904a\u6232\u53ef\u57f7\u884c\u6a94\uff08\u53ef\u9078\uff09"
+          }
+        }
+      }
+    },
+    "hkrpg.notSelected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Selected"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u672a\u9009\u62e9"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u672a\u9078\u64c7"
           }
         }
       }

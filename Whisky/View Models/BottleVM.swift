@@ -27,6 +27,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
     enum GamePreset: String, CaseIterable, Sendable {
         case hk4e
         case nap
+        case hkrpg
     }
 
     var bottlesList = BottleData()
@@ -64,6 +65,8 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
         initialNapRegion: NapGame.Region = .os,
         initialNapLaunchFixBlockNetwork: Bool = true,
         initialNapFixWebview: Bool = true,
+        initialHKRPGRegion: HKRPGGame.Region = .os,
+        initialHKRPGLaunchFixBlockNetwork: Bool = false,
         initialProxyEnabled: Bool = false,
         initialProxyHost: String = "",
         initialProxyPort: String = "",
@@ -131,18 +134,36 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 bottle.settings.windowsVersion = winVersion
                 bottle.settings.name = bottleName
 
-                bottle.settings.gamePreset = (gamePreset == .nap) ? .nap : .hk4e
+                switch gamePreset {
+                case .hk4e:
+                    bottle.settings.gamePreset = .hk4e
+                    bottle.settings.hk4eRegion = initialHK4eRegion
+                    bottle.settings.hk4eLaunchFixBlockNetwork = initialLaunchFixBlockNetwork
+                    bottle.settings.hk4eSteamPatch = initialSteamPatch
+                    bottle.settings.hk4eCertificateImportEnabled = initialCertImport
+                    bottle.settings.hk4eEnableHDR = initialEnableHDR
+                    bottle.settings.hk4eLaunchPatchingEnabled = true
+                    bottle.settings.napFixWebview = false
+                    bottle.settings.hkrpgFixWebview = true
+                    bottle.settings.hkrpgLaunchPatchingEnabled = false
+                case .nap:
+                    bottle.settings.gamePreset = .nap
+                    bottle.settings.napRegion = initialNapRegion
+                    bottle.settings.napLaunchFixBlockNetwork = initialNapLaunchFixBlockNetwork
+                    bottle.settings.napFixWebview = initialNapFixWebview
+                    bottle.settings.hk4eLaunchPatchingEnabled = false
+                    bottle.settings.hkrpgLaunchPatchingEnabled = false
+                    bottle.settings.hkrpgFixWebview = true
+                case .hkrpg:
+                    bottle.settings.gamePreset = .hkrpg
+                    bottle.settings.hkrpgRegion = initialHKRPGRegion
+                    bottle.settings.hkrpgLaunchFixBlockNetwork = initialHKRPGLaunchFixBlockNetwork
+                    bottle.settings.hkrpgLaunchPatchingEnabled = true
+                    bottle.settings.hkrpgFixWebview = true
+                    bottle.settings.hk4eLaunchPatchingEnabled = false
+                    bottle.settings.napFixWebview = false
+                }
 
-                bottle.settings.hk4eRegion = initialHK4eRegion
-                bottle.settings.hk4eLaunchFixBlockNetwork = initialLaunchFixBlockNetwork
-                bottle.settings.hk4eSteamPatch = initialSteamPatch
-                bottle.settings.hk4eCertificateImportEnabled = initialCertImport
-                bottle.settings.hk4eEnableHDR = initialEnableHDR
-                bottle.settings.hk4eLaunchPatchingEnabled = (gamePreset == .hk4e)
-
-                bottle.settings.napRegion = initialNapRegion
-                bottle.settings.napLaunchFixBlockNetwork = initialNapLaunchFixBlockNetwork
-                bottle.settings.napFixWebview = initialNapFixWebview
                 bottle.settings.napCustomResolutionEnabled = initialNapCustomResolutionEnabled
                 bottle.settings.napCustomResolutionWidth = initialNapCustomResolutionWidth
                 bottle.settings.napCustomResolutionHeight = initialNapCustomResolutionHeight
@@ -239,6 +260,8 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                         bottle.settings.hk4eGameExecutableURL = pinProgramURL
                     case .nap:
                         bottle.settings.napGameExecutableURL = pinProgramURL
+                    case .hkrpg:
+                        bottle.settings.hkrpgGameExecutableURL = pinProgramURL
                     }
                 }
 

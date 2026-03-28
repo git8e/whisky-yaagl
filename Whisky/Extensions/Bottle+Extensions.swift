@@ -40,6 +40,11 @@ extension Bottle {
                 .appending(path: "patch-state.json", directoryHint: .notDirectory)
             try? FileManager.default.removeItem(at: hk4ePatchState)
 
+            let hkrpgPatchState = newBottleURL
+                .appendingPathComponent("HKRPG", isDirectory: true)
+                .appending(path: "patch-state.json", directoryHint: .notDirectory)
+            try? FileManager.default.removeItem(at: hkrpgPatchState)
+
             // Fix URLs inside metadata (pins, blocklist, stored executable paths).
             let newBottle = Bottle(bottleUrl: newBottleURL, inFlight: true)
             let oldBottleURL = url
@@ -59,6 +64,9 @@ extension Bottle {
             }
             if let exe = newBottle.settings.napGameExecutableURL {
                 newBottle.settings.napGameExecutableURL = exe.updateParentBottle(old: oldBottleURL, new: newBottleURL)
+            }
+            if let exe = newBottle.settings.hkrpgGameExecutableURL {
+                newBottle.settings.hkrpgGameExecutableURL = exe.updateParentBottle(old: oldBottleURL, new: newBottleURL)
             }
 
             // Give it a new display name.
