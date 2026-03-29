@@ -154,9 +154,13 @@ struct BottleCreationView: View {
                     .buttonStyle(.plain)
 
                     if otherSettingsExpanded {
-                        gameSpecificToggles
                         proxySettings
                         resolutionSettings
+                        gameSpecificToggles
+
+                        Text("patchOptions.keepDefaultHint")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                 }
 
@@ -275,20 +279,16 @@ struct BottleCreationView: View {
     @ViewBuilder
     private var gameSpecificToggles: some View {
         if gameRegionPreset.isHK4e {
+            Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
             Toggle("hk4e.launchFixBlockNetwork", isOn: $initialHK4eLaunchFixBlockNetwork)
             Toggle("hk4e.leftCommandIsCtrl", isOn: $initialHK4eLeftCommandIsCtrl)
             Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
-            Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
         } else if gameRegionPreset.isNAP {
             Toggle("nap.launchFixBlockNetwork", isOn: $initialNapLaunchFixBlockNetwork)
             Toggle("nap.fixWebview", isOn: $initialNapFixWebview)
         } else {
             Toggle("hkrpg.launchFixBlockNetwork", isOn: $initialHKRPGLaunchFixBlockNetwork)
         }
-
-        Text("patchOptions.keepDefaultHint")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
     }
 
     @ViewBuilder
