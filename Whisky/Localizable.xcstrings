@@ -22288,7 +22288,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "If the game isn't installed yet, leave this empty. Create the bottle, install HoYoPlay in it, then set the game .exe in Bottle Config."
+            "value" : "Haven't installed the game yet? Create the bottle first, install and configure the game with HoYoPlay, then come back and set the game path in Bottle Config."
           }
         },
         "es" : {
@@ -22384,13 +22384,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "还没安装游戏？先留空。先创建容器，在容器内安装 HoYoPlay，再到容器配置里选择游戏 .exe。"
+            "value" : "还没安装游戏？那就先创建容器，使用 HoYoPlay 安装配置好游戏，再来容器配置里设置游戏路径吧。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "還沒安裝遊戲？先留空。先建立容器，在容器內安裝 HoYoPlay，再到容器設定裡選擇遊戲 .exe。"
+            "value" : "還沒安裝遊戲？那就先建立容器，使用 HoYoPlay 安裝並設定好遊戲，再回到容器設定裡設定遊戲路徑吧。"
           }
         }
       }
