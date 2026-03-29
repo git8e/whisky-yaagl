@@ -176,6 +176,11 @@ struct ConfigView: View {
                         }
                     }
                 }
+
+                Text("config.wineRuntime.switchWarning")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
                 SettingItemView(title: "config.winVersion", loadingState: winVersionLoadingState) {
                     Picker("config.winVersion", selection: $bottle.settings.windowsVersion) {
                         ForEach(WinVersion.allCases.reversed(), id: \.self) {
