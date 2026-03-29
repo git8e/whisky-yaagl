@@ -74,8 +74,14 @@ final class WineRuntimeDownloadsVM: ObservableObject {
             return String(localized: "runtime.status.failed")
         case "Downloading WhiskyWine":
             return String(localized: "runtime.status.downloadingWhiskyWine")
+        case "Installing WhiskyWine":
+            return String(localized: "runtime.status.installingWhiskyWine")
         case "Downloading Wine runtime":
             return String(localized: "runtime.status.downloadingWineRuntime")
+        case "Installing Wine runtime":
+            return String(localized: "runtime.status.installingWineRuntime")
+        case "Installing Wine from local archive":
+            return String(localized: "runtime.status.installingWineFromArchive")
         case "Preparing isolated Wine runtime":
             return String(localized: "runtime.status.preparingIsolatedRuntime")
         default:

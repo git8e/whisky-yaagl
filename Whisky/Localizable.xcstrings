@@ -15370,6 +15370,94 @@
         }
       }
     },
+    "runtime.error.invalidArchive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid Wine archive: %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 压缩包无效：%@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 壓縮檔無效：%@"
+          }
+        }
+      }
+    },
+    "runtime.error.missingRemoteURL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine runtime has no download URL: %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 运行时没有下载地址：%@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 執行環境沒有下載位址：%@"
+          }
+        }
+      }
+    },
+    "runtime.error.unknownRuntime" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown Wine runtime: %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知的 Wine 运行时：%@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知的 Wine 執行環境：%@"
+          }
+        }
+      }
+    },
+    "runtime.error.whiskyWineMissing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhiskyWine is not installed. Please complete the setup first."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhiskyWine 尚未安装，请先完成初始化设置。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhiskyWine 尚未安裝，請先完成初始化設定。"
+          }
+        }
+      }
+    },
     "runtime.status.downloadingWhiskyWine" : {
       "localizations" : {
         "en" : {
@@ -15392,6 +15480,28 @@
         }
       }
     },
+    "runtime.status.installingWhiskyWine" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installing WhiskyWine"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在安装 WhiskyWine"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在安裝 WhiskyWine"
+          }
+        }
+      }
+    },
     "runtime.status.downloadingWineRuntime" : {
       "localizations" : {
         "en" : {
@@ -15410,6 +15520,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在下載 Wine 執行環境"
+          }
+        }
+      }
+    },
+    "runtime.status.installingWineRuntime" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installing Wine runtime"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在安装 Wine 运行时"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在安裝 Wine 執行環境"
+          }
+        }
+      }
+    },
+    "runtime.status.installingWineFromArchive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installing Wine from local archive"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在从本地压缩包安装 Wine"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在從本機壓縮檔安裝 Wine"
           }
         }
       }
