@@ -287,7 +287,13 @@ public class Wine {
             "GST_DEBUG": "1"
         ]
         if let runtime = WineRuntimes.runtime(id: bottle.settings.wineRuntimeId), runtime.renderBackend == .dxmt {
-            result["DXMT_LOG_PATH"] = WhiskyPaths.applicationSupportRoot.path(percentEncoded: false)
+            // Keep DXMT logs out of Application Support (and out of the main session log folder).
+            // DXMT writes its own log files; we place them under ~/Library/Logs/Whisky/DXMT.
+            let dxmtLogsRoot = WhiskyPaths.logsRoot.appending(path: "DXMT", directoryHint: .isDirectory)
+            if !FileManager.default.fileExists(atPath: dxmtLogsRoot.path(percentEncoded: false)) {
+                try? FileManager.default.createDirectory(at: dxmtLogsRoot, withIntermediateDirectories: true)
+            }
+            result["DXMT_LOG_PATH"] = dxmtLogsRoot.path(percentEncoded: false)
             result["DXMT_CONFIG"] = "d3d11.preferredMaxFrameRate=60;"
             // Keep DXMT config per-bottle to avoid cross-bottle side effects.
             result["DXMT_CONFIG_FILE"] = bottle.url.appending(path: "dxmt.conf").path(percentEncoded: false)
