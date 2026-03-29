@@ -73,7 +73,7 @@ struct BottleCreationView: View {
     @State private var initialNapCustomResolutionEnabled: Bool = false
     @State private var initialNapCustomResolutionWidth: Int = 1920
     @State private var initialNapCustomResolutionHeight: Int = 1080
-    @State private var patchSettingsExpanded: Bool = false
+    @State private var otherSettingsExpanded: Bool = false
     @State private var pinProgramURL: URL?
     @State private var newBottleURL: URL = UserDefaults.standard.url(forKey: "defaultBottleLocation")
                                            ?? BottleData.defaultBottleDir
@@ -138,27 +138,27 @@ struct BottleCreationView: View {
                 Section {
                     Button {
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            patchSettingsExpanded.toggle()
+                            otherSettingsExpanded.toggle()
                         }
                     } label: {
                         HStack {
-                            Text("create.patchSettings")
+                            Text("create.otherSettings")
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(.secondary)
-                                .rotationEffect(.degrees(patchSettingsExpanded ? 90 : 0))
+                                .rotationEffect(.degrees(otherSettingsExpanded ? 90 : 0))
                         }
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
 
-                    if patchSettingsExpanded {
+                    if otherSettingsExpanded {
                         gameSpecificToggles
+                        proxySettings
+                        resolutionSettings
                     }
                 }
-                proxySettings
-                resolutionSettings
 
                 if bottleVM.isCreatingBottle {
                     Section("create.progress.title") {
