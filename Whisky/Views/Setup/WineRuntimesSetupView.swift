@@ -79,7 +79,7 @@ struct WineRuntimesSetupView: View {
                 .disabled(preferredRuntimeId.map { !vm.isInstalled($0) } ?? false)
             }
         }
-        .frame(width: 520, height: 520)
+        .frame(width: 520, height: 470)
         .task {
             availableRuntimes = await WineRuntimes.refreshCatalog(forceRemote: false)
             if let runtimeId = preferredRuntimeId, !vm.isInstalled(runtimeId) {

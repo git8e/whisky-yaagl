@@ -24595,6 +24595,28 @@
         }
       }
     },
+    "settings.language.restart.required" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language changes take effect after restarting the app."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语言更改将在重启应用后生效。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "語言變更將在重新啟動應用後生效。"
+          }
+        }
+      }
+    },
     "settings.release" : {
       "localizations" : {
         "en" : {

@@ -46,6 +46,9 @@ struct SettingsView: View {
                         Text(language.displayName()).tag(language)
                     }
                 }
+                Text("settings.language.restart.required")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Toggle("settings.toggle.kill.on.terminate", isOn: $killOnTerminate)
                 ActionView(
                     text: "settings.path",

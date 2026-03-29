@@ -75,6 +75,13 @@ public enum WineRuntimes {
 
     private static let lock = NSLock()
     private static let manifestURL = URL(string: "https://raw.githubusercontent.com/git8e/whisky-yaagl/main/wine-runtimes.json")!
+    private static let allowedManifestHosts: Set<String> = ["raw.githubusercontent.com"]
+    private static let allowedRuntimeDownloadHosts: Set<String> = [
+        "github.com",
+        "raw.githubusercontent.com",
+        "objects.githubusercontent.com",
+        "data.getwhisky.app"
+    ]
     private static let manifestCacheTTL: TimeInterval = 12 * 60 * 60
     nonisolated(unsafe) private static var cachedManifest = ManifestStore(initialManifest: fallbackManifest)
 
@@ -162,7 +169,10 @@ public enum WineRuntimes {
         }
 
         do {
-            let (data, _) = try await URLSession(configuration: .ephemeral).data(from: manifestURL)
+            let (data, response) = try await URLSession(configuration: .ephemeral).data(from: manifestURL)
+            guard isAllowedManifestResponse(response) else {
+                return nil
+            }
             let manifest = try JSONDecoder().decode(RuntimeManifest.self, from: data).sanitized()
             try persistManifestToDisk(manifest, data: data)
             return manifest
@@ -235,6 +245,16 @@ public enum WineRuntimes {
         value.split(separator: ".").map { Int($0) ?? 0 }
     }
 
+    private static func isAllowedManifestResponse(_ response: URLResponse) -> Bool {
+        guard let url = response.url else { return false }
+        return url.scheme == "https" && allowedManifestHosts.contains(url.host() ?? "")
+    }
+
+    private static func isAllowedRuntimeURL(_ url: URL?) -> Bool {
+        guard let url else { return false }
+        return url.scheme == "https" && allowedRuntimeDownloadHosts.contains(url.host() ?? "")
+    }
+
     private struct ManifestStore {
         var manifest: RuntimeManifest
         var lastRefresh: Date?
@@ -252,7 +272,14 @@ public enum WineRuntimes {
         var runtimes: [WineRuntime]
 
         func sanitized() -> RuntimeManifest {
-            let deduped = Array(Dictionary(runtimes.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first }).values)
+            let filtered = runtimes.filter { runtime in
+                if runtime.id == WineRuntimes.whiskyDefaultId {
+                    return WineRuntimes.isAllowedRuntimeURL(runtime.remoteURL)
+                }
+                return WineRuntimes.isAllowedRuntimeURL(runtime.remoteURL)
+            }
+
+            let deduped = Array(Dictionary(filtered.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first }).values)
                 .sorted { lhs, rhs in
                     if lhs.recommended != rhs.recommended {
                         return lhs.recommended && !rhs.recommended
