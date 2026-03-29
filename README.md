@@ -2,7 +2,7 @@
 
 # Whisky YAAGL Fork
 
-Whisky for macOS, adjusted for HK4e (Genshin) and NAP (ZZZ) workflows.
+Whisky for macOS, adjusted for HK4e (Genshin), NAP (ZZZ), and HKRPG (Star Rail) workflows.
 
 ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/build.yml?style=for-the-badge)
 
@@ -12,7 +12,7 @@ Whisky for macOS, adjusted for HK4e (Genshin) and NAP (ZZZ) workflows.
 
 ## What This App Is
 
-This project is a user-focused fork of [Whisky](https://github.com/Whisky-App/Whisky) for people who want to run HK4e (Genshin) and NAP (ZZZ) setups on macOS with less manual tweaking.
+This project is a user-focused fork of [Whisky](https://github.com/Whisky-App/Whisky) for people who want to run HK4e (Genshin), NAP (ZZZ), and HKRPG (Star Rail) setups on macOS with less manual tweaking.
 
 Compared with upstream Whisky, this fork mainly adds:
 
@@ -20,6 +20,8 @@ Compared with upstream Whisky, this fork mainly adds:
 - Game-oriented options such as SteamPatch, HDR, Retina mode, custom resolution, and a stored game executable.
 - Better launch feedback, log access, and one-click tools such as Task Manager.
 - A simpler data layout under `~/Library/Application Support/Whisky/`.
+- Per-bottle Wine runtime isolation (runtime-level patches do not leak across bottles).
+- Bottle duplication that prefers APFS clone (copy-on-write) for speed and disk savings.
 
 This is not an official Whisky build.
 
@@ -52,19 +54,21 @@ On first launch, the app guides you through runtime setup.
 
 - `Wine 11.4 DXMT (signed)` is the recommended default.
 - Other supported runtimes are also available in the setup screen.
-- Downloads are cached, so each runtime only needs to be installed once.
+- Downloads are cached. Each bottle then gets its own isolated runtime based on the selected runtime.
 
 ## Quick Start
 
 1. Install the app from `Actions` artifacts (see `Download`).
 2. Launch the app once and let it download a Wine runtime (recommended: `Wine 11.4 DXMT (signed)`).
 3. Create a new bottle:
-   - Pick `Game / Region`: `Genshin Impact (hk4eos)` / `原神 (hk4ecn)` / `ZZZ Global (napos)` / `ZZZ China (napcn)`
+   - Pick `Game / Region`: `Genshin Impact (hk4eos)` / `原神 (hk4ecn)` / `ZZZ Global (napos)` / `ZZZ China (napcn)` / `Star Rail (hkrpgos)` / `崩坏：星穹铁道 (hkrpgcn)`
    - (Optional, HK4e) enable SteamPatch / HDR
+   - (Optional) enable `Launch Fix (test)` (see notes below)
    - (Optional) set proxy host + port
 4. In the bottle's config, select your game executable:
    - HK4e: `GenshinImpact.exe` (hk4eos) / `YuanShen.exe` (hk4ecn)
    - ZZZ: `ZenlessZoneZero.exe`
+   - Star Rail: `StarRail.exe`
 5. Launch from the pinned program (or the program list).
 
 ## Creating A Bottle
@@ -74,9 +78,10 @@ When creating a bottle, you can choose:
 - Wine runtime
 - Windows version
 - Retina mode
-- Game / region preset (HK4e / NAP)
+- Game / region preset (HK4e / NAP / HKRPG)
 - (HK4e) SteamPatch
 - (HK4e) HDR
+- (Optional) `Launch Fix (test)`
 - Proxy server host and port
 - Optional custom resolution
 - Optional game executable to pin on the bottle home screen
@@ -89,6 +94,7 @@ In `Bottle -> Config -> HK4e`, you can manage:
 
 - Game executable path
 - Left Command as Ctrl
+- Launch Fix (test)
 - SteamPatch
 - HDR
 - Custom resolution
@@ -100,8 +106,18 @@ This fork keeps HK4e settings persistent where possible, so the app does not nee
 In `Bottle -> Config -> NAP`, you can manage:
 
 - Game executable path
+- Launch Fix (test)
 - Fix WebView
 - Custom resolution
+
+## HKRPG / Star Rail Features
+
+In `Bottle -> Config -> HKRPG`, you can manage:
+
+- Game executable path
+- Launch Fix (test)
+
+HKRPG launch is wrapped with Jadeite inside the bottle prefix (downloaded and installed automatically when needed). WebView registry cleanup is applied automatically for HKRPG (no UI toggle).
 
 ## Useful Tools
 
@@ -126,6 +142,14 @@ Bottle creation and bottle configuration both support proxy settings.
 - Host and port are configured separately.
 - You can enable, disable, or change it later from the bottle config page.
 
+## Launch Fix (test)
+
+Some games need a short "offline" window during early startup.
+
+- This fork implements it by temporarily overriding Wine's proxy to an invalid local proxy (`127.0.0.1:1`).
+- It does not modify `/etc/hosts`.
+- If a bottle already has proxy enabled, Launch Fix is ignored.
+
 ## Compared With YAAGL
 
 This fork borrows HK4e workflow ideas from YAAGL, but adapts them to Whisky's bottle-first model (multiple bottles, preconfigured setup) instead of a single-app, per-launch patch/revert flow.
@@ -133,9 +157,9 @@ This fork borrows HK4e workflow ideas from YAAGL, but adapts them to Whisky's bo
 - Bottle isolation: keep OS/CN and different game setups in separate bottles.
 - Configure ahead of time: DXMT injection, SteamPatch, proxy, and HK4e settings are applied during bottle creation or when toggled in Config.
 - Less launch-time work: most settings are persisted and only re-applied when missing.
-- Shared-runtime aware: changes that touch Wine runtimes are treated as runtime-level and designed to be idempotent across bottles.
+- Per-bottle runtime isolation: runtime-level changes are applied inside each bottle's isolated runtime.
 - Better troubleshooting UX: per-launch logs, one-click tools, and clearer “file not found” errors (e.g. external drives).
-- Easier Wine switching: downloaded runtimes are cached, so switching versions does not require re-downloading.
+- Easier Wine switching: base runtime downloads are cached; bottles build isolated runtimes from them.
 - Native macOS app experience: GUI-first workflow with integrated tools and logs.
 - Faster day-to-day flow: fewer external steps than YAAGL’s per-launch patch/revert approach.
 - Fewer failure modes: less fragile launch-time patching, and clearer error surfaces when something does go wrong.
@@ -152,6 +176,8 @@ This fork stores data here:
 - `~/Library/Logs/Whisky/`
 
 If older Whisky data exists, the app will try to migrate it on first launch.
+
+Note: per-bottle runtime isolation works best on APFS volumes (so the app can use clone/copy-on-write when duplicating bottles).
 
 ## Logs
 
