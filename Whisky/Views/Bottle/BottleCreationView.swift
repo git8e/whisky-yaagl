@@ -239,7 +239,8 @@ struct BottleCreationView: View {
         Picker("create.wineRuntime", selection: $wineRuntimeId) {
             ForEach(WineRuntimes.all, id: \.id) { runtime in
                 let installed = WineRuntimeManager.isInstalled(runtimeId: runtime.id)
-                Text(installed ? "\(runtime.displayName)" : "\(runtime.displayName) (Not Installed)")
+                let notInstalledLabel = String(localized: "runtime.status.notInstalled")
+                Text(installed ? "\(runtime.displayName)" : "\(runtime.displayName) (\(notInstalledLabel))")
                     .tag(runtime.id)
             }
         }

@@ -71,7 +71,8 @@ struct PinView: View {
                 }
             }
             .frame(width: 45, height: 45)
-            Spacer()
+            Color.clear
+                .frame(height: 8)
             Text(name)
                 .multilineTextAlignment(.center)
                 .lineLimit(1)

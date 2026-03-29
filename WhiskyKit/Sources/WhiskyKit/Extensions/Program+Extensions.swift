@@ -76,21 +76,21 @@ extension Program {
                     self.lastExitCode = 0
                 }
             } catch {
+                let exitCode = (error as? HK4ePatchError).flatMap { err in
+                    if case .gameExited(let code) = err { return code }
+                    return nil
+                } ?? (error as? NAPPatchError).flatMap { err in
+                    if case .gameExited(let code) = err { return code }
+                    return nil
+                } ?? (error as? HKRPGPatchError).flatMap { err in
+                    if case .gameExited(let code) = err { return code }
+                    return nil
+                }
+
                 await MainActor.run {
                     self.isLaunching = false
-                    self.lastExitCode = (error as? HK4ePatchError).flatMap { err in
-                        if case .gameExited(let code) = err { return code }
-                        return nil
-                    } ?? (error as? NAPPatchError).flatMap { err in
-                        if case .gameExited(let code) = err { return code }
-                        return nil
-                    } ?? (error as? HKRPGPatchError).flatMap { err in
-                        if case .gameExited(let code) = err { return code }
-                        return nil
-                    }
-                }
-                await MainActor.run {
-                    self.showRunError(message: error.localizedDescription)
+                    self.lastExitCode = exitCode
+                    self.showRunError(message: error.localizedDescription, exitCode: exitCode)
                 }
             }
         }
@@ -132,12 +132,18 @@ extension Program {
         }
     }
 
-    @MainActor private func showRunError(message: String) {
+    @MainActor private func showRunError(message: String, exitCode: Int? = nil) {
         let alert = NSAlert()
         alert.messageText = String(localized: "alert.message")
-        alert.informativeText = String(localized: "alert.info")
+        var informativeText = String(localized: "alert.info")
         + " \(self.url.lastPathComponent): "
         + message
+
+        if exitCode == 5 {
+            informativeText += "\n\n" + String(localized: "alert.errorCode5Hint")
+        }
+
+        alert.informativeText = informativeText
 
         let latestLogURL = Wine.latestLogFileURL()
 
