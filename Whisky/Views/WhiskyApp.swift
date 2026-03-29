@@ -97,18 +97,8 @@ struct WhiskyApp: App {
                 }
             }
             CommandGroup(replacing: .help) {
-                Button("help.website") {
-                    if let url = URL(string: "https://getwhisky.app/") {
-                        openURL(url)
-                    }
-                }
                 Button("help.github") {
-                    if let url = URL(string: "https://github.com/Whisky-App/Whisky") {
-                        openURL(url)
-                    }
-                }
-                Button("help.discord") {
-                    if let url = URL(string: "https://discord.gg/CsqAfs9CnM") {
+                    if let url = URL(string: "https://github.com/git8e/whisky-yaagl") {
                         openURL(url)
                     }
                 }
