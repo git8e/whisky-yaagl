@@ -22424,7 +22424,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Patch options (Launch Fix, SteamPatch, etc.) are optional. If unsure, keep the defaults."
+            "value" : "If you are not sure what this option does, just keep the default."
           }
         },
         "es" : {
@@ -22520,13 +22520,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "补丁选项（Launch Fix、SteamPatch 等）为可选；不确定就保持默认。"
+            "value" : "如果你不明白当前选项的含义，请保持默认即可。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "補丁選項（Launch Fix、SteamPatch 等）為可選；不確定就保持預設。"
+            "value" : "如果你不明白目前選項的含義，請保持預設即可。"
           }
         }
       }
