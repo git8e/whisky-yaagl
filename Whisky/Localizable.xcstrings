@@ -828,13 +828,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u590d\u5236\u5bb9\u5668"
+            "value" : "复制容器"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u8907\u88fd\u5bb9\u5668"
+            "value" : "複製容器"
           }
         }
       }
@@ -986,13 +986,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\u526f\u672c"
+            "value" : "%@副本"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@\u526f\u672c"
+            "value" : "%@副本"
           }
         }
       }
@@ -6850,10 +6850,124 @@
     },
     "config.title.game" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعدادات اللعبة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavení hry"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spilindstillinger"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spieleinstellungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Game Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes del juego"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peliasetukset"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres du jeu"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazioni di gioco"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲーム設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임 설정"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spelinstellingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustawienia gry"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurações do jogo"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definições do jogo"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setări joc"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки игры"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oyun Ayarları"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштування гри"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cài đặt trò chơi"
           }
         },
         "zh-Hans" : {
@@ -21083,10 +21197,124 @@
     },
     "create.wineRuntime" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بيئة Wine:"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine runtime:"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine-runtime:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine-Laufzeit:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wine Runtime:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entorno de Wine:"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine-ajoympäristö:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Environnement Wine :"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runtime di Wine:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine ランタイム:"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 런타임:"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine-runtime:"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Środowisko Wine:"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runtime do Wine:"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runtime do Wine:"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runtime Wine:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Среда Wine:"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine çalışma zamanı:"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Середовище Wine:"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runtime Wine:"
           }
         },
         "zh-Hans" : {
@@ -21350,19 +21578,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u539f\u795e (hk4ecn)"
+            "value" : "原神 (hk4ecn)"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u539f\u795e (hk4ecn)"
+            "value" : "原神 (hk4ecn)"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u539f\u795e (hk4ecn)"
+            "value" : "原神 (hk4ecn)"
           }
         }
       }
@@ -21394,19 +21622,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u661f\u7a79\u94c1\u9053 (hkrpgcn)"
+            "value" : "星穹铁道 (hkrpgcn)"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u661f\u7a79\u94c1\u9053 (hkrpgcn)"
+            "value" : "星穹铁道 (hkrpgcn)"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u661f\u7a79\u9435\u9053 (hkrpgcn)"
+            "value" : "星穹鐵道 (hkrpgcn)"
           }
         }
       }
@@ -21818,13 +22046,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u6e38\u620f\u53ef\u6267\u884c\u6587\u4ef6"
+            "value" : "游戏可执行文件"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u904a\u6232\u53ef\u57f7\u884c\u6a94"
+            "value" : "遊戲可執行檔"
           }
         }
       }
@@ -21840,13 +22068,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u6e38\u620f\u53ef\u6267\u884c\u6587\u4ef6\uff08\u53ef\u9009\uff09"
+            "value" : "游戏可执行文件（可选）"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u904a\u6232\u53ef\u57f7\u884c\u6a94\uff08\u53ef\u9078\uff09"
+            "value" : "遊戲可執行檔（可選）"
           }
         }
       }
@@ -21862,277 +22090,1645 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u672a\u9009\u62e9"
+            "value" : "未选择"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u672a\u9078\u64c7"
+            "value" : "未選擇"
           }
         }
       }
     },
     "exePicker.panelMessage" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر ملف .exe (وليس مجلدًا)."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyberte soubor .exe (ne složku)."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vælg en .exe-fil (ikke en mappe)."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle eine .exe-Datei (kein Ordner)."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose a .exe file (not a folder)."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un archivo .exe (no una carpeta)."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valitse .exe-tiedosto (ei kansiota)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez un fichier .exe (pas un dossier)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli un file .exe (non una cartella)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".exe ファイルを選択してください（フォルダではありません）。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".exe 파일을 선택하세요(폴더가 아닙니다)."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kies een .exe-bestand (geen map)."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wybierz plik .exe (nie folder)."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha um arquivo .exe (não uma pasta)."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha um ficheiro .exe (não uma pasta)."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alegeți un fișier .exe (nu un folder)."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите файл .exe (не папку)."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir .exe dosyası seçin (klasör değil)."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть файл .exe (не папку)."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chọn tệp .exe (không phải thư mục)."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u8bf7\u9009\u62e9 .exe \u53ef\u6267\u884c\u6587\u4ef6\uff08\u4e0d\u662f\u6587\u4ef6\u5939\uff09\u3002"
+            "value" : "请选择 .exe 可执行文件（不是文件夹）。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u8acb\u9078\u64c7 .exe \u53ef\u57f7\u884c\u6a94\uff08\u4e0d\u662f\u8cc7\u6599\u593e\uff09\u3002"
+            "value" : "請選擇 .exe 可執行檔（不是資料夾）。"
           }
         }
       }
     },
     "exePicker.leaveBlankHint" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إذا لم تكن اللعبة مثبتة بعد، اترك هذا فارغًا. أنشئ الحاوية أولًا، ثبّت HoYoPlay بداخلها، ثم حدّد ملف .exe من إعدادات الحاوية لاحقًا."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud hra ještě není nainstalovaná, nechte to prázdné. Nejdřív vytvořte bottle, nainstalujte do ní HoYoPlay a pak později vyberte herní .exe v nastavení bottle."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hvis spillet ikke er installeret endnu, så lad dette være tomt. Opret bottle først, installér HoYoPlay i den, og vælg derefter spillets .exe i Bottle Config senere."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn das Spiel noch nicht installiert ist, lassen Sie das leer. Erstellen Sie zuerst die Bottle, installieren Sie HoYoPlay darin und wählen Sie später die Spiel-.exe in den Bottle-Einstellungen aus."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "If the game is not installed yet, leave this empty. Create the bottle first, install HoYoPlay inside it, then set the game .exe in Bottle Config later."
+            "value" : "If the game isn't installed yet, leave this empty. Create the bottle, install HoYoPlay in it, then set the game .exe in Bottle Config."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si el juego aún no está instalado, déjalo vacío. Crea la botella, instala HoYoPlay en ella y luego selecciona el .exe del juego en la configuración de la botella."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jos peliä ei ole vielä asennettu, jätä tämä tyhjäksi. Luo bottle ensin, asenna HoYoPlay siihen ja valitse sitten pelin .exe Bottle-asetuksista."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si le jeu n'est pas encore installé, laissez vide. Créez la bottle, installez HoYoPlay dedans, puis sélectionnez le .exe du jeu dans la configuration de la bottle."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se il gioco non è ancora installato, lascia vuoto. Crea la bottle, installa HoYoPlay al suo interno, poi seleziona il .exe del gioco nella configurazione della bottle."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだゲームをインストールしていない場合は空のままにしてください。先に Bottle を作成し、Bottle 内に HoYoPlay をインストールしてから、Bottle 設定でゲームの .exe を指定します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 게임을 설치하지 않았다면 비워 두세요. 먼저 Bottle을 만들고 그 안에 HoYoPlay를 설치한 다음, Bottle 설정에서 게임 .exe를 지정하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als het spel nog niet is geïnstalleerd, laat dit leeg. Maak eerst de bottle, installeer HoYoPlay erin en kies daarna de game-.exe in de bottle-instellingen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli gra nie jest jeszcze zainstalowana, zostaw to puste. Najpierw utwórz bottle, zainstaluj w niej HoYoPlay, a potem wskaż plik .exe gry w ustawieniach bottle."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se o jogo ainda não estiver instalado, deixe isso em branco. Crie a bottle, instale o HoYoPlay nela e depois selecione o .exe do jogo nas configurações da bottle."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se o jogo ainda não estiver instalado, deixe isto em branco. Crie a bottle, instale o HoYoPlay nela e depois selecione o .exe do jogo nas definições da bottle."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dacă jocul nu este instalat încă, lasă acest câmp gol. Creează bottle-ul, instalează HoYoPlay în ea, apoi selectează .exe-ul jocului în setările bottle-ului."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если игра ещё не установлена, оставьте это поле пустым. Сначала создайте bottle, установите в неё HoYoPlay, затем укажите .exe игры в настройках bottle."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oyun henüz yüklü değilse bunu boş bırakın. Önce bottle'ı oluşturun, içine HoYoPlay'i kurun, ardından Bottle Config'ten oyunun .exe dosyasını seçin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Якщо гру ще не встановлено, залиште це поле порожнім. Спочатку створіть bottle, встановіть у ній HoYoPlay, а потім у налаштуваннях bottle вкажіть .exe гри."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nếu bạn chưa cài game, hãy để trống. Tạo bottle trước, cài HoYoPlay trong bottle, rồi vào cấu hình bottle để chọn tệp .exe của game."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u5982\u679c\u8fd8\u6ca1\u6709\u5b89\u88c5\u6e38\u620f\uff0c\u53ef\u4ee5\u5148\u7559\u7a7a\uff1a\u5148\u521b\u5efa\u5bb9\u5668\uff0c\u5728\u5bb9\u5668\u5185\u5b89\u88c5 HoYoPlay\uff0c\u4e4b\u540e\u518d\u5230\u5bb9\u5668\u914d\u7f6e\u4e2d\u6307\u5b9a\u6e38\u620f .exe\u3002"
+            "value" : "还没安装游戏？先留空。先创建容器，在容器内安装 HoYoPlay，再到容器配置里选择游戏 .exe。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u5982\u679c\u9084\u6c92\u6709\u5b89\u88dd\u904a\u6232\uff0c\u53ef\u4ee5\u5148\u7559\u7a7a\uff1a\u5148\u5efa\u7acb\u5bb9\u5668\uff0c\u5728\u5bb9\u5668\u5167\u5b89\u88dd HoYoPlay\uff0c\u4e4b\u5f8c\u518d\u5230\u5bb9\u5668\u8a2d\u5b9a\u4e2d\u6307\u5b9a\u904a\u6232 .exe\u3002"
+            "value" : "還沒安裝遊戲？先留空。先建立容器，在容器內安裝 HoYoPlay，再到容器設定裡選擇遊戲 .exe。"
           }
         }
       }
     },
     "patchOptions.keepDefaultHint" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خيارات التصحيح (Launch Fix وSteamPatch وغيرها) اختيارية. إذا لم تكن متأكدًا، اترك الإعدادات الافتراضية."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Možnosti patchů (Launch Fix, SteamPatch atd.) jsou volitelné. Pokud si nejste jistí, ponechte výchozí hodnoty."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patch-indstillinger (Launch Fix, SteamPatch osv.) er valgfrie. Hvis du er i tvivl, så behold standardindstillingerne."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patch-Optionen (Launch Fix, SteamPatch usw.) sind optional. Wenn Sie unsicher sind, behalten Sie die Standardwerte bei."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Patch options (Launch Fix, SteamPatch, etc.) are optional. Keep the defaults if you are not sure."
+            "value" : "Patch options (Launch Fix, SteamPatch, etc.) are optional. If unsure, keep the defaults."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las opciones de parche (Launch Fix, SteamPatch, etc.) son opcionales. Si no estás seguro, deja los valores por defecto."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korjausasetukset (Launch Fix, SteamPatch jne.) ovat valinnaisia. Jos et ole varma, pidä oletukset."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les options de patch (Launch Fix, SteamPatch, etc.) sont facultatives. En cas de doute, gardez les valeurs par défaut."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le opzioni di patch (Launch Fix, SteamPatch, ecc.) sono facoltative. Se non sei sicuro, lascia i valori predefiniti."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パッチオプション（Launch Fix、SteamPatch など）は任意です。迷ったらデフォルトのままにしてください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "패치 옵션(Launch Fix, SteamPatch 등)은 선택 사항입니다. 잘 모르겠다면 기본값을 유지하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patch-opties (Launch Fix, SteamPatch, enz.) zijn optioneel. Als je het niet zeker weet, houd dan de standaardinstellingen aan."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opcje patchy (Launch Fix, SteamPatch itd.) są opcjonalne. Jeśli nie jesteś pewien, pozostaw ustawienia domyślne."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As opções de patch (Launch Fix, SteamPatch, etc.) são opcionais. Se tiver dúvida, mantenha o padrão."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As opções de patch (Launch Fix, SteamPatch, etc.) são opcionais. Se tiver dúvidas, mantenha as predefinições."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opțiunile de patch (Launch Fix, SteamPatch etc.) sunt opționale. Dacă nu ești sigur, păstrează valorile implicite."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Опции патча (Launch Fix, SteamPatch и т. д.) необязательны. Если не уверены, оставьте значения по умолчанию."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yama seçenekleri (Launch Fix, SteamPatch vb.) isteğe bağlıdır. Emin değilseniz varsayılanları koruyun."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Параметри патчів (Launch Fix, SteamPatch тощо) необов’язкові. Якщо не впевнені, залиште значення за замовчуванням."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Các tuỳ chọn patch (Launch Fix, SteamPatch, v.v.) là tuỳ chọn. Nếu không chắc, hãy giữ mặc định."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u8865\u4e01\u9009\u9879\uff08Launch Fix\u3001SteamPatch \u7b49\uff09\u4e3a\u53ef\u9009\uff0c\u5982\u4e0d\u786e\u5b9a\u8bf7\u4fdd\u6301\u9ed8\u8ba4\u3002"
+            "value" : "补丁选项（Launch Fix、SteamPatch 等）为可选；不确定就保持默认。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u88dc\u4e01\u9078\u9805\uff08Launch Fix\u3001SteamPatch \u7b49\uff09\u70ba\u53ef\u9078\uff0c\u5982\u4e0d\u78ba\u5b9a\u8acb\u4fdd\u6301\u9810\u8a2d\u3002"
+            "value" : "補丁選項（Launch Fix、SteamPatch 等）為可選；不確定就保持預設。"
           }
         }
       }
     },
     "hk4e.exeHint" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلميح: اختر GenshinImpact.exe (OS) أو YuanShen.exe (CN)."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vyberte GenshinImpact.exe (OS) nebo YuanShen.exe (CN)."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vælg GenshinImpact.exe (OS) eller YuanShen.exe (CN)."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Wähle GenshinImpact.exe (OS) oder YuanShen.exe (CN)."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tip: select GenshinImpact.exe (OS) or YuanShen.exe (CN)."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: selecciona GenshinImpact.exe (OS) o YuanShen.exe (CN)."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinkki: valitse GenshinImpact.exe (OS) tai YuanShen.exe (CN)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce : sélectionnez GenshinImpact.exe (OS) ou YuanShen.exe (CN)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimento: seleziona GenshinImpact.exe (OS) o YuanShen.exe (CN)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒント: GenshinImpact.exe（OS）または YuanShen.exe（CN）を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "팁: GenshinImpact.exe(OS) 또는 YuanShen.exe(CN)를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: selecteer GenshinImpact.exe (OS) of YuanShen.exe (CN)."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wskazówka: wybierz GenshinImpact.exe (OS) lub YuanShen.exe (CN)."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione GenshinImpact.exe (OS) ou YuanShen.exe (CN)."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione GenshinImpact.exe (OS) ou YuanShen.exe (CN)."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sfat: selectează GenshinImpact.exe (OS) sau YuanShen.exe (CN)."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подсказка: выберите GenshinImpact.exe (OS) или YuanShen.exe (CN)."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İpucu: GenshinImpact.exe (OS) veya YuanShen.exe (CN) dosyasını seçin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підказка: виберіть GenshinImpact.exe (OS) або YuanShen.exe (CN)."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gợi ý: chọn GenshinImpact.exe (OS) hoặc YuanShen.exe (CN)."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 GenshinImpact.exe\uff08\u56fd\u9645\u670d\uff09\u6216 YuanShen.exe\uff08\u56fd\u670d\uff09\u3002"
+            "value" : "提示：请选择 GenshinImpact.exe（国际服）或 YuanShen.exe（国服）。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 GenshinImpact.exe\uff08\u570b\u969b\u670d\uff09\u6216 YuanShen.exe\uff08\u570b\u670d\uff09\u3002"
+            "value" : "提示：請選擇 GenshinImpact.exe（國際服）或 YuanShen.exe（國服）。"
           }
         }
       }
     },
     "hk4e.exeHint.os" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلميح: اختر GenshinImpact.exe."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vyberte GenshinImpact.exe."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vælg GenshinImpact.exe."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Wähle GenshinImpact.exe."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tip: select GenshinImpact.exe."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: selecciona GenshinImpact.exe."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinkki: valitse GenshinImpact.exe."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce : sélectionnez GenshinImpact.exe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimento: seleziona GenshinImpact.exe."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒント: GenshinImpact.exe を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "팁: GenshinImpact.exe를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: selecteer GenshinImpact.exe."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wskazówka: wybierz GenshinImpact.exe."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione GenshinImpact.exe."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione GenshinImpact.exe."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sfat: selectează GenshinImpact.exe."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подсказка: выберите GenshinImpact.exe."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İpucu: GenshinImpact.exe dosyasını seçin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підказка: виберіть GenshinImpact.exe."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gợi ý: chọn GenshinImpact.exe."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 GenshinImpact.exe\u3002"
+            "value" : "提示：请选择 GenshinImpact.exe。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 GenshinImpact.exe\u3002"
+            "value" : "提示：請選擇 GenshinImpact.exe。"
           }
         }
       }
     },
     "hk4e.exeHint.cn" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلميح: اختر YuanShen.exe."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vyberte YuanShen.exe."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vælg YuanShen.exe."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Wähle YuanShen.exe."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tip: select YuanShen.exe."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: selecciona YuanShen.exe."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinkki: valitse YuanShen.exe."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce : sélectionnez YuanShen.exe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimento: seleziona YuanShen.exe."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒント: YuanShen.exe を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "팁: YuanShen.exe를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: selecteer YuanShen.exe."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wskazówka: wybierz YuanShen.exe."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione YuanShen.exe."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione YuanShen.exe."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sfat: selectează YuanShen.exe."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подсказка: выберите YuanShen.exe."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İpucu: YuanShen.exe dosyasını seçin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підказка: виберіть YuanShen.exe."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gợi ý: chọn YuanShen.exe."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 YuanShen.exe\u3002"
+            "value" : "提示：请选择 YuanShen.exe。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 YuanShen.exe\u3002"
+            "value" : "提示：請選擇 YuanShen.exe。"
           }
         }
       }
     },
     "nap.exeHint" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلميح: اختر ZenlessZoneZero.exe."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vyberte ZenlessZoneZero.exe."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vælg ZenlessZoneZero.exe."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Wähle ZenlessZoneZero.exe."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tip: select ZenlessZoneZero.exe."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: selecciona ZenlessZoneZero.exe."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinkki: valitse ZenlessZoneZero.exe."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce : sélectionnez ZenlessZoneZero.exe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimento: seleziona ZenlessZoneZero.exe."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒント: ZenlessZoneZero.exe を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "팁: ZenlessZoneZero.exe를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: selecteer ZenlessZoneZero.exe."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wskazówka: wybierz ZenlessZoneZero.exe."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione ZenlessZoneZero.exe."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione ZenlessZoneZero.exe."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sfat: selectează ZenlessZoneZero.exe."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подсказка: выберите ZenlessZoneZero.exe."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İpucu: ZenlessZoneZero.exe dosyasını seçin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підказка: виберіть ZenlessZoneZero.exe."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gợi ý: chọn ZenlessZoneZero.exe."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 ZenlessZoneZero.exe\u3002"
+            "value" : "提示：请选择 ZenlessZoneZero.exe。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 ZenlessZoneZero.exe\u3002"
+            "value" : "提示：請選擇 ZenlessZoneZero.exe。"
           }
         }
       }
     },
     "nap.exeHint.os" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلميح: اختر ZenlessZoneZero.exe."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vyberte ZenlessZoneZero.exe."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vælg ZenlessZoneZero.exe."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Wähle ZenlessZoneZero.exe."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tip: select ZenlessZoneZero.exe."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: selecciona ZenlessZoneZero.exe."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinkki: valitse ZenlessZoneZero.exe."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce : sélectionnez ZenlessZoneZero.exe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimento: seleziona ZenlessZoneZero.exe."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒント: ZenlessZoneZero.exe を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "팁: ZenlessZoneZero.exe를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: selecteer ZenlessZoneZero.exe."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wskazówka: wybierz ZenlessZoneZero.exe."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione ZenlessZoneZero.exe."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione ZenlessZoneZero.exe."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sfat: selectează ZenlessZoneZero.exe."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подсказка: выберите ZenlessZoneZero.exe."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İpucu: ZenlessZoneZero.exe dosyasını seçin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підказка: виберіть ZenlessZoneZero.exe."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gợi ý: chọn ZenlessZoneZero.exe."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 ZenlessZoneZero.exe\u3002"
+            "value" : "提示：请选择 ZenlessZoneZero.exe。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 ZenlessZoneZero.exe\u3002"
+            "value" : "提示：請選擇 ZenlessZoneZero.exe。"
           }
         }
       }
     },
     "nap.exeHint.cn" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلميح: اختر ZenlessZoneZero.exe."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vyberte ZenlessZoneZero.exe."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vælg ZenlessZoneZero.exe."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Wähle ZenlessZoneZero.exe."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tip: select ZenlessZoneZero.exe."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: selecciona ZenlessZoneZero.exe."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinkki: valitse ZenlessZoneZero.exe."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce : sélectionnez ZenlessZoneZero.exe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimento: seleziona ZenlessZoneZero.exe."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒント: ZenlessZoneZero.exe を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "팁: ZenlessZoneZero.exe를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: selecteer ZenlessZoneZero.exe."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wskazówka: wybierz ZenlessZoneZero.exe."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione ZenlessZoneZero.exe."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione ZenlessZoneZero.exe."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sfat: selectează ZenlessZoneZero.exe."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подсказка: выберите ZenlessZoneZero.exe."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İpucu: ZenlessZoneZero.exe dosyasını seçin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підказка: виберіть ZenlessZoneZero.exe."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gợi ý: chọn ZenlessZoneZero.exe."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 ZenlessZoneZero.exe\u3002"
+            "value" : "提示：请选择 ZenlessZoneZero.exe。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 ZenlessZoneZero.exe\u3002"
+            "value" : "提示：請選擇 ZenlessZoneZero.exe。"
           }
         }
       }
     },
     "hkrpg.exeHint" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلميح: اختر StarRail.exe."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vyberte StarRail.exe."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vælg StarRail.exe."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Wähle StarRail.exe."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tip: select StarRail.exe."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: selecciona StarRail.exe."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinkki: valitse StarRail.exe."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce : sélectionnez StarRail.exe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimento: seleziona StarRail.exe."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒント: StarRail.exe を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "팁: StarRail.exe를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: selecteer StarRail.exe."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wskazówka: wybierz StarRail.exe."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione StarRail.exe."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione StarRail.exe."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sfat: selectează StarRail.exe."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подсказка: выберите StarRail.exe."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İpucu: StarRail.exe dosyasını seçin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підказка: виберіть StarRail.exe."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gợi ý: chọn StarRail.exe."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 StarRail.exe\u3002"
+            "value" : "提示：请选择 StarRail.exe。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 StarRail.exe\u3002"
+            "value" : "提示：請選擇 StarRail.exe。"
           }
         }
       }
     },
     "hkrpg.exeHint.os" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلميح: اختر StarRail.exe."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vyberte StarRail.exe."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vælg StarRail.exe."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Wähle StarRail.exe."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tip: select StarRail.exe."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: selecciona StarRail.exe."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinkki: valitse StarRail.exe."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce : sélectionnez StarRail.exe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimento: seleziona StarRail.exe."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒント: StarRail.exe を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "팁: StarRail.exe를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: selecteer StarRail.exe."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wskazówka: wybierz StarRail.exe."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione StarRail.exe."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione StarRail.exe."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sfat: selectează StarRail.exe."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подсказка: выберите StarRail.exe."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İpucu: StarRail.exe dosyasını seçin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підказка: виберіть StarRail.exe."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gợi ý: chọn StarRail.exe."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 StarRail.exe\u3002"
+            "value" : "提示：请选择 StarRail.exe。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 StarRail.exe\u3002"
+            "value" : "提示：請選擇 StarRail.exe。"
           }
         }
       }
     },
     "hkrpg.exeHint.cn" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلميح: اختر StarRail.exe."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vyberte StarRail.exe."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: vælg StarRail.exe."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Wähle StarRail.exe."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tip: select StarRail.exe."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consejo: selecciona StarRail.exe."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinkki: valitse StarRail.exe."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce : sélectionnez StarRail.exe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerimento: seleziona StarRail.exe."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒント: StarRail.exe を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "팁: StarRail.exe를 선택하세요."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: selecteer StarRail.exe."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wskazówka: wybierz StarRail.exe."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione StarRail.exe."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dica: selecione StarRail.exe."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sfat: selectează StarRail.exe."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подсказка: выберите StarRail.exe."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İpucu: StarRail.exe dosyasını seçin."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підказка: виберіть StarRail.exe."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gợi ý: chọn StarRail.exe."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 StarRail.exe\u3002"
+            "value" : "提示：请选择 StarRail.exe。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 StarRail.exe\u3002"
+            "value" : "提示：請選擇 StarRail.exe。"
           }
         }
       }
@@ -22385,8 +23981,144 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wine"
+      }
+    },
+    "config.wineRuntime.switchWarning" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحذير: تغيير إصدار Wine قد يؤثر على التوافق وقد يتطلب إعادة تطبيق الإعدادات/التصحيحات."
           }
         },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upozornění: Změna verze Wine může ovlivnit kompatibilitu a může vyžadovat znovu aplikovat nastavení/patch." 
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advarsel: Skift af Wine-version kan påvirke kompatibilitet og kan kræve, at indstillinger/patches anvendes igen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warnung: Das Wechseln der Wine-Version kann die Kompatibilität beeinflussen und kann erfordern, dass Einstellungen/Patches erneut angewendet werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warning: switching the Wine runtime may affect compatibility and may require reapplying patches/settings."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso: cambiar la versión de Wine puede afectar la compatibilidad y puede requerir volver a aplicar ajustes/parches."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varoitus: Wine-ympäristön vaihtaminen voi vaikuttaa yhteensopivuuteen ja voi vaatia asetusten/patchien uudelleenkäyttöä."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement : changer la version de Wine peut affecter la compatibilité et peut nécessiter de réappliquer des correctifs/réglages."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avviso: cambiare il runtime di Wine può influire sulla compatibilità e può richiedere di riapplicare patch/impostazioni."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "注意: Wine ランタイムの切り替えは互換性に影響し、パッチ/設定の再適用が必要になる場合があります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "경고: Wine 런타임을 변경하면 호환성에 영향을 줄 수 있으며 패치/설정을 다시 적용해야 할 수 있습니다."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waarschuwing: het wisselen van Wine-runtime kan de compatibiliteit beïnvloeden en kan vereisen dat patches/instellingen opnieuw worden toegepast."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzeżenie: zmiana środowiska Wine może wpłynąć na zgodność i może wymagać ponownego zastosowania poprawek/ustawień."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso: trocar o runtime do Wine pode afetar a compatibilidade e pode exigir reaplicar patches/configurações."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso: mudar o runtime do Wine pode afetar a compatibilidade e pode exigir reaplicar patches/definições."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertisment: schimbarea runtime-ului Wine poate afecta compatibilitatea și poate necesita reaplicarea patch-urilor/setărilor."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предупреждение: переключение среды Wine может повлиять на совместимость и может потребовать повторного применения патчей/настроек."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uyarı: Wine çalışma zamanını değiştirmek uyumluluğu etkileyebilir ve yamaların/ayarların yeniden uygulanmasını gerektirebilir."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередження: перемикання середовища Wine може вплинути на сумісність і може вимагати повторного застосування патчів/налаштувань."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cảnh báo: đổi runtime Wine có thể ảnh hưởng tương thích và có thể cần áp dụng lại patch/cài đặt."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提示：切换 Wine 运行时可能影响兼容性，并可能需要重新应用补丁/设置。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提示：切換 Wine 執行環境可能影響相容性，並可能需要重新套用補丁/設定。"
+          }
+        }
+      }
+    },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
