@@ -19,6 +19,7 @@
 import SwiftUI
 import AppKit
 import WhiskyKit
+import UniformTypeIdentifiers
 
 enum LoadingState {
     case loading
@@ -301,15 +302,6 @@ struct ConfigView: View {
             }
 
             Section("create.gameRegion", isExpanded: $hk4eSectionExpanded) {
-                Picker("create.gameRegion", selection: gameRegionSelection) {
-                    Text("hk4e.region.os").tag(GameRegionPreset.hk4eOs)
-                    Text("hk4e.region.cn").tag(GameRegionPreset.hk4eCn)
-                    Text("nap.region.os").tag(GameRegionPreset.napOs)
-                    Text("nap.region.cn").tag(GameRegionPreset.napCn)
-                    Text("hkrpg.region.os").tag(GameRegionPreset.hkrpgOs)
-                    Text("hkrpg.region.cn").tag(GameRegionPreset.hkrpgCn)
-                }
-
                 if gameRegionSelection.wrappedValue.isHK4e {
                     ActionView(
                         text: "hk4e.gameExecutable",
@@ -321,6 +313,7 @@ struct ConfigView: View {
                         panel.canChooseFiles = true
                         panel.canChooseDirectories = false
                         panel.allowsMultipleSelection = false
+                        panel.allowedContentTypes = [UTType.exe]
                         panel.begin { result in
                             if result == .OK, let url = panel.urls.first {
                                 let oldURL = bottle.settings.hk4eGameExecutableURL
@@ -329,7 +322,58 @@ struct ConfigView: View {
                             }
                         }
                     }
+                } else if gameRegionSelection.wrappedValue.isNAP {
+                    ActionView(
+                        text: "nap.gameExecutable",
+                        subtitle: bottle.settings.napGameExecutableURL?.prettyPath()
+                            ?? String(localized: "nap.notSelected"),
+                        actionName: "create.browse"
+                    ) {
+                        let panel = NSOpenPanel()
+                        panel.canChooseFiles = true
+                        panel.canChooseDirectories = false
+                        panel.allowsMultipleSelection = false
+                        panel.allowedContentTypes = [UTType.exe]
+                        panel.begin { result in
+                            if result == .OK, let url = panel.urls.first {
+                                let oldURL = bottle.settings.napGameExecutableURL
+                                bottle.settings.napGameExecutableURL = url
+                                updatePinnedGameExecutable(oldURL: oldURL, newURL: url)
+                            }
+                        }
+                    }
+                } else {
+                    ActionView(
+                        text: "hkrpg.gameExecutable",
+                        subtitle: bottle.settings.hkrpgGameExecutableURL?.prettyPath()
+                            ?? String(localized: "hkrpg.notSelected"),
+                        actionName: "create.browse"
+                    ) {
+                        let panel = NSOpenPanel()
+                        panel.canChooseFiles = true
+                        panel.canChooseDirectories = false
+                        panel.allowsMultipleSelection = false
+                        panel.allowedContentTypes = [UTType.exe]
+                        panel.begin { result in
+                            if result == .OK, let url = panel.urls.first {
+                                let oldURL = bottle.settings.hkrpgGameExecutableURL
+                                bottle.settings.hkrpgGameExecutableURL = url
+                                updatePinnedGameExecutable(oldURL: oldURL, newURL: url)
+                            }
+                        }
+                    }
+                }
 
+                Picker("create.gameRegion", selection: gameRegionSelection) {
+                    Text("hk4e.region.os").tag(GameRegionPreset.hk4eOs)
+                    Text("hk4e.region.cn").tag(GameRegionPreset.hk4eCn)
+                    Text("nap.region.os").tag(GameRegionPreset.napOs)
+                    Text("nap.region.cn").tag(GameRegionPreset.napCn)
+                    Text("hkrpg.region.os").tag(GameRegionPreset.hkrpgOs)
+                    Text("hkrpg.region.cn").tag(GameRegionPreset.hkrpgCn)
+                }
+
+                if gameRegionSelection.wrappedValue.isHK4e {
                     Toggle("hk4e.leftCommandIsCtrl", isOn: $bottle.settings.hk4eLeftCommandIsCtrl)
                         .onChange(of: bottle.settings.hk4eLeftCommandIsCtrl) { _, _ in
                             Task(priority: .userInitiated) {
@@ -420,25 +464,6 @@ struct ConfigView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 } else if gameRegionSelection.wrappedValue.isNAP {
-                    ActionView(
-                        text: "nap.gameExecutable",
-                        subtitle: bottle.settings.napGameExecutableURL?.prettyPath()
-                            ?? String(localized: "nap.notSelected"),
-                        actionName: "create.browse"
-                    ) {
-                        let panel = NSOpenPanel()
-                        panel.canChooseFiles = true
-                        panel.canChooseDirectories = false
-                        panel.allowsMultipleSelection = false
-                        panel.begin { result in
-                            if result == .OK, let url = panel.urls.first {
-                                let oldURL = bottle.settings.napGameExecutableURL
-                                bottle.settings.napGameExecutableURL = url
-                                updatePinnedGameExecutable(oldURL: oldURL, newURL: url)
-                            }
-                        }
-                    }
-
                     Toggle("nap.launchFixBlockNetwork", isOn: $bottle.settings.napLaunchFixBlockNetwork)
                         .onChange(of: bottle.settings.napLaunchFixBlockNetwork) { _, enabled in
                             guard enabled == false else { return }
@@ -473,25 +498,6 @@ struct ConfigView: View {
                         Spacer()
                     }
                 } else {
-                    ActionView(
-                        text: "hkrpg.gameExecutable",
-                        subtitle: bottle.settings.hkrpgGameExecutableURL?.prettyPath()
-                            ?? String(localized: "hkrpg.notSelected"),
-                        actionName: "create.browse"
-                    ) {
-                        let panel = NSOpenPanel()
-                        panel.canChooseFiles = true
-                        panel.canChooseDirectories = false
-                        panel.allowsMultipleSelection = false
-                        panel.begin { result in
-                            if result == .OK, let url = panel.urls.first {
-                                let oldURL = bottle.settings.hkrpgGameExecutableURL
-                                bottle.settings.hkrpgGameExecutableURL = url
-                                updatePinnedGameExecutable(oldURL: oldURL, newURL: url)
-                            }
-                        }
-                    }
-
                     Toggle("hkrpg.launchFixBlockNetwork", isOn: $bottle.settings.hkrpgLaunchFixBlockNetwork)
                         .onChange(of: bottle.settings.hkrpgLaunchFixBlockNetwork) { _, enabled in
                             guard enabled == false else { return }
