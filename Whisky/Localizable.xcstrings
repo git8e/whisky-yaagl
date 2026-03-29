@@ -23981,6 +23981,20 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wine"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine"
+          }
+        }
       }
     },
     "config.wineRuntime.switchWarning" : {
@@ -23994,7 +24008,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Upozornění: Změna verze Wine může ovlivnit kompatibilitu a může vyžadovat znovu aplikovat nastavení/patch." 
+            "value" : "Upozornění: Změna verze Wine může ovlivnit kompatibilitu a může vyžadovat znovu aplikovat nastavení/patch."
           }
         },
         "da" : {
@@ -24115,20 +24129,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "提示：切換 Wine 執行環境可能影響相容性，並可能需要重新套用補丁/設定。"
-          }
-        }
-      }
-    },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wine"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wine"
           }
         }
       }
