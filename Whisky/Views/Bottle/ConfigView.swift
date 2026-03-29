@@ -323,13 +323,9 @@ struct ConfigView: View {
                         panel.allowsMultipleSelection = false
                         panel.begin { result in
                             if result == .OK, let url = panel.urls.first {
+                                let oldURL = bottle.settings.hk4eGameExecutableURL
                                 bottle.settings.hk4eGameExecutableURL = url
-
-                                if !bottle.settings.pins.contains(where: { $0.url == url }) {
-                                    bottle.settings.pins.append(
-                                        PinnedProgram(name: url.deletingPathExtension().lastPathComponent, url: url)
-                                    )
-                                }
+                                updatePinnedGameExecutable(oldURL: oldURL, newURL: url)
                             }
                         }
                     }
@@ -436,13 +432,9 @@ struct ConfigView: View {
                         panel.allowsMultipleSelection = false
                         panel.begin { result in
                             if result == .OK, let url = panel.urls.first {
+                                let oldURL = bottle.settings.napGameExecutableURL
                                 bottle.settings.napGameExecutableURL = url
-
-                                if !bottle.settings.pins.contains(where: { $0.url == url }) {
-                                    bottle.settings.pins.append(
-                                        PinnedProgram(name: url.deletingPathExtension().lastPathComponent, url: url)
-                                    )
-                                }
+                                updatePinnedGameExecutable(oldURL: oldURL, newURL: url)
                             }
                         }
                     }
@@ -493,13 +485,9 @@ struct ConfigView: View {
                         panel.allowsMultipleSelection = false
                         panel.begin { result in
                             if result == .OK, let url = panel.urls.first {
+                                let oldURL = bottle.settings.hkrpgGameExecutableURL
                                 bottle.settings.hkrpgGameExecutableURL = url
-
-                                if !bottle.settings.pins.contains(where: { $0.url == url }) {
-                                    bottle.settings.pins.append(
-                                        PinnedProgram(name: url.deletingPathExtension().lastPathComponent, url: url)
-                                    )
-                                }
+                                updatePinnedGameExecutable(oldURL: oldURL, newURL: url)
                             }
                         }
                     }
@@ -693,6 +681,26 @@ struct ConfigView: View {
 
         proxyHost = String(parts[0])
         proxyPort = String(parts[1])
+    }
+
+    private func updatePinnedGameExecutable(oldURL: URL?, newURL: URL) {
+        // The bottle home screen renders pins via `bottle.pinnedPrograms`, which is derived from `bottle.programs`.
+        // Selecting a new executable updates settings/pins, but the programs list is only refreshed on appear.
+        // Refresh it here so the icon updates immediately when returning.
+
+        if let oldURL, oldURL != newURL, let idx = bottle.settings.pins.firstIndex(where: { $0.url == oldURL }) {
+            // Avoid creating duplicate pins for the new executable.
+            if bottle.settings.pins.contains(where: { $0.url == newURL }) {
+                bottle.settings.pins.remove(at: idx)
+            } else {
+                let existingName = bottle.settings.pins[idx].name
+                bottle.settings.pins[idx] = PinnedProgram(name: existingName, url: newURL)
+            }
+        } else if !bottle.settings.pins.contains(where: { $0.url == newURL }) {
+            bottle.settings.pins.append(PinnedProgram(name: newURL.deletingPathExtension().lastPathComponent, url: newURL))
+        }
+
+        bottle.updateInstalledPrograms()
     }
 }
 
