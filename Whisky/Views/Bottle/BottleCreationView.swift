@@ -18,6 +18,7 @@
 
 import SwiftUI
 import WhiskyKit
+import UniformTypeIdentifiers
 
 struct BottleCreationView: View {
     @Binding var newlyCreatedBottleURL: URL?
@@ -113,11 +114,11 @@ struct BottleCreationView: View {
                 runtimePicker
                 bottlePathPicker
                 Toggle("config.retinaMode", isOn: $initialRetinaMode)
+                executablePicker
                 regionPicker
                 gameSpecificToggles
                 proxySettings
                 resolutionSettings
-                executablePicker
 
                 if bottleVM.isCreatingBottle {
                     Section("create.progress.title") {
@@ -309,6 +310,7 @@ struct BottleCreationView: View {
             panel.canChooseFiles = true
             panel.canChooseDirectories = false
             panel.allowsMultipleSelection = false
+            panel.allowedContentTypes = [UTType.exe]
             panel.begin { result in
                 if result == .OK, let url = panel.urls.first {
                     pinProgramURL = url
