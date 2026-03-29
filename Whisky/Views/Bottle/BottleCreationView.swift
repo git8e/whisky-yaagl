@@ -92,9 +92,20 @@ struct BottleCreationView: View {
     }
 
     private var exeHintKey: LocalizedStringKey {
-        if gameRegionPreset.isHK4e { return "hk4e.exeHint" }
-        if gameRegionPreset.isNAP { return "nap.exeHint" }
-        return "hkrpg.exeHint"
+        switch gameRegionPreset {
+        case .hk4eOs:
+            return "hk4e.exeHint.os"
+        case .hk4eCn:
+            return "hk4e.exeHint.cn"
+        case .napOs:
+            return "nap.exeHint.os"
+        case .napCn:
+            return "nap.exeHint.cn"
+        case .hkrpgOs:
+            return "hkrpg.exeHint.os"
+        case .hkrpgCn:
+            return "hkrpg.exeHint.cn"
+        }
     }
 
     private func normalizeProxyFields() {
@@ -120,8 +131,8 @@ struct BottleCreationView: View {
                 runtimePicker
                 bottlePathPicker
                 Toggle("config.retinaMode", isOn: $initialRetinaMode)
-                executablePicker
                 regionPicker
+                executablePicker
                 gameSpecificToggles
                 proxySettings
                 resolutionSettings
@@ -250,6 +261,10 @@ struct BottleCreationView: View {
         } else {
             Toggle("hkrpg.launchFixBlockNetwork", isOn: $initialHKRPGLaunchFixBlockNetwork)
         }
+
+        Text("patchOptions.keepDefaultHint")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
     }
 
     @ViewBuilder
@@ -339,6 +354,10 @@ struct BottleCreationView: View {
 
             if pinProgramURL == nil {
                 Text(exeHintKey)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                Text("exePicker.leaveBlankHint")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
