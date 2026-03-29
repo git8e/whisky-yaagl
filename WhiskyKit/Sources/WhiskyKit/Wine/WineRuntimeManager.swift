@@ -302,13 +302,13 @@ public enum WineRuntimeManagerError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .whiskyWineMissing:
-            return "WhiskyWine is not installed. Please complete the setup first."
+            return String(localized: "runtime.error.whiskyWineMissing")
         case .unknownRuntime(let id):
-            return "Unknown Wine runtime: \(id)"
+            return String(format: String(localized: "runtime.error.unknownRuntime"), id)
         case .missingRemoteURL(let id):
-            return "Wine runtime has no download URL: \(id)"
+            return String(format: String(localized: "runtime.error.missingRemoteURL"), id)
         case .invalidArchive(let message):
-            return "Invalid Wine archive: \(message)"
+            return String(format: String(localized: "runtime.error.invalidArchive"), message)
         }
     }
 }

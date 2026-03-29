@@ -36,6 +36,8 @@ struct PinView: View {
 
     var body: some View {
         VStack {
+            Color.clear
+                .frame(height: 8)
             ZStack(alignment: .topTrailing) {
                 Group {
                     if let image = image {
@@ -71,8 +73,7 @@ struct PinView: View {
                 }
             }
             .frame(width: 45, height: 45)
-            Color.clear
-                .frame(height: 8)
+            Spacer()
             Text(name)
                 .multilineTextAlignment(.center)
                 .lineLimit(1)

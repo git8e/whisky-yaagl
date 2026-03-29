@@ -25,6 +25,8 @@ struct PinAddView: View {
 
     var body: some View {
         VStack {
+            Color.clear
+                .frame(height: 8)
             Button {
                 showingSheet = true
             } label: {
@@ -34,8 +36,7 @@ struct PinAddView: View {
             }
             .buttonStyle(.plain)
             .frame(width: 45, height: 45)
-            Color.clear
-                .frame(height: 8)
+            Spacer()
             Text("pin.help")
                 .multilineTextAlignment(.center)
                 .lineLimit(1)

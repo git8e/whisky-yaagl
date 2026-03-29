@@ -64,7 +64,6 @@ struct WineRuntimesSetupView: View {
                 }
             }
             .formStyle(.grouped)
-            .scrollDisabled(true)
 
             Spacer()
 
@@ -75,7 +74,7 @@ struct WineRuntimesSetupView: View {
                 .disabled(!vm.isInstalled("11.4-dxmt-signed") && !vm.isInstalled("11.0-dxmt-signed"))
             }
         }
-        .frame(width: 520, height: 420)
+        .frame(width: 520, height: 520)
         .onAppear {
             // Default behavior: start downloading Wine 11.4 DXMT on first run.
             if !vm.isInstalled("11.4-dxmt-signed") {
