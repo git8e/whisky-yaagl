@@ -2,7 +2,7 @@
 
 [English README](README.md)
 
-这是一个更面向普通用户的 `Whisky` 分支，主要用于在 macOS 上更方便地运行 HK4e（原神）和 NAP（绝区零）相关环境。
+这是一个更面向普通用户的 `Whisky` 分支，主要用于在 macOS 上更方便地运行 HK4e（原神）、NAP（绝区零）、HKRPG（崩坏：星穹铁道）相关环境。
 
 它不是官方版 Whisky。
 
@@ -25,6 +25,8 @@
 - 支持每个容器单独设置代理服务器
 - 支持快速打开 `C 盘`、终端、任务管理器、控制面板、注册表编辑器、Wine 配置
 - 改善了启动反馈和日志定位
+- 每个容器独立 Wine Runtime（runtime 级补丁不会跨容器互相污染）
+- 支持容器复制（优先使用 APFS clone / CoW，速度更快更省空间）
 
 ## 系统要求
 
@@ -54,19 +56,21 @@
 首次打开时，应用会引导你下载 Wine 运行时。
 
 - 推荐默认使用 `Wine 11.4 DXMT (signed)`
-- 运行时下载一次后会缓存到本地，不需要每次重复下载
+- 运行时下载一次后会缓存到本地；每个容器会基于所选运行时生成自己的独立 runtime
 
 ## 快速上手
 
 1. 从仓库的 `Actions` 下载 `Whisky.app`（见“下载方式”）。
 2. 首次启动时下载 Wine 运行时（推荐：`Wine 11.4 DXMT (signed)`）。
 3. 创建容器：
-   - 选择“游戏 / 区服”：`Genshin Impact (hk4eos)` / `原神 (hk4ecn)` / `ZZZ Global (napos)` / `ZZZ China (napcn)`
+   - 选择“游戏 / 区服”：`Genshin Impact (hk4eos)` / `原神 (hk4ecn)` / `ZZZ Global (napos)` / `ZZZ China (napcn)` / `Star Rail (hkrpgos)` / `崩坏：星穹铁道 (hkrpgcn)`
    - （仅 HK4e）可选开启 SteamPatch / HDR
+   - 可选开启 `Launch Fix（test）`（见下方说明）
    - 可选填写代理 IP + 端口
 4. 在容器配置中选择游戏 exe：
    - HK4e：`GenshinImpact.exe`（hk4eos）/ `YuanShen.exe`（hk4ecn）
    - 绝区零：`ZenlessZoneZero.exe`
+   - 崩铁：`StarRail.exe`
 5. 从置顶的程序（或程序列表）启动。
 
 ## 创建容器时可以设置什么
@@ -76,12 +80,13 @@
 - Wine 运行时
 - Windows 版本
 - Retina 模式
-- 游戏 / 区服（HK4e / NAP）
-- （仅 HK4e）SteamPatch
-- （仅 HK4e）HDR
-- 代理服务器 IP 和端口
-- 自定义分辨率
-- 可选的游戏可执行文件路径（用于自动置顶）
+ - 游戏 / 区服（HK4e / NAP / HKRPG）
+ - （仅 HK4e）SteamPatch
+ - （仅 HK4e）HDR
+ - 可选 `Launch Fix（test）`
+ - 代理服务器 IP 和端口
+ - 自定义分辨率
+ - 可选的游戏可执行文件路径（用于自动置顶）
 
 这些配置会尽量持久保存，避免每次启动时重复做相同操作。
 
@@ -91,6 +96,7 @@
 
 - 游戏可执行文件
 - 将左侧 Command 映射为 Ctrl
+- Launch Fix（test）
 - SteamPatch
 - HDR
 - 自定义分辨率
@@ -102,8 +108,18 @@
 在 `Bottle -> Config -> NAP` 中可以设置：
 
 - 游戏可执行文件
+- Launch Fix（test）
 - 修复 WebView
 - 自定义分辨率
+
+## HKRPG / 崩坏：星穹铁道相关功能
+
+在 `Bottle -> Config -> HKRPG` 中可以设置：
+
+- 游戏可执行文件
+- Launch Fix（test）
+
+HKRPG 会在容器内使用 Jadeite 包裹启动（按需自动下载并安装到 prefix 内）。此外会自动应用 WebView 相关注册表清理（不提供 UI 开关）。
 
 ## 常用工具
 
@@ -128,6 +144,14 @@
 - IP 和端口分开填写
 - 之后可以随时在配置页修改或关闭
 
+## Launch Fix（test）
+
+某些游戏在启动早期需要短暂“断网”窗口。
+
+- 本分支通过临时把 Wine 代理覆盖为一个无效代理（`127.0.0.1:1`）来实现。
+- 不会去修改 `/etc/hosts`。
+- 如果容器本来就启用了代理，则会忽略 Launch Fix。
+
 ## 相比 YAAGL 的优化点
 
 本分支参考了 YAAGL 的 HK4e 流程实现思路，但会按 Whisky 的“多容器 / 可预先配置”的使用方式来设计，而不是 YAAGL 更偏“启动时 patch / 运行后 revert”的单目录流程。
@@ -135,9 +159,9 @@
 - 多容器隔离：OS/CN、不同运行环境/配置可以完全分开。
 - 可预先配置：创建容器或在配置页切换时，就会应用 DXMT 注入 / SteamPatch / 代理 / HK4e 设置。
 - 更少的启动期改动：尽量把设置持久化，缺失时才补齐。
-- 适配共享 Wine 环境：对 Wine 环境的改动按“环境级配置”处理，并尽量做到幂等，避免容器之间互相干扰。
+- 每容器独立 runtime：runtime 级改动落在容器自己的 WineRuntime 里，避免容器之间互相干扰。
 - 更好排障体验：按启动会话整理日志、常用工具一键打开，并对“找不到目标文件”（例如外置磁盘断开）给出明确提示。
-- 更方便切换 Wine 版本：运行时下载一次后会缓存，后续切换/新建容器不需要反复下载。
+- 更方便切换 Wine 版本：运行时下载一次后会缓存，新建容器会基于缓存 runtime 复制/clone 生成独立 runtime。
 - 原生 macOS App：图形界面为主，常用工具与日志入口都在应用内。
 - 运行体验更快：相比 YAAGL 的外部流程，日常启动与操作步骤更少。
 - 更不容易报错：减少启动期 patch/revert 的易错环节，出错时也更容易定位。
