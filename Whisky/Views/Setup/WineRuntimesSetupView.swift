@@ -4,6 +4,11 @@ import WhiskyKit
 struct WineRuntimesSetupView: View {
     @StateObject private var vm = WineRuntimeDownloadsVM()
     @Binding var showSetup: Bool
+    @State private var availableRuntimes: [WineRuntime] = WineRuntimes.all
+
+    private var preferredRuntimeId: String? {
+        WineRuntimes.preferredSetupRuntime?.id
+    }
 
     var body: some View {
         VStack {
@@ -20,7 +25,7 @@ struct WineRuntimesSetupView: View {
             Spacer()
 
             Form {
-                ForEach(WineRuntimes.all, id: \.id) { runtime in
+                ForEach(availableRuntimes, id: \.id) { runtime in
                     let state = vm.items[runtime.id] ?? WineRuntimeDownloadsVM.ItemState()
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 4) {
@@ -71,15 +76,18 @@ struct WineRuntimesSetupView: View {
                 Button("setup.done") {
                     showSetup = false
                 }
-                .disabled(!vm.isInstalled("11.4-dxmt-signed") && !vm.isInstalled("11.0-dxmt-signed"))
+                .disabled(preferredRuntimeId.map { !vm.isInstalled($0) } ?? false)
             }
         }
         .frame(width: 520, height: 520)
-        .onAppear {
-            // Default behavior: start downloading Wine 11.4 DXMT on first run.
-            if !vm.isInstalled("11.4-dxmt-signed") {
-                vm.download(runtimeId: "11.4-dxmt-signed")
+        .task {
+            availableRuntimes = await WineRuntimes.refreshCatalog(forceRemote: false)
+            if let runtimeId = preferredRuntimeId, !vm.isInstalled(runtimeId) {
+                vm.download(runtimeId: runtimeId)
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: WineRuntimes.didUpdateNotification)) { _ in
+            availableRuntimes = WineRuntimes.all
         }
     }
 }

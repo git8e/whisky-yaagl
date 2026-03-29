@@ -27,7 +27,8 @@ struct BottleCreationView: View {
 
     @State private var newBottleName: String = ""
     @State private var newBottleVersion: WinVersion = .win10
-    @State private var wineRuntimeId: String = "11.4-dxmt-signed"
+    @State private var wineRuntimeId: String = WineRuntimes.defaultRuntimeId
+    @State private var availableRuntimes: [WineRuntime] = WineRuntimes.all
     @State private var initialRetinaMode: Bool = false
 
     private enum GameRegionPreset: String, CaseIterable, Sendable {
@@ -218,6 +219,18 @@ struct BottleCreationView: View {
         }
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: ViewWidth.small)
+        .task {
+            availableRuntimes = await WineRuntimes.refreshCatalog(forceRemote: false)
+            if !availableRuntimes.contains(where: { $0.id == wineRuntimeId }) {
+                wineRuntimeId = WineRuntimes.defaultRuntimeId
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: WineRuntimes.didUpdateNotification)) { _ in
+            availableRuntimes = WineRuntimes.all
+            if !availableRuntimes.contains(where: { $0.id == wineRuntimeId }) {
+                wineRuntimeId = WineRuntimes.defaultRuntimeId
+            }
+        }
     }
 
     private var nameField: some View {
@@ -237,7 +250,7 @@ struct BottleCreationView: View {
 
     private var runtimePicker: some View {
         Picker("create.wineRuntime", selection: $wineRuntimeId) {
-            ForEach(WineRuntimes.all, id: \.id) { runtime in
+            ForEach(availableRuntimes, id: \.id) { runtime in
                 let installed = WineRuntimeManager.isInstalled(runtimeId: runtime.id)
                 let notInstalledLabel = String(localized: "runtime.status.notInstalled")
                 Text(installed ? "\(runtime.displayName)" : "\(runtime.displayName) (\(notInstalledLabel))")

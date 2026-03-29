@@ -40,6 +40,7 @@ struct ConfigView: View {
     @State private var runtimeInstallLoadingState: LoadingState = .success
     @State private var runtimeWineVersion: String? = nil
     @State private var isRevertingRuntimeSelection: Bool = false
+    @State private var availableRuntimes: [WineRuntime] = WineRuntimes.all
     @State private var winVersionLoadingState: LoadingState = .loading
     @State private var buildVersionLoadingState: LoadingState = .loading
     @State private var retinaModeLoadingState: LoadingState = .loading
@@ -132,7 +133,7 @@ struct ConfigView: View {
             Section("config.title.wine", isExpanded: $wineSectionExpanded) {
                 SettingItemView(title: "config.wineRuntime", loadingState: runtimeInstallLoadingState) {
                     Picker("config.wineRuntime", selection: $bottle.settings.wineRuntimeId) {
-                        ForEach(WineRuntimes.all, id: \.id) { runtime in
+                        ForEach(availableRuntimes, id: \.id) { runtime in
                             let installed = WineRuntimeManager.isInstalled(runtimeId: runtime.id)
                             let notInstalledLabel = String(localized: "runtime.status.notInstalled")
                             let suffix: String = {
@@ -664,6 +665,15 @@ struct ConfigView: View {
                     runtimeWineVersion = version
                 }
             }
+            Task(priority: .userInitiated) {
+                let runtimes = await WineRuntimes.refreshCatalog(forceRemote: false)
+                await MainActor.run {
+                    availableRuntimes = runtimes
+                }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: WineRuntimes.didUpdateNotification)) { _ in
+            availableRuntimes = WineRuntimes.all
         }
         .onChange(of: bottle.settings.windowsVersion) { _, newValue in
             if winVersionLoadingState == .success {

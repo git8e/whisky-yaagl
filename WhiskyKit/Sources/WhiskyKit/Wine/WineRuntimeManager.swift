@@ -25,8 +25,6 @@ public enum WineRuntimeManager {
     public static let isolatedRuntimeFolderName = "WineRuntime"
     private static let isolatedRuntimeMarkerFileName = ".base-runtime-id"
 
-    private static let whiskyWineLibrariesURL = URL(string: "https://data.getwhisky.app/Wine/Libraries.tar.gz")!
-
     private static var versionsFolder: URL {
         WhiskyWineInstaller.libraryFolder.appending(path: "WineVersions", directoryHint: .isDirectory)
     }
@@ -130,6 +128,11 @@ public enum WineRuntimeManager {
         progress: (@Sendable (Double) -> Void)? = nil
     ) async throws {
         if runtimeId == WineRuntimes.whiskyDefaultId {
+            guard let runtime = WineRuntimes.runtime(id: runtimeId),
+                  let remoteURL = runtime.remoteURL else {
+                throw WineRuntimeManagerError.missingRemoteURL(runtimeId)
+            }
+
             if isInstalled(runtimeId: runtimeId) {
                 return
             }
@@ -137,7 +140,7 @@ public enum WineRuntimeManager {
             status?("Downloading WhiskyWine")
             let archive = try await downloadOnce(
                 runtimeId: runtimeId,
-                url: whiskyWineLibrariesURL,
+                url: remoteURL,
                 progress: progress
             )
 

@@ -90,6 +90,7 @@ struct ContentView: View {
             openedFileURL = url
         }
         .task {
+            await WineRuntimes.refreshCatalog(forceRemote: false)
             bottleVM.loadBottles()
             bottlesLoaded = true
 
@@ -101,8 +102,8 @@ struct ContentView: View {
                 }
             }
 
-            if !WineRuntimeManager.isInstalled(runtimeId: "11.4-dxmt-signed") &&
-                !WineRuntimeManager.isInstalled(runtimeId: "11.0-dxmt-signed") {
+            if let runtimeId = WineRuntimes.preferredSetupRuntime?.id,
+               !WineRuntimeManager.isInstalled(runtimeId: runtimeId) {
                 showSetup = true
             }
         }

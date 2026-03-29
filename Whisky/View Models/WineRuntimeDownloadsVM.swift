@@ -12,13 +12,6 @@ final class WineRuntimeDownloadsVM: ObservableObject {
 
     @Published var items: [String: ItemState] = [:]
 
-    init() {
-        for runtime in WineRuntimes.all {
-            var state = ItemState()
-            items[runtime.id] = state
-        }
-    }
-
     func isInstalled(_ runtimeId: String) -> Bool {
         WineRuntimeManager.isInstalled(runtimeId: runtimeId)
     }

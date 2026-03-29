@@ -17,20 +17,108 @@
 //
 
 import SwiftUI
-import Sparkle
 import WhiskyKit
+
+enum AppLanguage: String, CaseIterable, Identifiable {
+    case auto
+    case english = "en"
+    case german = "de"
+    case spanish = "es"
+    case french = "fr"
+    case italian = "it"
+    case japanese = "ja"
+    case korean = "ko"
+    case russian = "ru"
+    case ukrainian = "uk"
+    case thai = "th"
+    case chineseSimplified = "zh-Hans"
+    case chineseTraditional = "zh-Hant"
+
+    static let storageKey = "appLanguage"
+
+    var id: String { rawValue }
+
+    var appleLanguageCode: String? {
+        switch self {
+        case .auto:
+            return nil
+        case .english:
+            return "en"
+        case .german:
+            return "de"
+        case .spanish:
+            return "es"
+        case .french:
+            return "fr"
+        case .italian:
+            return "it"
+        case .japanese:
+            return "ja"
+        case .korean:
+            return "ko"
+        case .russian:
+            return "ru"
+        case .ukrainian:
+            return "uk"
+        case .thai:
+            return "th"
+        case .chineseSimplified:
+            return "zh-Hans"
+        case .chineseTraditional:
+            return "zh-Hant"
+        }
+    }
+
+    func displayName() -> String {
+        switch self {
+        case .auto:
+            return String(localized: "locale.auto")
+        case .english:
+            return "English"
+        case .german:
+            return "Deutsch"
+        case .spanish:
+            return "Español"
+        case .french:
+            return "Français"
+        case .italian:
+            return "Italiano"
+        case .japanese:
+            return "日本語"
+        case .korean:
+            return "한국어"
+        case .russian:
+            return "Русский"
+        case .ukrainian:
+            return "Українська"
+        case .thai:
+            return "ไทย"
+        case .chineseSimplified:
+            return "简体中文"
+        case .chineseTraditional:
+            return "繁體中文"
+        }
+    }
+
+    static func applyStoredPreference() {
+        let defaults = UserDefaults.standard
+        let language = AppLanguage(rawValue: defaults.string(forKey: storageKey) ?? AppLanguage.auto.rawValue) ?? .auto
+        if let code = language.appleLanguageCode {
+            defaults.set([code], forKey: "AppleLanguages")
+        } else {
+            defaults.removeObject(forKey: "AppleLanguages")
+        }
+    }
+}
 
 @main
 struct WhiskyApp: App {
     @State var showSetup: Bool = false
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.openURL) var openURL
-    private let updaterController: SPUStandardUpdaterController
 
     init() {
-        updaterController = SPUStandardUpdaterController(startingUpdater: true,
-                                                         updaterDelegate: nil,
-                                                         userDriverDelegate: nil)
+        AppLanguage.applyStoredPreference()
     }
 
     var body: some Scene {
@@ -38,6 +126,13 @@ struct WhiskyApp: App {
             ContentView(showSetup: $showSetup)
                 .frame(minWidth: ViewWidth.large, minHeight: 316)
                 .environmentObject(BottleVM.shared)
+                .task {
+                    await WineRuntimes.refreshCatalogIfNeeded()
+                    await AppUpdateChecker.shared.checkForUpdatesIfNeeded()
+                    await WineUpdateChecker.shared.checkForUpdatesIfNeeded {
+                        showSetup = true
+                    }
+                }
                 .onAppear {
                     NSWindow.allowsAutomaticWindowTabbing = false
 
@@ -50,7 +145,7 @@ struct WhiskyApp: App {
         .handlesExternalEvents(matching: ["{same path of URL?}"])
         .commands {
             CommandGroup(after: .appInfo) {
-                SparkleView(updater: updaterController.updater)
+                SparkleView()
             }
             CommandGroup(before: .systemServices) {
                 Divider()
@@ -98,7 +193,7 @@ struct WhiskyApp: App {
             }
             CommandGroup(replacing: .help) {
                 Button("help.github") {
-                    if let url = URL(string: "https://github.com/git8e/whisky-yaagl") {
+                    if let url = URL(string: "https://github.com/git8e/whisky-yaagl/releases") {
                         openURL(url)
                     }
                 }

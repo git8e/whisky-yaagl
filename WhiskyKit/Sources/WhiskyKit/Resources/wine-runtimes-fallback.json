@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-03-30T00:00:00Z",
+  "defaultRuntimeId": "11.4-dxmt-signed",
+  "runtimes": [
+    {
+      "id": "11.4-dxmt-signed",
+      "track": "signed-dxmt",
+      "displayName": "Wine 11.4 DXMT (signed)",
+      "version": "11.4",
+      "revision": 1,
+      "remoteURL": "https://github.com/dawn-winery/dawn-signed/releases/download/wine-gcenx-11.4-osx64/wine-devel-11.4-osx64-signed.tar.xz",
+      "renderBackend": "dxmt",
+      "archive": {
+        "winePathInArchive": "wine-devel-11.4-osx64-signed/Contents/Resources/wine"
+      },
+      "recommended": true
+    },
+    {
+      "id": "11.0-dxmt-signed",
+      "track": "signed-dxmt",
+      "displayName": "Wine 11.0 DXMT (signed)",
+      "version": "11.0",
+      "revision": 1,
+      "remoteURL": "https://github.com/dawn-winery/dawn-signed/releases/download/wine-stable-gcenx-11.0-osx64/wine-stable-11.0-osx64-signed.tar.xz",
+      "renderBackend": "dxmt",
+      "archive": {
+        "winePathInArchive": "Wine Stable.app/Contents/Resources/wine"
+      },
+      "recommended": false
+    },
+    {
+      "id": "10.18-dxmt",
+      "track": "unsigned-dxmt",
+      "displayName": "Wine 10.18 DXMT Experimental",
+      "version": "10.18",
+      "revision": 1,
+      "remoteURL": "https://github.com/Gcenx/macOS_Wine_builds/releases/download/10.18/wine-devel-10.18-osx64.tar.xz",
+      "renderBackend": "dxmt",
+      "archive": {
+        "winePathInArchive": "Wine Devel.app/Contents/Resources/wine"
+      },
+      "recommended": false
+    },
+    {
+      "id": "9.9-dxmt",
+      "track": "unsigned-dxmt",
+      "displayName": "Wine 9.9 DXMT",
+      "version": "9.9",
+      "revision": 1,
+      "remoteURL": "https://github.com/3Shain/wine/releases/download/v9.9-mingw/wine.tar.gz",
+      "renderBackend": "dxmt",
+      "archive": {
+        "winePathInArchive": null
+      },
+      "recommended": false
+    },
+    {
+      "id": "whisky",
+      "track": "whiskywine",
+      "displayName": "WhiskyWine",
+      "version": "7.7.0",
+      "revision": 1,
+      "remoteURL": "https://data.getwhisky.app/Wine/Libraries.tar.gz",
+      "renderBackend": null,
+      "archive": {
+        "winePathInArchive": null
+      },
+      "recommended": false
+    }
+  ]
+}

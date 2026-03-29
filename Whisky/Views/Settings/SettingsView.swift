@@ -22,12 +22,30 @@ import WhiskyKit
 struct SettingsView: View {
     @AppStorage("SUEnableAutomaticChecks") var whiskyUpdate = true
     @AppStorage("killOnTerminate") var killOnTerminate = true
-    @AppStorage("checkWhiskyWineUpdates") var checkWhiskyWineUpdates = true
+    @AppStorage("checkWineRuntimeUpdates") var checkWineRuntimeUpdates = false
     @AppStorage("defaultBottleLocation") var defaultBottleLocation = BottleData.defaultBottleDir
+    @AppStorage(AppLanguage.storageKey) var appLanguageRawValue = AppLanguage.auto.rawValue
+
+    private var appLanguage: Binding<AppLanguage> {
+        Binding(
+            get: {
+                AppLanguage(rawValue: appLanguageRawValue) ?? .auto
+            },
+            set: { language in
+                appLanguageRawValue = language.rawValue
+                AppLanguage.applyStoredPreference()
+            }
+        )
+    }
 
     var body: some View {
         Form {
             Section("settings.general") {
+                Picker("settings.language", selection: appLanguage) {
+                    ForEach(AppLanguage.allCases) { language in
+                        Text(language.displayName()).tag(language)
+                    }
+                }
                 Toggle("settings.toggle.kill.on.terminate", isOn: $killOnTerminate)
                 ActionView(
                     text: "settings.path",
@@ -49,7 +67,15 @@ struct SettingsView: View {
             }
             Section("settings.updates") {
                 Toggle("settings.toggle.whisky.updates", isOn: $whiskyUpdate)
-                Toggle("settings.toggle.whiskywine.updates", isOn: $checkWhiskyWineUpdates)
+                Toggle("settings.toggle.wine.updates", isOn: $checkWineRuntimeUpdates)
+                ActionView(
+                    text: "settings.release",
+                    actionName: "button.openReleases"
+                ) {
+                    if let url = URL(string: "https://github.com/git8e/whisky-yaagl/releases") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
             }
         }
         .formStyle(.grouped)

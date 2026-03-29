@@ -98,8 +98,9 @@ struct WelcomeView: View {
 
     func checkInstallStatus() {
         rosettaInstalled = Rosetta2.isRosettaInstalled
-        wine11Installed = WineRuntimeManager.isInstalled(runtimeId: "11.4-dxmt-signed") ||
-            WineRuntimeManager.isInstalled(runtimeId: "11.0-dxmt-signed")
+        wine11Installed = WineRuntimes.setupRuntimeIds.contains { runtimeId in
+            WineRuntimeManager.isInstalled(runtimeId: runtimeId)
+        }
     }
 }
 
