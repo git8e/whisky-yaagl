@@ -57,6 +57,7 @@ struct BottleCreationView: View {
     @State private var initialHK4eLaunchFixBlockNetwork: Bool = false
     @State private var initialNapLaunchFixBlockNetwork: Bool = true
     @State private var initialHKRPGLaunchFixBlockNetwork: Bool = false
+    @State private var initialHK4eLeftCommandIsCtrl: Bool = false
     @State private var initialSteamPatch: Bool = true
     @State private var initialEnableHDR: Bool = false
 
@@ -134,8 +135,27 @@ struct BottleCreationView: View {
                 Toggle("config.retinaMode", isOn: $initialRetinaMode)
                 regionPicker
                 executablePicker
-                Section("create.patchSettings", isExpanded: $patchSettingsExpanded) {
-                    gameSpecificToggles
+                Section {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            patchSettingsExpanded.toggle()
+                        }
+                    } label: {
+                        HStack {
+                            Text("create.patchSettings")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                                .rotationEffect(.degrees(patchSettingsExpanded ? 90 : 0))
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+
+                    if patchSettingsExpanded {
+                        gameSpecificToggles
+                    }
                 }
                 proxySettings
                 resolutionSettings
@@ -256,6 +276,7 @@ struct BottleCreationView: View {
     private var gameSpecificToggles: some View {
         if gameRegionPreset.isHK4e {
             Toggle("hk4e.launchFixBlockNetwork", isOn: $initialHK4eLaunchFixBlockNetwork)
+            Toggle("hk4e.leftCommandIsCtrl", isOn: $initialHK4eLeftCommandIsCtrl)
             Toggle("hk4e.steamPatch", isOn: $initialSteamPatch)
             Toggle("hk4e.enableHDR", isOn: $initialEnableHDR)
         } else if gameRegionPreset.isNAP {
@@ -386,6 +407,7 @@ struct BottleCreationView: View {
             gamePreset: preset,
             initialHK4eRegion: gameRegionPreset.hk4eRegion,
             initialLaunchFixBlockNetwork: hk4eLaunchFixBlockNetwork,
+            initialHK4eLeftCommandIsCtrl: initialHK4eLeftCommandIsCtrl,
             initialSteamPatch: hk4eSteamPatch,
             initialEnableHDR: hk4eEnableHDR,
             initialNapRegion: gameRegionPreset.napRegion,

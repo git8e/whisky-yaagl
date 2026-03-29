@@ -59,6 +59,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
         gamePreset: GamePreset = .hk4e,
         initialHK4eRegion: HK4eGame.Region = .os,
         initialLaunchFixBlockNetwork: Bool = false,
+        initialHK4eLeftCommandIsCtrl: Bool = false,
         initialSteamPatch: Bool = false,
         initialCertImport: Bool = true,
         initialEnableHDR: Bool = false,
@@ -139,6 +140,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     bottle.settings.gamePreset = .hk4e
                     bottle.settings.hk4eRegion = initialHK4eRegion
                     bottle.settings.hk4eLaunchFixBlockNetwork = initialLaunchFixBlockNetwork
+                    bottle.settings.hk4eLeftCommandIsCtrl = initialHK4eLeftCommandIsCtrl
                     bottle.settings.hk4eSteamPatch = initialSteamPatch
                     bottle.settings.hk4eCertificateImportEnabled = initialCertImport
                     bottle.settings.hk4eEnableHDR = initialEnableHDR
