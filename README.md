@@ -14,6 +14,8 @@ An app for running HK4e, NAP, and HKRPG on macOS with less setup hassle.
 
 This is a macOS game launcher and management tool for general users. It is mainly intended to make certain anime-style games easier to run, but it is not limited to those games. It is built on top of [Whisky](https://github.com/Whisky-App/Whisky), references the Wine environment setup and patching approach used by [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher), and follows a workflow closer to CrossOver to make game setup, launching, and day-to-day management easier.
 
+This project is an independently maintained fork and is not affiliated with the original Whisky or YAAGL projects.
+
 ## Main Features
 
 - Choose from multiple Wine versions when creating a bottle
@@ -30,7 +32,7 @@ This is a macOS game launcher and management tool for general users. It is mainl
 
 ## Is it safe?
 
-Use it at your own risk. Or enjoying it with a new f2p account.
+Use at your own risk.
 
 ## Installation
 
@@ -103,6 +105,5 @@ This project is built on top of Whisky and the work of the Wine, DXVK, MoltenVK,
 
 - [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher) for the HK4e-oriented workflow ideas and reference behavior.
 - [Whisky](https://github.com/Whisky-App/Whisky) for the base app and the macOS Wine bottle experience.
-- OpenCode (gpt-5.2) for porting work and documentation.
 
 Please also support the upstream projects that make this fork possible.

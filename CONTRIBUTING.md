@@ -2,6 +2,11 @@
 
 Thanks for your interest! First, make a fork of Whisky, make a new branch for your changes, and get coding!
 
+## Project notes
+
+- This project is an independently maintained fork and is not affiliated with the original Whisky or YAAGL projects.
+- ChatGPT (OpenAI gpt-5.4) assisted with a large portion of the implementation and documentation work in this fork.
+
 # Build environment
 
 Whisky is built using Xcode 15 on macOS Sonoma. All external dependencies are handled through the Swift Package Manager.

@@ -4,6 +4,8 @@
 
 这是一个面向普通用户的 macOS 游戏启动与管理工具，主要用于更方便地运行一些特定的动漫游戏，但不限定于这些游戏。它基于 [Whisky](https://github.com/Whisky-App/Whisky) 开发，参考了 [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher) 的 Wine 环境配置与补丁方案，使用逻辑更接近于 CrossOver，能帮助你更轻松地完成游戏配置、启动与日常管理。
 
+本项目是一个独立维护的 fork，与原版 Whisky 和 YAAGL 项目没有官方关联。
+
 ## 主要功能
 
 - 创建容器时可选择多个 Wine 版本
@@ -20,7 +22,7 @@
 
 ## 是否安全
 
-使用风险自负。或使用一个新的零氪账号体验。
+请自行承担使用风险。
 
 ## 安装方式
 
@@ -89,6 +91,5 @@
 
 - [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher)：提供了很多 HK4e 相关流程的参考实现与思路。
 - [Whisky](https://github.com/Whisky-App/Whisky)：提供了本分支的基础框架与 macOS 上的 Wine bottle 体验。
-- OpenCode (gpt-5.2)：移植实现与文档整理。
 
 也建议支持 upstream Whisky 和相关上游项目。
