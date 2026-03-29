@@ -16,6 +16,17 @@ This is a macOS game launcher and management tool for general users. It is mainl
 
 This project is an independently maintained fork and is not affiliated with the original Whisky or YAAGL projects.
 
+## Screenshots
+
+<p align="center">
+  <img src="images/wine-runtimes.png" alt="Wine Runtimes Setup" width="420" />
+  <img src="images/create-bottle.png" alt="Create Bottle" width="340" />
+</p>
+
+### Main Window
+
+<img src="images/main.png" alt="Main Window" width="720" />
+
 ## Main Features
 
 - Choose from multiple Wine versions when creating a bottle

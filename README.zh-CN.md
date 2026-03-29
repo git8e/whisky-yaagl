@@ -6,6 +6,17 @@
 
 本项目是一个独立维护的 fork，与原版 Whisky 和 YAAGL 项目没有官方关联。
 
+## 截图
+
+<p align="center">
+  <img src="images/wine-runtimes.png" alt="Wine 运行时安装" width="420" />
+  <img src="images/create-bottle.png" alt="创建容器" width="340" />
+</p>
+
+### 主界面
+
+<img src="images/main.png" alt="主界面" width="720" />
+
 ## 主要功能
 
 - 创建容器时可选择多个 Wine 版本
