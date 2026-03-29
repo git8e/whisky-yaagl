@@ -314,6 +314,9 @@ struct ConfigView: View {
                         panel.canChooseDirectories = false
                         panel.allowsMultipleSelection = false
                         panel.allowedContentTypes = [UTType.exe]
+                        panel.message = String(localized: "exePicker.panelMessage")
+                        panel.directoryURL = bottle.settings.hk4eGameExecutableURL?.deletingLastPathComponent()
+                            ?? bottle.url.appending(path: "drive_c")
                         panel.begin { result in
                             if result == .OK, let url = panel.urls.first {
                                 let oldURL = bottle.settings.hk4eGameExecutableURL
@@ -321,6 +324,12 @@ struct ConfigView: View {
                                 updatePinnedGameExecutable(oldURL: oldURL, newURL: url)
                             }
                         }
+                    }
+
+                    if bottle.settings.hk4eGameExecutableURL == nil {
+                        Text("hk4e.exeHint")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                 } else if gameRegionSelection.wrappedValue.isNAP {
                     ActionView(
@@ -334,6 +343,9 @@ struct ConfigView: View {
                         panel.canChooseDirectories = false
                         panel.allowsMultipleSelection = false
                         panel.allowedContentTypes = [UTType.exe]
+                        panel.message = String(localized: "exePicker.panelMessage")
+                        panel.directoryURL = bottle.settings.napGameExecutableURL?.deletingLastPathComponent()
+                            ?? bottle.url.appending(path: "drive_c")
                         panel.begin { result in
                             if result == .OK, let url = panel.urls.first {
                                 let oldURL = bottle.settings.napGameExecutableURL
@@ -341,6 +353,12 @@ struct ConfigView: View {
                                 updatePinnedGameExecutable(oldURL: oldURL, newURL: url)
                             }
                         }
+                    }
+
+                    if bottle.settings.napGameExecutableURL == nil {
+                        Text("nap.exeHint")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                 } else {
                     ActionView(
@@ -354,6 +372,9 @@ struct ConfigView: View {
                         panel.canChooseDirectories = false
                         panel.allowsMultipleSelection = false
                         panel.allowedContentTypes = [UTType.exe]
+                        panel.message = String(localized: "exePicker.panelMessage")
+                        panel.directoryURL = bottle.settings.hkrpgGameExecutableURL?.deletingLastPathComponent()
+                            ?? bottle.url.appending(path: "drive_c")
                         panel.begin { result in
                             if result == .OK, let url = panel.urls.first {
                                 let oldURL = bottle.settings.hkrpgGameExecutableURL
@@ -361,6 +382,12 @@ struct ConfigView: View {
                                 updatePinnedGameExecutable(oldURL: oldURL, newURL: url)
                             }
                         }
+                    }
+
+                    if bottle.settings.hkrpgGameExecutableURL == nil {
+                        Text("hkrpg.exeHint")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                 }
 

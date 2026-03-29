@@ -21851,6 +21851,94 @@
         }
       }
     },
+    "exePicker.panelMessage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a .exe file (not a folder)."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u8bf7\u9009\u62e9 .exe \u53ef\u6267\u884c\u6587\u4ef6\uff08\u4e0d\u662f\u6587\u4ef6\u5939\uff09\u3002"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u8acb\u9078\u64c7 .exe \u53ef\u57f7\u884c\u6a94\uff08\u4e0d\u662f\u8cc7\u6599\u593e\uff09\u3002"
+          }
+        }
+      }
+    },
+    "hk4e.exeHint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: select GenshinImpact.exe (OS) or YuanShen.exe (CN)."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 GenshinImpact.exe\uff08\u56fd\u9645\u670d\uff09\u6216 YuanShen.exe\uff08\u56fd\u670d\uff09\u3002"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 GenshinImpact.exe\uff08\u570b\u969b\u670d\uff09\u6216 YuanShen.exe\uff08\u570b\u670d\uff09\u3002"
+          }
+        }
+      }
+    },
+    "nap.exeHint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: select ZenlessZoneZero.exe."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 ZenlessZoneZero.exe\u3002"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 ZenlessZoneZero.exe\u3002"
+          }
+        }
+      }
+    },
+    "hkrpg.exeHint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip: select StarRail.exe."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u63d0\u793a\uff1a\u8bf7\u9009\u62e9 StarRail.exe\u3002"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u63d0\u793a\uff1a\u8acb\u9078\u64c7 StarRail.exe\u3002"
+          }
+        }
+      }
+    },
     "nap.height" : {
       "localizations" : {
         "en" : {
