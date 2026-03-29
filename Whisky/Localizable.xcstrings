@@ -21354,19 +21354,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Other Settings"
+            "value" : "Advanced Settings"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "其他设置"
+            "value" : "高级设置"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "其他設定"
+            "value" : "進階設定"
           }
         }
       }
