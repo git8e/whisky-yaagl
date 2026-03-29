@@ -352,15 +352,13 @@ struct BottleCreationView: View {
                 }
             }
 
-            if pinProgramURL == nil {
-                Text(exeHintKey)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+            Text(exeHintKey)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
 
-                Text("exePicker.leaveBlankHint")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
+            Text("exePicker.leaveBlankHint")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
         }
     }
 
