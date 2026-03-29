@@ -110,6 +110,23 @@ struct ConfigView: View {
         WineRuntimes.runtime(id: bottle.settings.wineRuntimeId)?.renderBackend == .dxmt
     }
 
+    private var exeHintKey: LocalizedStringKey {
+        switch gameRegionSelection.wrappedValue {
+        case .hk4eOs:
+            return "hk4e.exeHint.os"
+        case .hk4eCn:
+            return "hk4e.exeHint.cn"
+        case .napOs:
+            return "nap.exeHint.os"
+        case .napCn:
+            return "nap.exeHint.cn"
+        case .hkrpgOs:
+            return "hkrpg.exeHint.os"
+        case .hkrpgCn:
+            return "hkrpg.exeHint.cn"
+        }
+    }
+
     var body: some View {
         Form {
             Section("config.title.wine", isExpanded: $wineSectionExpanded) {
@@ -301,7 +318,16 @@ struct ConfigView: View {
                 }
             }
 
-            Section("create.gameRegion", isExpanded: $hk4eSectionExpanded) {
+            Section("config.title.game", isExpanded: $hk4eSectionExpanded) {
+                Picker("create.gameRegion", selection: gameRegionSelection) {
+                    Text("hk4e.region.os").tag(GameRegionPreset.hk4eOs)
+                    Text("hk4e.region.cn").tag(GameRegionPreset.hk4eCn)
+                    Text("nap.region.os").tag(GameRegionPreset.napOs)
+                    Text("nap.region.cn").tag(GameRegionPreset.napCn)
+                    Text("hkrpg.region.os").tag(GameRegionPreset.hkrpgOs)
+                    Text("hkrpg.region.cn").tag(GameRegionPreset.hkrpgCn)
+                }
+
                 if gameRegionSelection.wrappedValue.isHK4e {
                     ActionView(
                         text: "hk4e.gameExecutable",
@@ -327,7 +353,7 @@ struct ConfigView: View {
                     }
 
                     if bottle.settings.hk4eGameExecutableURL == nil {
-                        Text("hk4e.exeHint")
+                        Text(exeHintKey)
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
@@ -356,7 +382,7 @@ struct ConfigView: View {
                     }
 
                     if bottle.settings.napGameExecutableURL == nil {
-                        Text("nap.exeHint")
+                        Text(exeHintKey)
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
@@ -385,19 +411,10 @@ struct ConfigView: View {
                     }
 
                     if bottle.settings.hkrpgGameExecutableURL == nil {
-                        Text("hkrpg.exeHint")
+                        Text(exeHintKey)
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
-                }
-
-                Picker("create.gameRegion", selection: gameRegionSelection) {
-                    Text("hk4e.region.os").tag(GameRegionPreset.hk4eOs)
-                    Text("hk4e.region.cn").tag(GameRegionPreset.hk4eCn)
-                    Text("nap.region.os").tag(GameRegionPreset.napOs)
-                    Text("nap.region.cn").tag(GameRegionPreset.napCn)
-                    Text("hkrpg.region.os").tag(GameRegionPreset.hkrpgOs)
-                    Text("hkrpg.region.cn").tag(GameRegionPreset.hkrpgCn)
                 }
 
                 if gameRegionSelection.wrappedValue.isHK4e {
@@ -490,6 +507,10 @@ struct ConfigView: View {
                     Text("hk4e.description")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+
+                    Text("patchOptions.keepDefaultHint")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 } else if gameRegionSelection.wrappedValue.isNAP {
                     Toggle("nap.launchFixBlockNetwork", isOn: $bottle.settings.napLaunchFixBlockNetwork)
                         .onChange(of: bottle.settings.napLaunchFixBlockNetwork) { _, enabled in
@@ -524,6 +545,10 @@ struct ConfigView: View {
                         .disabled(!bottle.settings.napCustomResolutionEnabled)
                         Spacer()
                     }
+
+                    Text("patchOptions.keepDefaultHint")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 } else {
                     Toggle("hkrpg.launchFixBlockNetwork", isOn: $bottle.settings.hkrpgLaunchFixBlockNetwork)
                         .onChange(of: bottle.settings.hkrpgLaunchFixBlockNetwork) { _, enabled in
@@ -532,6 +557,10 @@ struct ConfigView: View {
                                 try? await WineProxySettings.restoreDesiredState(bottle: bottle)
                             }
                         }
+
+                    Text("patchOptions.keepDefaultHint")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
