@@ -91,6 +91,12 @@ struct BottleCreationView: View {
         return "hkrpg.notSelected"
     }
 
+    private var exeHintKey: LocalizedStringKey {
+        if gameRegionPreset.isHK4e { return "hk4e.exeHint" }
+        if gameRegionPreset.isNAP { return "nap.exeHint" }
+        return "hkrpg.exeHint"
+    }
+
     private func normalizeProxyFields() {
         // If user pastes "host:port" into host field, split it.
         let host = initialProxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -301,31 +307,40 @@ struct BottleCreationView: View {
     }
 
     private var executablePicker: some View {
-        ActionView(
-            text: gameExecutableOptionalKey,
-            subtitle: pinProgramURL?.path(percentEncoded: false) ?? String(localized: gameNotSelectedKey),
-            actionName: "create.browse"
-        ) {
-            let panel = NSOpenPanel()
-            panel.canChooseFiles = true
-            panel.canChooseDirectories = false
-            panel.allowsMultipleSelection = false
-            panel.allowedContentTypes = [UTType.exe]
-            panel.begin { result in
-                if result == .OK, let url = panel.urls.first {
-                    pinProgramURL = url
+        Group {
+            ActionView(
+                text: gameExecutableOptionalKey,
+                subtitle: pinProgramURL?.path(percentEncoded: false) ?? String(localized: gameNotSelectedKey),
+                actionName: "create.browse"
+            ) {
+                let panel = NSOpenPanel()
+                panel.canChooseFiles = true
+                panel.canChooseDirectories = false
+                panel.allowsMultipleSelection = false
+                panel.allowedContentTypes = [UTType.exe]
+                panel.message = String(localized: "exePicker.panelMessage")
+                panel.begin { result in
+                    if result == .OK, let url = panel.urls.first {
+                        pinProgramURL = url
 
-                    let lower = url.lastPathComponent.lowercased()
-                    if lower.contains("zenlesszonezero") {
-                        gameRegionPreset = .napOs
-                    } else if lower.contains("starrail") {
-                        gameRegionPreset = .hkrpgOs
-                    } else if lower.contains("yuanshen") {
-                        gameRegionPreset = .hk4eCn
-                    } else if lower.contains("genshinimpact") {
-                        gameRegionPreset = .hk4eOs
+                        let lower = url.lastPathComponent.lowercased()
+                        if lower.contains("zenlesszonezero") {
+                            gameRegionPreset = .napOs
+                        } else if lower.contains("starrail") {
+                            gameRegionPreset = .hkrpgOs
+                        } else if lower.contains("yuanshen") {
+                            gameRegionPreset = .hk4eCn
+                        } else if lower.contains("genshinimpact") {
+                            gameRegionPreset = .hk4eOs
+                        }
                     }
                 }
+            }
+
+            if pinProgramURL == nil {
+                Text(exeHintKey)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
         }
     }
