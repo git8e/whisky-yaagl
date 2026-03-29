@@ -388,6 +388,24 @@ struct BottleCreationView: View {
     }
 
     func submit() {
+        guard bottleVM.isCreatingBottle == false else { return }
+
+        if otherSettingsExpanded {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                otherSettingsExpanded = false
+            }
+
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(220))
+                performCreate()
+            }
+            return
+        }
+
+        performCreate()
+    }
+
+    private func performCreate() {
         let preset = gameRegionPreset.gamePreset
         let hk4eLaunchFixBlockNetwork = (preset == .hk4e) ? initialHK4eLaunchFixBlockNetwork : false
         let napLaunchFixBlockNetwork = (preset == .nap) ? initialNapLaunchFixBlockNetwork : false
