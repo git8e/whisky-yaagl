@@ -72,6 +72,7 @@ struct BottleCreationView: View {
     @State private var initialNapCustomResolutionEnabled: Bool = false
     @State private var initialNapCustomResolutionWidth: Int = 1920
     @State private var initialNapCustomResolutionHeight: Int = 1080
+    @State private var patchSettingsExpanded: Bool = false
     @State private var pinProgramURL: URL?
     @State private var newBottleURL: URL = UserDefaults.standard.url(forKey: "defaultBottleLocation")
                                            ?? BottleData.defaultBottleDir
@@ -133,7 +134,9 @@ struct BottleCreationView: View {
                 Toggle("config.retinaMode", isOn: $initialRetinaMode)
                 regionPicker
                 executablePicker
-                gameSpecificToggles
+                Section("create.patchSettings", isExpanded: $patchSettingsExpanded) {
+                    gameSpecificToggles
+                }
                 proxySettings
                 resolutionSettings
 
