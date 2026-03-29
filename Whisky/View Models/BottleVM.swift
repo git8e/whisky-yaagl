@@ -127,7 +127,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
 
                 // Create an isolated runtime copy for this bottle so runtime-level patches don't affect other bottles.
                 await MainActor.run {
-                    self.createBottleStatus = "Preparing isolated Wine runtime"
+                    self.createBottleStatus = String(localized: "runtime.status.preparingIsolatedRuntime")
                     self.createBottleProgress = nil
                 }
                 try await WineRuntimeManager.ensureIsolatedRuntime(bottle: bottle, baseRuntimeId: wineRuntimeId)

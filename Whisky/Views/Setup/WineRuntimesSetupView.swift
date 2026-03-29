@@ -8,10 +8,10 @@ struct WineRuntimesSetupView: View {
     var body: some View {
         VStack {
             VStack {
-                Text("Wine Runtimes")
+                Text("runtime.setup.title")
                     .font(.title)
                     .fontWeight(.bold)
-                Text("Select any runtimes to download. Wine 11.4 DXMT is recommended.")
+                Text("runtime.setup.subtitle")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -25,13 +25,13 @@ struct WineRuntimesSetupView: View {
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(runtime.displayName)
-                            Text(vm.isInstalled(runtime.id) ? "Installed" : "Not Installed")
+                            Text(vm.isInstalled(runtime.id) ? String(localized: "runtime.status.installed") : String(localized: "runtime.status.notInstalled"))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
                         Toggle(
-                            "Download",
+                            "runtime.setup.download",
                             isOn: Binding(
                                 get: { vm.isInstalled(runtime.id) || state.isBusy },
                                 set: { newValue in
@@ -69,7 +69,7 @@ struct WineRuntimesSetupView: View {
             Spacer()
 
             HStack {
-                Button("Done") {
+                Button("setup.done") {
                     showSetup = false
                 }
                 .disabled(!vm.isInstalled("11.4-dxmt-signed") && !vm.isInstalled("11.0-dxmt-signed"))

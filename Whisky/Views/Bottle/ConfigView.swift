@@ -134,12 +134,13 @@ struct ConfigView: View {
                     Picker("config.wineRuntime", selection: $bottle.settings.wineRuntimeId) {
                         ForEach(WineRuntimes.all, id: \.id) { runtime in
                             let installed = WineRuntimeManager.isInstalled(runtimeId: runtime.id)
+                            let notInstalledLabel = String(localized: "runtime.status.notInstalled")
                             let suffix: String = {
                                 if runtime.id == bottle.settings.wineRuntimeId, let v = runtimeWineVersion, !v.isEmpty {
                                     return " (\(v))"
                                 }
                                 if !installed {
-                                    return " (Not Installed)"
+                                    return " (\(notInstalledLabel))"
                                 }
                                 return ""
                             }()

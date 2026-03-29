@@ -34,10 +34,12 @@ struct PinAddView: View {
             }
             .buttonStyle(.plain)
             .frame(width: 45, height: 45)
-            Spacer()
+            Color.clear
+                .frame(height: 8)
             Text("pin.help")
                 .multilineTextAlignment(.center)
-                .lineLimit(2, reservesSpace: true)
+                .lineLimit(1)
+                .truncationMode(.tail)
         }
         .frame(width: 90, height: 90)
         .padding(10)
