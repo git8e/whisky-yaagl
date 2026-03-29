@@ -20953,6 +20953,28 @@
         }
       }
     },
+    "create.patchSettings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patch Settings"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "补丁设置"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "補丁設定"
+          }
+        }
+      }
+    },
     "create.progress.title" : {
       "localizations" : {
         "en" : {

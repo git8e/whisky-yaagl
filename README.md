@@ -1,8 +1,8 @@
 <div align="center">
 
-# Whisky YAAGL Fork
+# [Whisky](https://github.com/Whisky-App/Whisky) [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher) Fork
 
-Whisky for macOS, adjusted for HK4e (Genshin), NAP (ZZZ), and HKRPG (Star Rail) workflows.
+An app for running HK4e, NAP, and HKRPG on macOS with less setup hassle.
 
 ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/build.yml?style=for-the-badge)
 
@@ -12,53 +12,45 @@ Whisky for macOS, adjusted for HK4e (Genshin), NAP (ZZZ), and HKRPG (Star Rail) 
 
 ## What This App Is
 
-This project is a user-focused fork of [Whisky](https://github.com/Whisky-App/Whisky) for people who want to run HK4e (Genshin), NAP (ZZZ), and HKRPG (Star Rail) setups on macOS with less manual tweaking.
+This is a macOS game launcher and management tool for general users. It is mainly intended to make certain anime-style games easier to run, but it is not limited to those games. It is built on top of [Whisky](https://github.com/Whisky-App/Whisky), references the Wine environment setup and patching approach used by [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher), and follows a workflow closer to CrossOver to make game setup, launching, and day-to-day management easier.
 
-Compared with upstream Whisky, this fork mainly adds:
+## Main Features
 
-- More Wine runtimes you can choose from when creating a bottle.
-- Game-oriented options such as SteamPatch, HDR, Retina mode, custom resolution, and a stored game executable.
-- Better launch feedback, log access, and one-click tools such as Task Manager.
-- A simpler data layout under `~/Library/Application Support/Whisky/`.
-- Per-bottle Wine runtime isolation (runtime-level patches do not leak across bottles).
-- Bottle duplication that prefers APFS clone (copy-on-write) for speed and disk savings.
+- Choose from multiple Wine versions when creating a bottle
+- Supports some patches from upstream YAAGL
+- Each bottle has its own isolated Wine runtime
+- Can run multiple instances of the same game, or different games, at the same time
+- Supports per-bottle proxy settings
+- Supports fast duplication with APFS clone, so duplicate files only take the space of a single copy
 
 This is not an official Whisky build.
 
 ## System Requirements
 
 - Apple Silicon Mac
-- macOS 14 or later
+- macOS 15 or later
 
 ## Is it safe?
 
 Use it at your own risk. Or enjoying it with a new f2p account.
 
-## Download
+## Installation
 
-1. Open the repository's `Actions` page.
-2. Open the latest successful `Build (macOS)` run.
-3. Scroll to `Artifacts` and download `Whisky.app.zip`.
-4. Open `Finder` and unzip it (double-click).
-5. Drag `Whisky.app` into `/Applications`.
-6. Launch it from `Applications`.
+1. Prefer downloading the latest `Whisky.app.zip` from `Releases`.
+2. `Actions` builds are mainly for preview/testing and may be unstable.
+3. Unzip it in `Finder`.
+4. Drag `Whisky.app` into `/Applications`.
+5. Launch it from `Applications`; on first launch the app will guide you through downloading a Wine runtime (recommended: `Wine 11.4 DXMT (signed)`).
+6. Runtime downloads are cached locally, and each bottle builds its own isolated runtime from the selected base runtime.
 
 If macOS blocks the app on first launch:
 
 1. Open `System Settings` -> `Privacy & Security`.
 2. Find the blocked app message and click `Open Anyway`.
 
-## First Launch
-
-On first launch, the app guides you through runtime setup.
-
-- `Wine 11.4 DXMT (signed)` is the recommended default.
-- Other supported runtimes are also available in the setup screen.
-- Downloads are cached. Each bottle then gets its own isolated runtime based on the selected runtime.
-
 ## Quick Start
 
-1. Install the app from `Actions` artifacts (see `Download`).
+1. Install the app from `Releases` (see `Installation`).
 2. Launch the app once and let it download a Wine runtime (recommended: `Wine 11.4 DXMT (signed)`).
 3. Create a new bottle:
    - Pick `Game / Region`: `Genshin Impact (hk4eos)` / `原神 (hk4ecn)` / `ZZZ Global (napos)` / `ZZZ China (napcn)` / `Star Rail (hkrpgos)` / `崩坏：星穹铁道 (hkrpgcn)`
@@ -69,65 +61,19 @@ On first launch, the app guides you through runtime setup.
    - HK4e: `GenshinImpact.exe` (hk4eos) / `YuanShen.exe` (hk4ecn)
    - ZZZ: `ZenlessZoneZero.exe`
    - Star Rail: `StarRail.exe`
-5. Launch from the pinned program (or the program list).
-
-## Creating A Bottle
-
-When creating a bottle, you can choose:
-
-- Wine runtime
-- Windows version
-- Retina mode
-- Game / region preset (HK4e / NAP / HKRPG)
-- (HK4e) SteamPatch
-- (HK4e) HDR
-- (Optional) `Launch Fix (test)`
-- Proxy server host and port
-- Optional custom resolution
-- Optional game executable to pin on the bottle home screen
-
-The bottle creation flow prepares the prefix, applies the selected one-time settings, and stores them for later reuse.
-
-## HK4e / Genshin Features
-
-In `Bottle -> Config -> HK4e`, you can manage:
-
-- Game executable path
-- Left Command as Ctrl
-- Launch Fix (test)
-- SteamPatch
-- HDR
-- Custom resolution
-
-This fork keeps HK4e settings persistent where possible, so the app does not need to rewrite the same registry values on every launch.
-
-## NAP / ZZZ Features
-
-In `Bottle -> Config -> NAP`, you can manage:
-
-- Game executable path
-- Launch Fix (test)
-- Fix WebView
-- Custom resolution
-
-## HKRPG / Star Rail Features
-
-In `Bottle -> Config -> HKRPG`, you can manage:
-
-- Game executable path
-- Launch Fix (test)
-
-HKRPG launch is wrapped with Jadeite inside the bottle prefix (downloaded and installed automatically when needed). WebView registry cleanup is applied automatically for HKRPG (no UI toggle).
+5. For patch-related options, keeping the defaults is recommended unless you know you need to change them.
+6. Launch from the pinned program (or the program list).
 
 ## Compared With YAAGL
 
 This fork borrows HK4e workflow ideas from YAAGL, but adapts them to Whisky's bottle-first model (multiple bottles, preconfigured setup) instead of a single-app, per-launch patch/revert flow.
 
-- Bottle isolation: keep OS/CN and different game setups in separate bottles.
-- Preconfigured workflow: most game options are applied when creating a bottle or toggled in Config (instead of per-launch patch/revert).
-- Per-bottle runtime isolation: runtime-level changes stay inside each bottle’s isolated runtime.
-- Better troubleshooting UX: per-launch logs and clearer errors (e.g. missing files on external drives).
-- Multi-game concurrency: multiple bottles can launch the same or different games at the same time.
+- Independent bottles: different games and runtime setups stay fully separated, avoiding cross-contamination.
+- Parallel bottles: you can run the same game or different games at the same time without affecting each other.
+- More stable day-to-day use: if one bottle breaks, you can delete and rebuild just that bottle without reinstalling the whole app.
+- Preconfigured workflow: most options are applied during bottle creation or when toggled in Config, instead of patching and reverting on every launch.
+- Fast switching: Wine downloads are cached locally, so switching versions or rebuilding bottles usually does not require downloading Wine again.
+- Native macOS app experience: faster launch, smoother interaction, and lower resource usage.
 
 ## Storage Location
 
@@ -156,8 +102,8 @@ Recent versions of this fork try to keep one launch session in one log file, so 
 If a game fails to start, the most useful things to check are:
 
 1. The latest log in `~/Library/Logs/Whisky/`
-2. Whether the game executable path still exists
-3. Whether an external game drive is still mounted
+2. Whether the game executable path still exists and the drive is still mounted
+3. Use HoYoPlay to verify game file integrity
 
 ## Credits
 
