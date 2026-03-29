@@ -9,7 +9,8 @@ public enum HK4eResources {
     private static var fm: FileManager { FileManager.default }
 
     public static var rootDir: URL {
-        WhiskyPaths.applicationSupportRoot.appending(path: "HK4e", directoryHint: .isDirectory)
+        // Store reusable HK4e assets under Libraries/ so they're grouped with other shared components.
+        WhiskyWineInstaller.libraryFolder.appending(path: "HK4e", directoryHint: .isDirectory)
     }
 
     public static var dxmtDir: URL { rootDir.appending(path: "dxmt", directoryHint: .isDirectory) }

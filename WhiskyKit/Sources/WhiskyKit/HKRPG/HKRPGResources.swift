@@ -9,7 +9,8 @@ public enum HKRPGResources {
     private static var fm: FileManager { FileManager.default }
 
     public static var rootDir: URL {
-        WhiskyPaths.applicationSupportRoot.appending(path: "HKRPG", directoryHint: .isDirectory)
+        // Store reusable HKRPG assets under Libraries/ so they're grouped with other shared components.
+        WhiskyWineInstaller.libraryFolder.appending(path: "HKRPG", directoryHint: .isDirectory)
     }
 
     public static var dxmtDir: URL { rootDir.appending(path: "dxmt", directoryHint: .isDirectory) }

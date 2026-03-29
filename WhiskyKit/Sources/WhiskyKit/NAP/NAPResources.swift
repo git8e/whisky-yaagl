@@ -9,7 +9,8 @@ public enum NAPResources {
     private static var fm: FileManager { FileManager.default }
 
     public static var rootDir: URL {
-        WhiskyPaths.applicationSupportRoot.appending(path: "NAP", directoryHint: .isDirectory)
+        // Store reusable NAP assets under Libraries/ so they're grouped with other shared components.
+        WhiskyWineInstaller.libraryFolder.appending(path: "NAP", directoryHint: .isDirectory)
     }
 
     public static var dxmtDir: URL { rootDir.appending(path: "dxmt", directoryHint: .isDirectory) }
