@@ -63,7 +63,7 @@ On first launch, the app guides you through runtime setup.
 3. Create a new bottle:
    - Pick `Game / Region`: `Genshin Impact (hk4eos)` / `原神 (hk4ecn)` / `ZZZ Global (napos)` / `ZZZ China (napcn)` / `Star Rail (hkrpgos)` / `崩坏：星穹铁道 (hkrpgcn)`
    - (Optional, HK4e) enable SteamPatch / HDR
-   - (Optional) enable `Launch Fix (test)` (see notes below)
+   - (Optional) enable `Launch Fix (test)`
    - (Optional) set proxy host + port
 4. In the bottle's config, select your game executable:
    - HK4e: `GenshinImpact.exe` (hk4eos) / `YuanShen.exe` (hk4ecn)
@@ -119,50 +119,14 @@ In `Bottle -> Config -> HKRPG`, you can manage:
 
 HKRPG launch is wrapped with Jadeite inside the bottle prefix (downloaded and installed automatically when needed). WebView registry cleanup is applied automatically for HKRPG (no UI toggle).
 
-## Useful Tools
-
-Each bottle includes quick access to:
-
-- Open `C:` drive
-- Terminal
-- Task Manager
-- Control Panel
-- Registry Editor
-- Wine Configuration
-- Open Logs / Open Latest Log
-
-If a pinned game lives on an external drive and that drive is disconnected, the app now warns you that the target file cannot be found.
-
-## Proxy Support
-
-Bottle creation and bottle configuration both support proxy settings.
-
-- The setting is stored per bottle.
-- It is written into Wine Internet Settings.
-- Host and port are configured separately.
-- You can enable, disable, or change it later from the bottle config page.
-
-## Launch Fix (test)
-
-Some games need a short "offline" window during early startup.
-
-- This fork implements it by temporarily overriding Wine's proxy to an invalid local proxy (`127.0.0.1:1`).
-- It does not modify `/etc/hosts`.
-- If a bottle already has proxy enabled, Launch Fix is ignored.
-
 ## Compared With YAAGL
 
 This fork borrows HK4e workflow ideas from YAAGL, but adapts them to Whisky's bottle-first model (multiple bottles, preconfigured setup) instead of a single-app, per-launch patch/revert flow.
 
 - Bottle isolation: keep OS/CN and different game setups in separate bottles.
-- Configure ahead of time: DXMT injection, SteamPatch, proxy, and HK4e settings are applied during bottle creation or when toggled in Config.
-- Less launch-time work: most settings are persisted and only re-applied when missing.
-- Per-bottle runtime isolation: runtime-level changes are applied inside each bottle's isolated runtime.
-- Better troubleshooting UX: per-launch logs, one-click tools, and clearer “file not found” errors (e.g. external drives).
-- Easier Wine switching: base runtime downloads are cached; bottles build isolated runtimes from them.
-- Native macOS app experience: GUI-first workflow with integrated tools and logs.
-- Faster day-to-day flow: fewer external steps than YAAGL’s per-launch patch/revert approach.
-- Fewer failure modes: less fragile launch-time patching, and clearer error surfaces when something does go wrong.
+- Preconfigured workflow: most game options are applied when creating a bottle or toggled in Config (instead of per-launch patch/revert).
+- Per-bottle runtime isolation: runtime-level changes stay inside each bottle’s isolated runtime.
+- Better troubleshooting UX: per-launch logs and clearer errors (e.g. missing files on external drives).
 - Multi-game concurrency: multiple bottles can launch the same or different games at the same time.
 
 ## Storage Location
