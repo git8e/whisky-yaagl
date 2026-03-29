@@ -1,10 +1,8 @@
-# [Whisky](https://github.com/Whisky-App/Whisky) [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher) Fork
+# Whisky YAAGL Fork
 
 [English README](README.md)
 
 这是一个面向普通用户的 macOS 游戏启动与管理工具，主要用于更方便地运行一些特定的动漫游戏，但不限定于这些游戏。它基于 [Whisky](https://github.com/Whisky-App/Whisky) 开发，参考了 [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher) 的 Wine 环境配置与补丁方案，使用逻辑更接近于 CrossOver，能帮助你更轻松地完成游戏配置、启动与日常管理。
-
-它不是官方版 Whisky。
 
 ## 主要功能
 
@@ -42,17 +40,9 @@
 
 1. 从仓库的 `Releases` 安装 `Whisky.app`（见“安装方式”）。
 2. 首次启动时下载 Wine 运行时（推荐：`Wine 11.4 DXMT (signed)`）。
-3. 创建容器：
-   - 选择“游戏 / 区服”：`Genshin Impact (hk4eos)` / `原神 (hk4ecn)` / `ZZZ Global (napos)` / `ZZZ China (napcn)` / `Star Rail (hkrpgos)` / `崩坏：星穹铁道 (hkrpgcn)`
-   - （仅 HK4e）可选开启 SteamPatch / HDR
-   - 可选开启 `Launch Fix（test）`
-   - 可选填写代理 IP + 端口
-4. 在容器配置中选择游戏 exe：
-   - HK4e：`GenshinImpact.exe`（hk4eos）/ `YuanShen.exe`（hk4ecn）
-   - 绝区零：`ZenlessZoneZero.exe`
-   - 崩铁：`StarRail.exe`
-5. 补丁配置建议先保持默认选项，不确定时不要随意改动。
-6. 从置顶的程序（或程序列表）启动。
+3. 选择好游戏可执行文件路径，并创建容器。
+4. 补丁配置建议先保持默认选项，不确定时不要随意改动。
+5. 从置顶的程序（或程序列表）启动。
 
 ## 相比 YAAGL 的优化点
 

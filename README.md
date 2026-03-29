@@ -1,6 +1,6 @@
 <div align="center">
 
-# [Whisky](https://github.com/Whisky-App/Whisky) [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher) Fork
+# Whisky YAAGL Fork
 
 An app for running HK4e, NAP, and HKRPG on macOS with less setup hassle.
 
@@ -22,8 +22,6 @@ This is a macOS game launcher and management tool for general users. It is mainl
 - Can run multiple instances of the same game, or different games, at the same time
 - Supports per-bottle proxy settings
 - Supports fast duplication with APFS clone, so duplicate files only take the space of a single copy
-
-This is not an official Whisky build.
 
 ## System Requirements
 
@@ -52,17 +50,9 @@ If macOS blocks the app on first launch:
 
 1. Install the app from `Releases` (see `Installation`).
 2. Launch the app once and let it download a Wine runtime (recommended: `Wine 11.4 DXMT (signed)`).
-3. Create a new bottle:
-   - Pick `Game / Region`: `Genshin Impact (hk4eos)` / `原神 (hk4ecn)` / `ZZZ Global (napos)` / `ZZZ China (napcn)` / `Star Rail (hkrpgos)` / `崩坏：星穹铁道 (hkrpgcn)`
-   - (Optional, HK4e) enable SteamPatch / HDR
-   - (Optional) enable `Launch Fix (test)`
-   - (Optional) set proxy host + port
-4. In the bottle's config, select your game executable:
-   - HK4e: `GenshinImpact.exe` (hk4eos) / `YuanShen.exe` (hk4ecn)
-   - ZZZ: `ZenlessZoneZero.exe`
-   - Star Rail: `StarRail.exe`
-5. For patch-related options, keeping the defaults is recommended unless you know you need to change them.
-6. Launch from the pinned program (or the program list).
+3. Choose the game executable path, then create the bottle.
+4. For patch-related options, keeping the defaults is recommended unless you know you need to change them.
+5. Launch from the pinned program (or the program list).
 
 ## Compared With YAAGL
 
