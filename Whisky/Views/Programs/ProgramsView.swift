@@ -116,6 +116,9 @@ struct ProgramsView: View {
         .onChange(of: resortPrograms) {
             loadPrograms()
         }
+        .onChange(of: bottle.programs) {
+            loadPrograms()
+        }
         .onChange(of: bottle.settings) {
             loadData()
         }

@@ -98,12 +98,18 @@ struct BottleView: View {
                                         } catch {
                                             print("Failed to run external program: \(error)")
                                         }
-                                        programLoading = false
+                                        await MainActor.run {
+                                            programLoading = false
+                                        }
                                     }
                                 } else {
-                                    programLoading = false
+                                    await MainActor.run {
+                                        programLoading = false
+                                    }
                                 }
-                                updateStartMenu()
+                                await MainActor.run {
+                                    bottle.refreshProgramsAndPinsFromDisk()
+                                }
                             }
                         }
                     }
@@ -118,7 +124,7 @@ struct BottleView: View {
                 .padding()
             }
             .onAppear {
-                updateStartMenu()
+                bottle.refreshProgramsAndPinsFromDisk()
             }
             .disabled(!bottle.isAvailable)
             .navigationTitle(bottle.settings.name)
@@ -144,27 +150,6 @@ struct BottleView: View {
             }
             .navigationDestination(for: Program.self) { program in
                 ProgramView(program: program)
-            }
-        }
-    }
-
-    private func updateStartMenu() {
-        bottle.updateInstalledPrograms()
-
-        let startMenuPrograms = bottle.getStartMenuPrograms()
-        for startMenuProgram in startMenuPrograms {
-            for program in bottle.programs where
-            // For some godforsaken reason "foo/bar" != "foo/Bar" so...
-            program.url.path().caseInsensitiveCompare(startMenuProgram.url.path()) == .orderedSame {
-                if !program.pinned {
-                    program.pinned = true
-                }
-                if !bottle.settings.pins.contains(where: { $0.url == program.url }) {
-                    bottle.settings.pins.append(PinnedProgram(
-                        name: program.url.deletingPathExtension().lastPathComponent,
-                        url: program.url
-                    ))
-                }
             }
         }
     }

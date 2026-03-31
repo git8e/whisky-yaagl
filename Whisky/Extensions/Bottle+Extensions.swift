@@ -209,6 +209,52 @@ extension Bottle {
         self.programs = programs.sorted { $0.name.lowercased() < $1.name.lowercased() }
     }
 
+    /// Refreshes `programs` and imports new Start Menu shortcuts into pins.
+    ///
+    /// Some installers only become discoverable via Start Menu `.lnk` files, which are
+    /// processed here so newly installed apps can appear without restarting the app.
+    @MainActor
+    func refreshProgramsAndPinsFromDisk() {
+        updateInstalledPrograms()
+
+        let startMenuPrograms = getStartMenuPrograms()
+        for startMenuProgram in startMenuPrograms {
+            // Match by case-insensitive path because URL equality is case-sensitive.
+            let existing = programs.first(where: {
+                $0.url.path().caseInsensitiveCompare(startMenuProgram.url.path()) == .orderedSame
+            })
+
+            let program: Program
+            if let existing {
+                program = existing
+            } else {
+                // If it's present in Start Menu, surface it even if it's outside Program Files.
+                guard !settings.blocklist.contains(startMenuProgram.url) else { continue }
+                programs.append(startMenuProgram)
+                program = startMenuProgram
+            }
+
+            if !program.pinned {
+                program.pinned = true
+            }
+
+            // Ensure a pin exists even if path casing differs.
+            let alreadyPinned = settings.pins.contains(where: { pin in
+                guard let pinURL = pin.url else { return false }
+                return pinURL.path().caseInsensitiveCompare(program.url.path()) == .orderedSame
+            })
+            if !alreadyPinned {
+                settings.pins.append(PinnedProgram(
+                    name: program.url.deletingPathExtension().lastPathComponent,
+                    url: program.url
+                ))
+            }
+        }
+
+        // Re-sort after adding Start Menu programs.
+        programs = programs.sorted { $0.name.lowercased() < $1.name.lowercased() }
+    }
+
     @MainActor
     func move(destination: URL) {
         do {
