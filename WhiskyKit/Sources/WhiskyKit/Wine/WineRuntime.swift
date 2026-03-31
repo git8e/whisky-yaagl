@@ -112,13 +112,6 @@ public enum WineRuntimes {
         return runtimes.first(where: { $0.id != whiskyDefaultId })
     }
 
-    public static var setupRuntimeIds: [String] {
-        if let preferredSetupRuntime {
-            return [preferredSetupRuntime.id]
-        }
-        return []
-    }
-
     public static func refreshCatalogIfNeeded() async {
         let shouldRefresh: Bool = lock.withLock {
             guard let lastRefresh = cachedManifest.lastRefresh else { return true }

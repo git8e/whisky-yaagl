@@ -21,7 +21,7 @@ import WhiskyKit
 
 struct WelcomeView: View {
     @State var rosettaInstalled: Bool?
-    @State var wine11Installed: Bool?
+    @State var dxmtWineInstalled: Bool?
     @State var shouldCheckInstallStatus: Bool = false
     @Binding var path: [SetupStage]
     @Binding var showSetup: Bool
@@ -52,10 +52,10 @@ struct WelcomeView: View {
                 InstallStatusView(isInstalled: $rosettaInstalled,
                                   shouldCheckInstallStatus: $shouldCheckInstallStatus,
                                   name: "Rosetta")
-                InstallStatusView(isInstalled: $wine11Installed,
+                InstallStatusView(isInstalled: $dxmtWineInstalled,
                                   shouldCheckInstallStatus: $shouldCheckInstallStatus,
                                   showUninstall: false,
-                                  name: "Wine 11.4 DXMT")
+                                  name: "Wine DXMT")
             }
             .formStyle(.grouped)
             .scrollDisabled(true)
@@ -68,21 +68,21 @@ struct WelcomeView: View {
             Spacer()
             HStack {
                 if let rosettaInstalled = rosettaInstalled,
-                   let wine11Installed = wine11Installed {
-                    if !rosettaInstalled || !wine11Installed {
+                   let dxmtWineInstalled = dxmtWineInstalled {
+                    if !rosettaInstalled || !dxmtWineInstalled {
                         Button("setup.quit") {
                             exit(0)
                         }
                         .keyboardShortcut(.cancelAction)
                     }
                     Spacer()
-                    Button(rosettaInstalled && wine11Installed ? "setup.done" : "setup.next") {
+                    Button(rosettaInstalled && dxmtWineInstalled ? "setup.done" : "setup.next") {
                         if !rosettaInstalled {
                             path.append(.rosetta)
                             return
                         }
 
-                        if !wine11Installed {
+                        if !dxmtWineInstalled {
                             path.append(.wineRuntimes)
                             return
                         }
@@ -98,8 +98,10 @@ struct WelcomeView: View {
 
     func checkInstallStatus() {
         rosettaInstalled = Rosetta2.isRosettaInstalled
-        wine11Installed = WineRuntimes.setupRuntimeIds.contains { runtimeId in
-            WineRuntimeManager.isInstalled(runtimeId: runtimeId)
+        dxmtWineInstalled = WineRuntimes.all.contains { runtime in
+            runtime.id != WineRuntimes.whiskyDefaultId
+                && runtime.renderBackend == .dxmt
+                && WineRuntimeManager.isInstalled(runtimeId: runtime.id)
         }
     }
 }

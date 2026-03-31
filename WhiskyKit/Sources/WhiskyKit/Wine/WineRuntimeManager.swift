@@ -342,6 +342,16 @@ public enum WineRuntimeManager {
     }
 
     private static func locateWineRoot(in root: URL) -> URL? {
+        // Some archives are "flat" and extract directly into the root (bin/, lib/, share/...).
+        // In that case the wine root is `root` itself, and the directory enumerator below
+        // will never consider `root` (only its children).
+        let rootBin = root.appending(path: "bin", directoryHint: .isDirectory)
+        let rootWine64 = rootBin.appending(path: "wine64")
+        let rootWine = rootBin.appending(path: "wine")
+        if fm.fileExists(atPath: rootWine64.path(percentEncoded: false)) || fm.fileExists(atPath: rootWine.path(percentEncoded: false)) {
+            return root
+        }
+
         // Look for a directory that contains bin/wine64 or bin/wine
         let enumerator = fm.enumerator(
             at: root,

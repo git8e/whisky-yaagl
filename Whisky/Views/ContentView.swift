@@ -102,8 +102,12 @@ struct ContentView: View {
                 }
             }
 
-            if let runtimeId = WineRuntimes.preferredSetupRuntime?.id,
-               !WineRuntimeManager.isInstalled(runtimeId: runtimeId) {
+            let hasDxmtRuntime = WineRuntimes.all.contains { runtime in
+                runtime.id != WineRuntimes.whiskyDefaultId
+                    && runtime.renderBackend == .dxmt
+                    && WineRuntimeManager.isInstalled(runtimeId: runtime.id)
+            }
+            if !hasDxmtRuntime {
                 showSetup = true
             }
         }

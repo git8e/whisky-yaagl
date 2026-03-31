@@ -6,8 +6,12 @@ struct WineRuntimesSetupView: View {
     @Binding var showSetup: Bool
     @State private var availableRuntimes: [WineRuntime] = WineRuntimes.all
 
-    private var preferredRuntimeId: String? {
-        WineRuntimes.preferredSetupRuntime?.id
+    private var isSetupReady: Bool {
+        WineRuntimes.all.contains { runtime in
+            runtime.id != WineRuntimes.whiskyDefaultId
+                && runtime.renderBackend == .dxmt
+                && vm.isInstalled(runtime.id)
+        }
     }
 
     var body: some View {
@@ -83,10 +87,10 @@ struct WineRuntimesSetupView: View {
                 Button("setup.done") {
                     showSetup = false
                 }
-                .disabled(preferredRuntimeId.map { !vm.isInstalled($0) } ?? false)
+                .disabled(!isSetupReady)
             }
         }
-        .frame(width: 520, height: 470)
+        .frame(width: 520, height: 430)
         .task {
             availableRuntimes = await WineRuntimes.refreshCatalog(forceRemote: false)
         }

@@ -132,8 +132,6 @@ struct BottleCreationView: View {
                 nameField
                 windowsPicker
                 runtimePicker
-                bottlePathPicker
-                Toggle("config.retinaMode", isOn: $initialRetinaMode)
                 regionPicker
                 executablePicker
                 Section {
@@ -155,6 +153,8 @@ struct BottleCreationView: View {
                     .buttonStyle(.plain)
 
                     if otherSettingsExpanded {
+                        bottlePathPicker
+                        Toggle("config.retinaMode", isOn: $initialRetinaMode)
                         proxySettings
                         resolutionSettings
                         gameSpecificToggles
