@@ -35,19 +35,26 @@ struct WineRuntimesSetupView: View {
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Toggle(
-                            "runtime.setup.download",
-                            isOn: Binding(
-                                get: { vm.isInstalled(runtime.id) || state.isBusy },
-                                set: { newValue in
-                                    if newValue {
-                                        vm.download(runtimeId: runtime.id)
-                                    }
-                                }
-                            )
-                        )
-                        .labelsHidden()
-                        .disabled(vm.isInstalled(runtime.id) || state.isBusy)
+
+                        if vm.isInstalled(runtime.id) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                                .imageScale(.medium)
+                        } else if state.isBusy {
+                            Button {
+                                vm.cancel(runtimeId: runtime.id)
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(.secondary)
+                                    .imageScale(.medium)
+                            }
+                            .buttonStyle(.plain)
+                            .help(String(localized: "button.cancel"))
+                        } else {
+                            Button("runtime.setup.download") {
+                                vm.download(runtimeId: runtime.id)
+                            }
+                        }
                     }
 
                     if state.isBusy {
@@ -82,9 +89,6 @@ struct WineRuntimesSetupView: View {
         .frame(width: 520, height: 470)
         .task {
             availableRuntimes = await WineRuntimes.refreshCatalog(forceRemote: false)
-            if let runtimeId = preferredRuntimeId, !vm.isInstalled(runtimeId) {
-                vm.download(runtimeId: runtimeId)
-            }
         }
         .onReceive(NotificationCenter.default.publisher(for: WineRuntimes.didUpdateNotification)) { _ in
             availableRuntimes = WineRuntimes.all

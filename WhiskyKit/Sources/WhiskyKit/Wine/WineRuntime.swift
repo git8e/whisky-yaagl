@@ -37,6 +37,7 @@ public struct WineRuntime: Identifiable, Hashable, Sendable, Codable {
     public var version: String
     public var revision: Int
     public var remoteURL: URL?
+    public var sha256: String?
     public var renderBackend: RenderBackend?
     public var archive: ArchiveLayout
     public var recommended: Bool
@@ -48,6 +49,7 @@ public struct WineRuntime: Identifiable, Hashable, Sendable, Codable {
         version: String,
         revision: Int,
         remoteURL: URL?,
+        sha256: String? = nil,
         renderBackend: RenderBackend? = nil,
         archive: ArchiveLayout,
         recommended: Bool = false
@@ -58,6 +60,7 @@ public struct WineRuntime: Identifiable, Hashable, Sendable, Codable {
         self.version = version
         self.revision = revision
         self.remoteURL = remoteURL
+        self.sha256 = sha256
         self.renderBackend = renderBackend
         self.archive = archive
         self.recommended = recommended
@@ -74,7 +77,7 @@ public enum WineRuntimes {
     public static let didUpdateNotification = Notification.Name("WineRuntimesDidUpdate")
 
     private static let lock = NSLock()
-    private static let manifestURL = URL(string: "https://raw.githubusercontent.com/git8e/whisky-yaagl/main/wine-runtimes.json")!
+    private static let manifestURL = URL(string: "https://raw.githubusercontent.com/git8e/whisky-yaagl/master/wine-runtimes.json")!
     private static let allowedManifestHosts: Set<String> = ["raw.githubusercontent.com"]
     private static let allowedRuntimeDownloadHosts: Set<String> = [
         "github.com",

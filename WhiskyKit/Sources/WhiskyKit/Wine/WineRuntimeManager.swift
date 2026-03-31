@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import CryptoKit
 
 public enum WineRuntimeManager {
     private static var fm: FileManager { FileManager.default }
@@ -138,11 +139,23 @@ public enum WineRuntimeManager {
             }
 
             status?("Downloading WhiskyWine")
-            let archive = try await downloadOnce(
+            var archive = try await downloadOnce(
                 runtimeId: runtimeId,
                 url: remoteURL,
                 progress: progress
             )
+
+            do {
+                try await verifyArchiveIfNeeded(runtime: runtime, archiveURL: archive)
+            } catch let error as WineRuntimeManagerError {
+                if case .integrityCheckFailed = error {
+                    // Auto self-heal: delete and re-download once.
+                    archive = try await downloadOnce(runtimeId: runtimeId, url: remoteURL, progress: progress)
+                    try await verifyArchiveIfNeeded(runtime: runtime, archiveURL: archive)
+                } else {
+                    throw error
+                }
+            }
 
             status?("Installing WhiskyWine")
             let tempCopy = WhiskyWineInstaller.applicationFolder
@@ -184,7 +197,17 @@ public enum WineRuntimeManager {
         }
 
         status?("Downloading Wine runtime")
-        let archive = try await downloadOnce(runtimeId: runtimeId, url: remoteURL, progress: progress)
+        var archive = try await downloadOnce(runtimeId: runtimeId, url: remoteURL, progress: progress)
+        do {
+            try await verifyArchiveIfNeeded(runtime: runtime, archiveURL: archive)
+        } catch let error as WineRuntimeManagerError {
+            if case .integrityCheckFailed = error {
+                archive = try await downloadOnce(runtimeId: runtimeId, url: remoteURL, progress: progress)
+                try await verifyArchiveIfNeeded(runtime: runtime, archiveURL: archive)
+            } else {
+                throw error
+            }
+        }
         status?("Installing Wine runtime")
         try install(runtime: runtime, fromArchive: archive)
     }
@@ -210,8 +233,53 @@ public enum WineRuntimeManager {
             return destination
         }
 
-        try await RemoteDownloader.downloadOnce(url: url, destination: destination, progress: progress)
+        do {
+            try await RemoteDownloader.downloadOnce(url: url, destination: destination, progress: progress)
+        } catch let error as RemoteDownloader.DownloadError {
+            if case .cancelled = error.kind {
+                throw CancellationError()
+            }
+            throw error
+        }
         return destination
+    }
+
+    private static func verifyArchiveIfNeeded(runtime: WineRuntime, archiveURL: URL) async throws {
+        guard let expected = runtime.sha256?.trimmingCharacters(in: .whitespacesAndNewlines), !expected.isEmpty else {
+            return
+        }
+
+        let normalizedExpected = expected.lowercased()
+
+        // Compute hash on a background thread.
+        let computed = try await Task.detached(priority: .utility) {
+            try computeSHA256(url: archiveURL)
+        }.value
+        try Task.checkCancellation()
+
+        if computed.lowercased() == normalizedExpected {
+            return
+        }
+
+        // Corrupted / partial download: delete and re-download.
+        try? fm.removeItem(at: archiveURL)
+        throw WineRuntimeManagerError.integrityCheckFailed
+    }
+
+    private static func computeSHA256(url: URL) throws -> String {
+        let handle = try FileHandle(forReadingFrom: url)
+        defer { try? handle.close() }
+
+        var hasher = SHA256()
+        while true {
+            let data = try handle.read(upToCount: 1024 * 1024) ?? Data()
+            if data.isEmpty {
+                break
+            }
+            hasher.update(data: data)
+        }
+        let digest = hasher.finalize()
+        return digest.map { String(format: "%02x", $0) }.joined()
     }
 
     private static func install(runtime: WineRuntime, fromArchive archiveURL: URL) throws {
@@ -301,6 +369,7 @@ public enum WineRuntimeManagerError: LocalizedError {
     case unknownRuntime(String)
     case missingRemoteURL(String)
     case invalidArchive(String)
+    case integrityCheckFailed
 
     public var errorDescription: String? {
         switch self {
@@ -312,6 +381,8 @@ public enum WineRuntimeManagerError: LocalizedError {
             return String(format: String(localized: "runtime.error.missingRemoteURL"), id)
         case .invalidArchive(let message):
             return String(format: String(localized: "runtime.error.invalidArchive"), message)
+        case .integrityCheckFailed:
+            return String(localized: "runtime.error.integrityFailed")
         }
     }
 }

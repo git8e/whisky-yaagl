@@ -9,6 +9,7 @@
       "displayName": "Wine 11.4 DXMT (signed)",
       "version": "11.4",
       "revision": 1,
+      "sha256": "b0ff5bb641e826b3c1d496ec2bb1e72422554d71c16a862c5e3f039ec7db13aa",
       "remoteURL": "https://github.com/dawn-winery/dawn-signed/releases/download/wine-gcenx-11.4-osx64/wine-devel-11.4-osx64-signed.tar.xz",
       "renderBackend": "dxmt",
       "archive": {
@@ -22,6 +23,7 @@
       "displayName": "Wine 11.0 DXMT (signed)",
       "version": "11.0",
       "revision": 1,
+      "sha256": "f83ceec5a31aa9df104eccc4ee555f8059a84b1b2ec75d8d5bf02e7c83f4889e",
       "remoteURL": "https://github.com/dawn-winery/dawn-signed/releases/download/wine-stable-gcenx-11.0-osx64/wine-stable-11.0-osx64-signed.tar.xz",
       "renderBackend": "dxmt",
       "archive": {
@@ -35,6 +37,7 @@
       "displayName": "Wine 10.18 DXMT Experimental",
       "version": "10.18",
       "revision": 1,
+      "sha256": "d38348f90d1e618eebe51a5fb6d08b7a5770563c63066f25a23d3219a1c998e1",
       "remoteURL": "https://github.com/Gcenx/macOS_Wine_builds/releases/download/10.18/wine-devel-10.18-osx64.tar.xz",
       "renderBackend": "dxmt",
       "archive": {
@@ -48,6 +51,7 @@
       "displayName": "Wine 9.9 DXMT",
       "version": "9.9",
       "revision": 1,
+      "sha256": "615ca4cedfc5cbf3d5e32595f5c7db09bb46d19a6b6f64b3d9ed9a51db488302",
       "remoteURL": "https://github.com/3Shain/wine/releases/download/v9.9-mingw/wine.tar.gz",
       "renderBackend": "dxmt",
       "archive": {
@@ -61,6 +65,7 @@
       "displayName": "WhiskyWine",
       "version": "7.7.0",
       "revision": 1,
+      "sha256": "3283b80fb7ec7b105529a9a3fcd2628685e2c7ea6492536f123e758f79c4c077",
       "remoteURL": "https://data.getwhisky.app/Wine/Libraries.tar.gz",
       "renderBackend": null,
       "archive": {
