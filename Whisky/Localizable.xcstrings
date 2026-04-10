@@ -145,6 +145,18 @@
             "value" : "Please try again. If the error keeps happening, try using a VPN."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "もう一度お試しください。エラーが続く場合は VPN を使用してみてください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도해 주세요. 오류가 계속되면 VPN을 사용해 보세요."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -847,6 +859,18 @@
             "value" : "Duplicate"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複製"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복제"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1003,6 +1027,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ Copy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ のコピー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 복사본"
           }
         },
         "zh-Hans" : {
@@ -3260,8 +3296,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Advertise AVX Support"
+            "state" : "translated",
+            "value" : "AVX 지원 표시"
           }
         },
         "nl" : {
@@ -3321,13 +3357,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "查看 AVX 支持"
+            "value" : "宣告 AVX 支持"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Advertise AVX Support"
+            "state" : "translated",
+            "value" : "宣告 AVX 支援"
           }
         }
       }
@@ -3396,8 +3432,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "May negatively impact performance"
+            "state" : "translated",
+            "value" : "성능에 부정적인 영향을 줄 수 있습니다"
           }
         },
         "nl" : {
@@ -3462,8 +3498,8 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "May negatively impact performance"
+            "state" : "translated",
+            "value" : "可能會對效能造成負面影響"
           }
         }
       }
@@ -3941,8 +3977,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "DirectX Raytracing"
+            "state" : "translated",
+            "value" : "DirectX 레이 트레이싱"
           }
         },
         "nl" : {
@@ -4007,8 +4043,8 @@
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "DirectX Raytracing"
+            "state" : "translated",
+            "value" : "DirectX 光線追蹤"
           }
         }
       }
@@ -4078,8 +4114,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enables raytracing support in DirectX 12 titles "
+            "state" : "translated",
+            "value" : "DirectX 12 타이틀에서 레이 트레이싱 지원을 활성화합니다"
           }
         },
         "nl" : {
@@ -4139,13 +4175,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在DirectX 12 游戏中启用光线追踪 "
+            "value" : "在 DirectX 12 游戏中启用光线追踪"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enables raytracing support in DirectX 12 titles "
+            "state" : "translated",
+            "value" : "在 DirectX 12 遊戲中啟用光線追蹤"
           }
         }
       }
@@ -15312,6 +15348,18 @@
             "value" : "Download"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15332,6 +15380,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select any runtimes to download. Wine 11.4 DXMT is recommended."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロードするランタイムを選択してください。Wine 11.4 DXMT を推奨します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드할 런타임을 선택하세요. Wine 11.4 DXMT를 권장합니다."
           }
         },
         "zh-Hans" : {
@@ -15356,6 +15416,18 @@
             "value" : "Wine Runtimes"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine ランタイム"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 런타임"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15376,6 +15448,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invalid Wine archive: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無効な Wine アーカイブ: %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잘못된 Wine 아카이브: %@"
           }
         },
         "zh-Hans" : {
@@ -15400,6 +15484,18 @@
             "value" : "Wine runtime has no download URL: %@"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine ランタイムにダウンロード URL がありません: %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 런타임에 다운로드 URL이 없습니다: %@"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15420,6 +15516,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unknown Wine runtime: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不明な Wine ランタイム: %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "알 수 없는 Wine 런타임: %@"
           }
         },
         "zh-Hans" : {
@@ -15444,6 +15552,18 @@
             "value" : "WhiskyWine is not installed. Please complete the setup first."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhiskyWine がインストールされていません。先にセットアップを完了してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhiskyWine이 설치되어 있지 않습니다. 먼저 설정을 완료해 주세요."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15464,6 +15584,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Downloading WhiskyWine"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhiskyWine をダウンロード中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhiskyWine 다운로드 중"
           }
         },
         "zh-Hans" : {
@@ -15488,6 +15620,18 @@
             "value" : "Installing WhiskyWine"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhiskyWine をインストール中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WhiskyWine 설치 중"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15508,6 +15652,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Downloading Wine runtime"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine ランタイムをダウンロード中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 런타임 다운로드 중"
           }
         },
         "zh-Hans" : {
@@ -15532,6 +15688,18 @@
             "value" : "Installing Wine runtime"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine ランタイムをインストール中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 런타임 설치 중"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15552,6 +15720,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Installing Wine from local archive"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルアーカイブから Wine をインストール中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로컬 아카이브에서 Wine 설치 중"
           }
         },
         "zh-Hans" : {
@@ -15576,6 +15756,18 @@
             "value" : "Failed"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失敗"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "실패"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15596,6 +15788,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Installed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インストール済み"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설치됨"
           }
         },
         "zh-Hans" : {
@@ -15620,6 +15824,18 @@
             "value" : "Not Installed"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未インストール"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미설치"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15640,6 +15856,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Preparing isolated Wine runtime"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分離された Wine ランタイムを準備中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "격리된 Wine 런타임 준비 중"
           }
         },
         "zh-Hans" : {
@@ -15664,6 +15892,18 @@
             "value" : "Starting"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작 중"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15684,6 +15924,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancelled"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセルしました"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소됨"
           }
         },
         "zh-Hans" : {
@@ -15708,6 +15960,18 @@
             "value" : "Downloaded file verification failed."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロードしたファイルの検証に失敗しました。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드한 파일 검증에 실패했습니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15728,6 +15992,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No internet connection."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インターネット接続がありません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인터넷 연결이 없습니다."
           }
         },
         "zh-Hans" : {
@@ -15752,6 +16028,18 @@
             "value" : "Download timed out. Please try again later."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロードがタイムアウトしました。後でもう一度お試しください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드 시간이 초과되었습니다. 나중에 다시 시도해 주세요."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15772,6 +16060,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Network name lookup failed."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ネットワーク名の解決に失敗しました。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "네트워크 이름 조회에 실패했습니다."
           }
         },
         "zh-Hans" : {
@@ -15796,6 +16096,18 @@
             "value" : "Network error while downloading."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロード中にネットワークエラーが発生しました。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드 중 네트워크 오류가 발생했습니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15816,6 +16128,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not enough free disk space."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ディスクの空き容量が不足しています。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "디스크 여유 공간이 부족합니다."
           }
         },
         "zh-Hans" : {
@@ -15840,6 +16164,18 @@
             "value" : "Download source is unavailable."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロード元が利用できません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드 소스를 사용할 수 없습니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15860,6 +16196,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The download source is temporarily unavailable."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロード元が一時的に利用できません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드 소스를 일시적으로 사용할 수 없습니다."
           }
         },
         "zh-Hans" : {
@@ -15884,6 +16232,18 @@
             "value" : "Download cancelled."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロードをキャンセルしました。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드가 취소되었습니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15906,6 +16266,18 @@
             "value" : "Something went wrong while downloading."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロード中に問題が発生しました。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드 중 문제가 발생했습니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15926,6 +16298,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
           }
         },
         "zh-Hans" : {
@@ -21533,6 +21917,18 @@
             "value" : "Open Latest Log"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新のログを開く"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최신 로그 열기"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21553,6 +21949,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Logs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログを開く"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그 열기"
           }
         },
         "zh-Hans" : {
@@ -21577,6 +21985,18 @@
             "value" : "Create Bottle Failed"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottle の作成に失敗"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottle 생성 실패"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21597,6 +22017,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unknown error"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不明なエラー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "알 수 없는 오류"
           }
         },
         "zh-Hans" : {
@@ -21621,6 +22053,18 @@
             "value" : "Advanced Settings"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "고급 설정"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21641,6 +22085,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Creating"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "作成中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "생성 중"
           }
         },
         "zh-Hans" : {
@@ -21665,6 +22121,18 @@
             "value" : "Importing certificates"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "証明書をインポート中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인증서 가져오는 중"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21685,6 +22153,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Certificate import failed (ignored): %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "証明書のインポートに失敗しました（無視）: %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인증서 가져오기에 실패했습니다(무시됨): %@"
           }
         },
         "zh-Hans" : {
@@ -21709,6 +22189,18 @@
             "value" : "Creating bottle directory"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottle ディレクトリを作成中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottle 디렉터리 만드는 중"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21729,6 +22221,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失敗"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "실패"
           }
         },
         "zh-Hans" : {
@@ -21753,6 +22257,18 @@
             "value" : "Finalizing"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最終処理中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마무리 중"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21773,6 +22289,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Applying HK4e settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e 設定を適用中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e 설정 적용 중"
           }
         },
         "zh-Hans" : {
@@ -21797,6 +22325,18 @@
             "value" : "Initializing Wine prefix"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine プレフィックスを初期化中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 프리픽스 초기화 중"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21817,6 +22357,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Preparing bottle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottle を準備中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottle 준비 중"
           }
         },
         "zh-Hans" : {
@@ -21841,6 +22393,18 @@
             "value" : "Setting Windows version"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Windows バージョンを設定中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Windows 버전 설정 중"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21861,6 +22425,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Running wineboot"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wineboot を実行中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wineboot 실행 중"
           }
         },
         "zh-Hans" : {
@@ -22021,6 +22597,18 @@
             "value" : "Custom Resolution"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタム解像度"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용자 지정 해상도"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22041,6 +22629,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Launch behavior follows YAAGL hk4eos: SteamPatch and DXMT are handled automatically, while persistent HK4e settings are only rewritten when changed."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "起動動作は YAAGL hk4eos に準拠します。SteamPatch と DXMT は自動処理され、永続的な HK4e 設定は変更があった場合のみ書き換えられます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "실행 동작은 YAAGL hk4eos를 따릅니다. SteamPatch와 DXMT는 자동으로 처리되며, 영구 HK4e 설정은 변경된 경우에만 다시 기록됩니다."
           }
         },
         "zh-Hans" : {
@@ -22065,6 +22665,18 @@
             "value" : "Enable HDR"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HDR を有効にする"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HDR 사용"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22085,6 +22697,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Game Executable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲーム実行ファイル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임 실행 파일"
           }
         },
         "zh-Hans" : {
@@ -22109,6 +22733,18 @@
             "value" : "Game Executable (Optional)"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲーム実行ファイル（任意）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임 실행 파일(선택)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22129,6 +22765,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Height"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高さ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "높이"
           }
         },
         "zh-Hans" : {
@@ -22153,6 +22801,18 @@
             "value" : "Map Left Command to Ctrl"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "左 Command を Ctrl に割り当て"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "왼쪽 Command를 Ctrl로 매핑"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22175,6 +22835,18 @@
             "value" : "Not Selected"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택되지 않음"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22192,6 +22864,18 @@
     "hk4e.section" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e"
+          }
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "HK4e"
@@ -22219,6 +22903,18 @@
             "value" : "Region"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リージョン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지역"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22239,6 +22935,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Genshin Impact (hk4eos)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原神 (hk4eos)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원신 (hk4eos)"
           }
         },
         "zh-Hans" : {
@@ -22263,6 +22971,18 @@
             "value" : "原神 (hk4ecn)"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原神 (hk4ecn)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원신 (hk4ecn)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22283,6 +23003,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Star Rail (hkrpgos)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "崩壊：スターレイル (hkrpgos)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "붕괴: 스타레일 (hkrpgos)"
           }
         },
         "zh-Hans" : {
@@ -22307,6 +23039,18 @@
             "value" : "星穹铁道 (hkrpgcn)"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "崩壊：スターレイル (hkrpgcn)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "붕괴: 스타레일 (hkrpgcn)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22324,6 +23068,18 @@
     "hk4e.steamPatch" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SteamPatch"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SteamPatch"
+          }
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "SteamPatch"
@@ -22351,6 +23107,18 @@
             "value" : "Launch Fix(test)"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "起動修正（テスト）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "실행 수정(테스트)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22371,6 +23139,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Launch Fix(test)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "起動修正（テスト）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "실행 수정(테스트)"
           }
         },
         "zh-Hans" : {
@@ -22395,6 +23175,18 @@
             "value" : "Launch Fix(test)"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "起動修正（テスト）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "실행 수정(테스트)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22415,6 +23207,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DXMT Injection"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DXMT インジェクション"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DXMT 인젝션"
           }
         },
         "zh-Hans" : {
@@ -22439,6 +23243,18 @@
             "value" : "Task Manager"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タスクマネージャー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "작업 관리자"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22459,6 +23275,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apply"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "適用"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "적용"
           }
         },
         "zh-Hans" : {
@@ -22483,6 +23311,18 @@
             "value" : "Enable Proxy"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プロキシを有効にする"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프록시 사용"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22503,6 +23343,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Proxy Server"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プロキシサーバー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프록시 서버"
           }
         },
         "zh-Hans" : {
@@ -22527,6 +23379,18 @@
             "value" : "Proxy Host"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プロキシホスト"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프록시 호스트"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22547,6 +23411,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Port"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポート"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "포트"
           }
         },
         "zh-Hans" : {
@@ -22571,6 +23447,18 @@
             "value" : "Applying proxy settings"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プロキシ設定を適用中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프록시 설정 적용 중"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22591,6 +23479,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The target file cannot be found. If the game is installed on an external disk, please reconnect it and try again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "対象ファイルが見つかりません。ゲームが外付けディスクにインストールされている場合は、再接続してからもう一度お試しください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "대상 파일을 찾을 수 없습니다. 게임이 외장 디스크에 설치되어 있다면 다시 연결한 뒤 재시도해 주세요."
           }
         },
         "zh-Hans" : {
@@ -22615,6 +23515,18 @@
             "value" : "Width"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "幅"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "너비"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22635,6 +23547,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Custom Resolution"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタム解像度"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용자 지정 해상도"
           }
         },
         "zh-Hans" : {
@@ -22659,6 +23583,18 @@
             "value" : "Fix WebView"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WebView を修正"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WebView 수정"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22679,6 +23615,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Game Executable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲーム実行ファイル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임 실행 파일"
           }
         },
         "zh-Hans" : {
@@ -22703,6 +23651,18 @@
             "value" : "Game Executable (Optional)"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲーム実行ファイル（任意）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임 실행 파일(선택)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22723,6 +23683,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Game Executable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲーム実行ファイル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임 실행 파일"
           }
         },
         "zh-Hans" : {
@@ -22747,6 +23719,18 @@
             "value" : "Game Executable (Optional)"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲーム実行ファイル（任意）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임 실행 파일(선택)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22767,6 +23751,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not Selected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택되지 않음"
           }
         },
         "zh-Hans" : {
@@ -24423,6 +25419,18 @@
             "value" : "Height"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高さ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "높이"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24443,6 +25451,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not Selected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택되지 않음"
           }
         },
         "zh-Hans" : {
@@ -24467,6 +25487,18 @@
             "value" : "Region"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リージョン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지역"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24487,6 +25519,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ZZZ China (napcn)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゼンレスゾーンゼロ（中国）(napcn)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "젠레스 존 제로 중국 (napcn)"
           }
         },
         "zh-Hans" : {
@@ -24511,6 +25555,18 @@
             "value" : "Zenless Zone Zero (napos)"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゼンレスゾーンゼロ (napos)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "젠레스 존 제로 (napos)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24528,6 +25584,18 @@
     "nap.section" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAP"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAP"
+          }
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "NAP"
@@ -24555,6 +25623,18 @@
             "value" : "Width"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "幅"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "너비"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24575,6 +25655,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Game"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲーム"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임"
           }
         },
         "zh-Hans" : {
@@ -24599,6 +25691,18 @@
             "value" : "Game / Region"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲーム / リージョン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임 / 지역"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24619,6 +25723,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Genshin (HK4e)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原神 (HK4e)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원신 (HK4e)"
           }
         },
         "zh-Hans" : {
@@ -24643,6 +25759,18 @@
             "value" : "ZZZ (NAP)"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゼンレスゾーンゼロ (NAP)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "젠레스 존 제로 (NAP)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24660,6 +25788,18 @@
     "config.wineRuntime" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine"
+          }
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wine"
@@ -24823,6 +25963,18 @@
             "value" : "Open Releases"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リリースページを開く"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "릴리스 페이지 열기"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24843,6 +25995,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Language"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "言語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "언어"
           }
         },
         "zh-Hans" : {
@@ -24867,6 +26031,18 @@
             "value" : "Language changes take effect after restarting the app."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "言語の変更はアプリの再起動後に反映されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "언어 변경은 앱을 재시작한 뒤 적용됩니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24887,6 +26063,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Latest release"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新リリース"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최신 릴리스"
           }
         },
         "zh-Hans" : {
@@ -24911,6 +26099,18 @@
             "value" : "Version %@ is available. You are currently using %@."
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン %@ が利用可能です。現在は %@ を使用しています。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버전 %@을(를) 사용할 수 있습니다. 현재 %@을(를) 사용 중입니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24931,6 +26131,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Update Available"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップデートがあります"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "업데이트 사용 가능"
           }
         },
         "zh-Hans" : {
@@ -24955,6 +26167,18 @@
             "value" : "Unable to Check for Updates"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップデートを確認できません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "업데이트를 확인할 수 없습니다"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -24975,6 +26199,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You are already using the latest version."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すでに最新バージョンを使用しています。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미 최신 버전을 사용 중입니다."
           }
         },
         "zh-Hans" : {
@@ -24999,6 +26235,18 @@
             "value" : "Up to Date"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新です"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최신 상태"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -25019,6 +26267,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Setup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セットアップを開く"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정 마법사 열기"
           }
         },
         "zh-Hans" : {
@@ -25043,6 +26303,18 @@
             "value" : "Automatically check for Wine updates"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine の更新を自動的に確認する"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 업데이트를 자동으로 확인"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -25065,6 +26337,18 @@
             "value" : "The following installed Wine runtimes have updates available:\n%@"
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以下のインストール済み Wine ランタイムに更新があります:\n%@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음 설치된 Wine 런타임에 업데이트가 있습니다:\n%@"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -25085,6 +26369,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wine Updates Available"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine の更新があります"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wine 업데이트가 있습니다"
           }
         },
         "zh-Hans" : {
