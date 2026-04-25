@@ -62,9 +62,9 @@ public enum HK4eAssetsError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .runtimeMissing:
-            return "HK4e runtime not found. Set HK4E_RUNTIME_ROOT or bundle Resources/HK4eRuntime."
+            return String(localized: "error.hk4e.runtimeMissing")
         case .protonExtrasMissing:
-            return "HK4e runtime missing protonextras (expected protonextras/ or sidecar/protonextras/)."
+            return String(localized: "error.hk4e.protonExtrasMissing")
         }
     }
 }

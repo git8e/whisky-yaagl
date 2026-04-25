@@ -102,9 +102,9 @@ public enum HKRPGJadeiteError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .extractFailed:
-            return "Failed to extract Jadeite zip"
+            return String(localized: "error.extractJadeiteZip")
         case .jadeiteNotFound:
-            return "jadeite.exe not found in extracted archive"
+            return String(localized: "error.jadeiteNotFound")
         }
     }
 }

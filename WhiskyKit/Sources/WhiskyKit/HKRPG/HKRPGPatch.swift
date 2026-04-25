@@ -246,7 +246,7 @@ public enum HKRPGPatchError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .gameExited(let code):
-            return "Game exited with code \(code)"
+            return String(format: String(localized: "error.gameExitedWithCode"), code)
         }
     }
 }

@@ -267,11 +267,11 @@ public enum HK4eProtonExtrasError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .noSidecarAsset:
-            return "Cannot find a YAAGL app tarball asset containing sidecar/protonextras."
+            return String(localized: "error.hk4e.protonExtras.sidecarMissing")
         case .missingContentLength:
-            return "Missing Content-Length while downloading protonextras."
+            return String(localized: "error.hk4e.protonExtras.missingContentLength")
         case .installFailed:
-            return "Failed to install protonextras."
+            return String(localized: "error.hk4e.protonExtras.installFailed")
         }
     }
 }

@@ -138,7 +138,11 @@ public enum HK4eResolutionError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .invalidSize(let width, let height):
-            return "Invalid resolution: \(width)x\(height)"
+            return String(
+                format: String(localized: "error.invalidResolution"),
+                width,
+                height
+            )
         case .registryWriteFailed(let message):
             return message
         }

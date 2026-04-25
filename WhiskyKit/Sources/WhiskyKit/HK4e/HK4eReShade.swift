@@ -123,7 +123,7 @@ public enum HK4eReShadeError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .zipSignatureNotFound:
-            return "Failed to locate embedded zip inside ReShade setup"
+            return String(localized: "error.hk4e.reshade.zipSignatureNotFound")
         }
     }
 }

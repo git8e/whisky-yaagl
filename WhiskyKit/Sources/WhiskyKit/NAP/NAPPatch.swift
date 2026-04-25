@@ -182,7 +182,7 @@ public enum NAPPatchError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .gameExited(let code):
-            return "Game process exited with code \(code)"
+            return String(format: String(localized: "error.gameProcessExitedWithCode"), code)
         }
     }
 }

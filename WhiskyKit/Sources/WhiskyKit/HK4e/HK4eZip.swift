@@ -24,7 +24,7 @@ public enum HK4eZipError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .extractFailed:
-            return "Failed to extract zip"
+            return String(localized: "error.extractZip")
         }
     }
 }

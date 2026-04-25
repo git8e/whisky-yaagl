@@ -112,11 +112,11 @@ public enum HK4eWineCertificatesError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .certNotFound:
-            return "Failed to fetch YAAGL WINE_INF_CERT_STR"
+            return String(localized: "error.hk4e.certificates.certNotFound")
         case .wineInfMissing(let path):
-            return "wine.inf not found: \(path)"
+            return String(format: String(localized: "error.hk4e.certificates.wineInfMissing"), path)
         case .httpError(let code, let url):
-            return "Failed to download certificate payload (HTTP \(code)): \(url)"
+            return String(format: String(localized: "error.hk4e.certificates.httpError"), code, url)
         }
     }
 }
