@@ -1,4 +1,8 @@
 blank_issues_enabled: false
-- name: Discord Support
-    url: https://discord.gg/K4AQukwAke
-    about: Please ask for support first to confirm the issue before submitting a report.
+contact_links:
+  - name: Read the setup guide
+    url: https://github.com/git8e/whisky-yaagl/blob/master/README.md
+    about: Check installation, log locations, and basic troubleshooting steps before opening an issue.
+  - name: 阅读中文说明
+    url: https://github.com/git8e/whisky-yaagl/blob/master/README.zh-CN.md
+    about: 如果你更习惯中文，可以先查看中文文档中的安装与排查说明。

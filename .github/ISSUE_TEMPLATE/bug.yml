@@ -1,57 +1,122 @@
 name: Bug Report
-description: Report a bug.
-type: "Bug"
+description: Report a launcher, bottle, runtime, update, or migration issue.
+title: "[Bug] "
+labels:
+  - bug
+type: Bug
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a report.
+
+        Please include logs and enough detail to reproduce the problem. For most issues, the latest log under `~/Library/Logs/whisky-yaagl/` is the fastest way to understand what went wrong.
+
   - type: textarea
     id: description
     attributes:
       label: Description
-      description: Please provide a description of the bug.
+      description: What is going wrong?
     validations:
       required: true
+  - type: dropdown
+    id: issue-category
+    attributes:
+      label: Issue category
+      options:
+        - Game does not launch
+        - Setup or Wine runtime install failed
+        - Bottle creation or bottle import failed
+        - Existing bottles disappeared after update or migration
+        - App update, rename, or data migration issue
+        - UI or other issue
+    validations:
+      required: true
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options:
+        - HK4e / Genshin Impact
+        - NAP / Zenless Zone Zero
+        - HKRPG / Honkai: Star Rail
+        - Other
+        - Not game-specific
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      description: You can find this in the app's About window.
+      placeholder: "e.g. 0.1.11 (12)"
+    validations:
+      required: true
+  - type: input
+    id: mac-version
+    attributes:
+      label: macOS version
+      placeholder: "e.g. macOS 15.4.1"
+    validations:
+      required: true
+  - type: input
+    id: install-source
+    attributes:
+      label: Install source
+      description: Where did this build come from?
+      placeholder: "e.g. Release zip / Actions artifact / built from source"
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Wine runtime
+      description: Include the runtime name shown in the app if relevant.
+      placeholder: "e.g. Wine 11.4 DXMT (signed)"
   - type: textarea
     id: reproduce
     attributes:
       label: Steps to reproduce
-      description: Please provide detailed step-by-step instructions on how to reproduce this issue.
+      description: Please provide detailed step-by-step instructions.
+      placeholder: |
+        1. Open the app
+        2. Select bottle ...
+        3. Click Launch
+        4. Observe the failure
     validations:
       required: true
   - type: textarea
     id: expected-behaviour
     attributes:
       label: Expected behaviour
-      description: Please provide a clear a detailed description of what you expected to happen.
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behaviour
+    attributes:
+      label: Actual behaviour
+      description: What actually happened instead?
     validations:
       required: true
   - type: textarea
     id: logs
     attributes:
       label: Logs
-      description: Please provide the logs from the launched Wine process. These can be found by pressing `CMD + L` in Whisky.
-      render: bash
+      description: Paste the relevant log output here. You can usually open logs with `Cmd + L` in the app. If you cannot provide logs, explain why.
+      render: shell
     validations:
       required: true
-  - type: dropdown
-    id: whisky-version
+  - type: textarea
+    id: extra-context
     attributes:
-      label: What version of Whisky are you using?
-      options:
-        - "2.3.2"
-        - "<2.3.2"
-    validations:
-      required: true
-  - type: dropdown
-    id: mac-version
-    attributes:
-      label: What version of macOS are you using?
-      options:
-        - "Sonoma (macOS 14)"
-    validations:
-      required: true
+      label: Extra context
+      description: Add anything else that may matter, such as bottle path, migration from old Whisky data, screenshots, or whether this started after upgrading.
   - type: checkboxes
     attributes:
-      label: Issue Language
-      description: All issues must be written in clear plain English so that all devs are able to read them.
+      label: Before submitting
       options:
+        - label: I searched existing issues first.
+          required: true
         - label: Yes my issue is written in English
           required: true
