@@ -37,6 +37,16 @@ public struct BottleData: Codable {
 
     static let currentVersion = SemanticVersion(1, 0, 0)
 
+    private static var legacyBottleRoots: [URL] {
+        [
+            WhiskyPaths.legacyContainersRoot,
+            WhiskyPaths.legacyApplicationSupportRoot,
+            WhiskyPaths.legacyBundleApplicationSupportRoot
+        ].map { root in
+            root.appending(path: "Bottles", directoryHint: .isDirectory)
+        }
+    }
+
     private var fileVersion: SemanticVersion
     public var paths: [URL] = [] {
         didSet {
@@ -115,10 +125,33 @@ public struct BottleData: Codable {
                 print("Invalid file version \(self.fileVersion)")
                 return false
             }
+
+            let migratedPaths = self.paths.map { path in
+                Self.migrateLegacyBottlePath(path) ?? path
+            }
+            if migratedPaths != self.paths {
+                self.paths = migratedPaths
+            }
+
             return true
         } catch {
             return false
         }
+    }
+
+    private static func migrateLegacyBottlePath(_ path: URL) -> URL? {
+        let pathString = path.path(percentEncoded: false)
+        let targetRoot = defaultBottleDir.path(percentEncoded: false)
+
+        for legacyRoot in legacyBottleRoots {
+            let legacyRootString = legacyRoot.path(percentEncoded: false)
+            guard pathString == legacyRootString || pathString.hasPrefix(legacyRootString + "/") else { continue }
+
+            let migratedPath = pathString.replacingOccurrences(of: legacyRootString, with: targetRoot)
+            return URL(filePath: migratedPath, directoryHint: .isDirectory)
+        }
+
+        return nil
     }
 
     @discardableResult
