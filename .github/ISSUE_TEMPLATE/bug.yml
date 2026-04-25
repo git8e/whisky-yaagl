@@ -1,5 +1,5 @@
-name: Bug Report
-description: Report a launcher, bottle, runtime, update, or migration issue.
+name: Bug Report / Bug 反馈
+description: Report a launcher, bottle, runtime, update, or migration issue. / 提交启动器、容器、运行时、更新或迁移相关问题。
 title: "[Bug] "
 labels:
   - bug
@@ -10,74 +10,78 @@ body:
       value: |
         Thanks for filing a report.
 
+        感谢你提交 issue。
+
         Please include logs and enough detail to reproduce the problem. For most issues, the latest log under `~/Library/Logs/whisky-yaagl/` is the fastest way to understand what went wrong.
+
+        请尽量附上日志和可复现步骤。对大多数问题来说，`~/Library/Logs/whisky-yaagl/` 下最新的日志是最快的排查入口。
 
   - type: textarea
     id: description
     attributes:
-      label: Description
-      description: What is going wrong?
+      label: Description / 问题描述
+      description: What is going wrong? / 你遇到了什么问题？
     validations:
       required: true
   - type: dropdown
     id: issue-category
     attributes:
-      label: Issue category
+      label: Issue category / 问题类型
       options:
-        - Game does not launch
-        - Setup or Wine runtime install failed
-        - Bottle creation or bottle import failed
-        - Existing bottles disappeared after update or migration
-        - App update, rename, or data migration issue
-        - UI or other issue
+        - Game does not launch / 游戏无法启动
+        - Setup or Wine runtime install failed / 初始化或 Wine 运行时安装失败
+        - Bottle creation or bottle import failed / 容器创建或导入失败
+        - Existing bottles disappeared after update or migration / 更新或迁移后容器消失
+        - App update, rename, or data migration issue / 应用更新、改名或数据迁移问题
+        - UI or other issue / UI 或其他问题
     validations:
       required: true
   - type: dropdown
     id: game
     attributes:
-      label: Game
+      label: Game / 游戏
       options:
         - HK4e / Genshin Impact
         - NAP / Zenless Zone Zero
         - HKRPG / Honkai: Star Rail
-        - Other
-        - Not game-specific
+        - Other / 其他
+        - Not game-specific / 与具体游戏无关
     validations:
       required: true
   - type: input
     id: app-version
     attributes:
-      label: App version
-      description: You can find this in the app's About window.
+      label: App version / 应用版本
+      description: You can find this in the app's About window. / 可在应用的 About 窗口中查看。
       placeholder: "e.g. 0.1.11 (12)"
     validations:
       required: true
   - type: input
     id: mac-version
     attributes:
-      label: macOS version
+      label: macOS version / macOS 版本
       placeholder: "e.g. macOS 15.4.1"
     validations:
       required: true
   - type: input
     id: install-source
     attributes:
-      label: Install source
-      description: Where did this build come from?
+      label: Install source / 安装来源
+      description: Where did this build come from? / 这个版本来自哪里？
       placeholder: "e.g. Release zip / Actions artifact / built from source"
     validations:
       required: true
   - type: input
     id: runtime
     attributes:
-      label: Wine runtime
-      description: Include the runtime name shown in the app if relevant.
+      label: Wine runtime / Wine 运行时
+      description: Include the runtime name shown in the app if relevant. / 如果相关，请填写应用中显示的运行时名称。
       placeholder: "e.g. Wine 11.4 DXMT (signed)"
   - type: textarea
     id: reproduce
     attributes:
-      label: Steps to reproduce
-      description: Please provide detailed step-by-step instructions.
+      label: Steps to reproduce / 复现步骤
+      description: Please provide detailed step-by-step instructions. / 请尽量提供可复现的详细步骤。
       placeholder: |
         1. Open the app
         2. Select bottle ...
@@ -88,35 +92,35 @@ body:
   - type: textarea
     id: expected-behaviour
     attributes:
-      label: Expected behaviour
-      description: What did you expect to happen?
+      label: Expected behaviour / 预期结果
+      description: What did you expect to happen? / 你原本希望发生什么？
     validations:
       required: true
   - type: textarea
     id: actual-behaviour
     attributes:
-      label: Actual behaviour
-      description: What actually happened instead?
+      label: Actual behaviour / 实际结果
+      description: What actually happened instead? / 实际发生了什么？
     validations:
       required: true
   - type: textarea
     id: logs
     attributes:
-      label: Logs
-      description: Paste the relevant log output here. You can usually open logs with `Cmd + L` in the app. If you cannot provide logs, explain why.
+      label: Logs / 日志
+      description: Paste the relevant log output here. You can usually open logs with `Cmd + L` in the app. If you cannot provide logs, explain why. / 请粘贴相关日志。通常可在应用内按 `Cmd + L` 打开日志；如果无法提供，也请说明原因。
       render: shell
     validations:
       required: true
   - type: textarea
     id: extra-context
     attributes:
-      label: Extra context
-      description: Add anything else that may matter, such as bottle path, migration from old Whisky data, screenshots, or whether this started after upgrading.
+      label: Extra context / 补充信息
+      description: Add anything else that may matter, such as bottle path, migration from old Whisky data, screenshots, or whether this started after upgrading. / 补充任何可能有帮助的信息，例如容器路径、是否从旧 Whisky 数据迁移、截图，或是否在升级后开始出现。
   - type: checkboxes
     attributes:
-      label: Before submitting
+      label: Before submitting / 提交前确认
       options:
-        - label: I searched existing issues first.
+        - label: I searched existing issues first. / 我已经先搜索过现有 issue。
           required: true
-        - label: Yes my issue is written in English
+        - label: My issue is written in English, or is clear enough for maintainers to understand. / 我已尽量使用英文，或提供了足够清晰的信息供维护者理解。
           required: true

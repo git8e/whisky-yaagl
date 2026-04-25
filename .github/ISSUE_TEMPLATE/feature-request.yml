@@ -1,32 +1,61 @@
-name: Feature Request
-description: Request a new feature.
-type: "Enhancement"
+name: Feature Request / 功能建议
+description: Request a new feature. / 提交功能建议。
+title: "[Feature] "
+labels:
+  - enhancement
+type: Enhancement
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing an idea.
+
+        感谢你提出建议。
+
+        Please describe the actual problem you want to solve, not only the solution you have in mind.
+
+        请尽量先说明你想解决的实际问题，而不仅仅是你想到的实现方式。
+
   - type: textarea
     id: related-to-problem
     attributes:
-      label: Is your feature request related to a problem?
-      description: A clear and concise description of what the problem is.
+      label: Is your feature request related to a problem? / 这个建议是否与某个问题相关？
+      description: A clear and concise description of what the problem is. / 请简要说明你遇到的问题。
     validations:
       required: true
   - type: textarea
     id: solution
     attributes:
-      label: Describe the solution you'd like
-      description: A clear and concise description of what you're suggesting.
+      label: Describe the solution you'd like / 你希望的解决方案
+      description: A clear and concise description of what you're suggesting. / 请简要说明你的建议。
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area / 相关模块
+      options:
+        - Bottle creation / 容器创建
+        - Wine runtime management / Wine 运行时管理
+        - Game launch or patch workflow / 游戏启动或补丁流程
+        - Update or migration flow / 更新或迁移流程
+        - UI or UX / 界面或交互
+        - Documentation / 文档
+        - Other / 其他
     validations:
       required: true
   - type: textarea
     id: extra-info
     attributes:
-      label: Anything else?
-      description: Upload any relevant images, links, screenshots that might help realise your suggestion.
+      label: Anything else? / 其他补充
+      description: Upload any relevant images, links, screenshots that might help realise your suggestion. / 可补充截图、链接、参考项目或其他说明。
     validations:
       required: true
   - type: checkboxes
     attributes:
-      label: Issue Language
-      description: All issues must be written in clear plain English so that all devs are able to read them.
+      label: Before submitting / 提交前确认
       options:
-        - label: Yes my issue is written in English
+        - label: I searched existing issues first. / 我已经先搜索过现有 issue。
+          required: true
+        - label: My issue is written in English, or is clear enough for maintainers to understand. / 我已尽量使用英文，或提供了足够清晰的信息供维护者理解。
           required: true
