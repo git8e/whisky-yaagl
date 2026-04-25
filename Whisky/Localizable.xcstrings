@@ -26363,6 +26363,652 @@
         }
       }
     },
+    "error.extractJadeiteZip" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to extract Jadeite zip"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jadeite の zip を展開できませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jadeite zip 압축을 풀 수 없습니다"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法解压 Jadeite 压缩包"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法解壓 Jadeite 壓縮檔"
+          }
+        }
+      }
+    },
+    "error.extractZip" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to extract zip"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zip を展開できませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zip 압축을 풀 수 없습니다"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法解压压缩包"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法解壓壓縮檔"
+          }
+        }
+      }
+    },
+    "error.gameExitedWithCode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game exited with code %d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲームが終了コード %d で終了しました"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임이 종료 코드 %d와 함께 종료되었습니다"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "游戏以退出代码 %d 结束"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊戲以結束代碼 %d 結束"
+          }
+        }
+      }
+    },
+    "error.gameProcessExitedWithCode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game process exited with code %d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゲームプロセスが終了コード %d で終了しました"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게임 프로세스가 종료 코드 %d와 함께 종료되었습니다"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "游戏进程以退出代码 %d 结束"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遊戲行程以結束代碼 %d 結束"
+          }
+        }
+      }
+    },
+    "error.hk4e.protonExtrasMissing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e runtime is missing protonextras (expected protonextras/ or sidecar/protonextras/)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e ランタイムに protonextras がありません（protonextras/ または sidecar/protonextras/ を想定）。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e 런타임에 protonextras가 없습니다 (protonextras/ 또는 sidecar/protonextras/ 필요)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e 运行时缺少 protonextras（应包含 protonextras/ 或 sidecar/protonextras/）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e 執行環境缺少 protonextras（應包含 protonextras/ 或 sidecar/protonextras/）"
+          }
+        }
+      }
+    },
+    "error.hk4e.runtimeMissing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e runtime not found. Set HK4E_RUNTIME_ROOT or bundle Resources/HK4eRuntime."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e ランタイムが見つかりません。HK4E_RUNTIME_ROOT を設定するか、Resources/HK4eRuntime を同梱してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HK4e 런타임을 찾을 수 없습니다. HK4E_RUNTIME_ROOT를 설정하거나 Resources/HK4eRuntime을 포함하세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未找到 HK4e 运行时。请设置 HK4E_RUNTIME_ROOT，或打包 Resources/HK4eRuntime。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到 HK4e 執行環境。請設定 HK4E_RUNTIME_ROOT，或打包 Resources/HK4eRuntime。"
+          }
+        }
+      }
+    },
+    "error.invalidResolution" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid resolution: %dx%d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無効な解像度です: %dx%d"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잘못된 해상도입니다: %dx%d"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无效的分辨率：%dx%d"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無效的解析度：%dx%d"
+          }
+        }
+      }
+    },
+    "error.jadeiteNotFound" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "jadeite.exe was not found in the extracted archive"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "展開したアーカイブ内に jadeite.exe が見つかりませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "압축 해제된 아카이브에서 jadeite.exe를 찾을 수 없습니다"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在解压后的归档中未找到 jadeite.exe"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在解壓後的封存檔中找不到 jadeite.exe"
+          }
+        }
+      }
+    },
+    "hoyoplay.error.missingInstallerURL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The HoYoPlay download URL is currently unavailable."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在 HoYoPlay のダウンロード URL を取得できません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "현재 HoYoPlay 다운로드 URL을 사용할 수 없습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前无法获取 HoYoPlay 下载地址。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前無法取得 HoYoPlay 下載網址。"
+          }
+        }
+      }
+    },
+    "hoyoplay.install.failed.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@\n\nPlease open the HoYoPlay website to download it manually, then use the Run button in the bottom-right corner of this bottle to install the downloaded installer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@\n\nHoYoPlay のサイトを開いて手動でダウンロードし、この bottle の右下にある Run ボタンでインストーラーを実行してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@\n\nHoYoPlay 웹사이트를 열어 수동으로 다운로드한 뒤, 이 bottle 오른쪽 아래의 Run 버튼으로 설치 파일을 실행해 주세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@\n\n请打开 HoYoPlay 官网手动下载安装包，然后使用该容器右下角的 Run 按钮运行安装。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@\n\n請開啟 HoYoPlay 官網手動下載安裝程式，然後使用該 bottle 右下角的 Run 按鈕執行安裝。"
+          }
+        }
+      }
+    },
+    "hoyoplay.install.failed.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to install HoYoPlay"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay をインストールできません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay를 설치할 수 없습니다"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法安装 HoYoPlay"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法安裝 HoYoPlay"
+          }
+        }
+      }
+    },
+    "hoyoplay.openWebsite" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open HoYoPlay Website"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay のサイトを開く"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay 웹사이트 열기"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开 HoYoPlay 官网"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 HoYoPlay 官網"
+          }
+        }
+      }
+    },
+    "error.hk4e.certificates.certNotFound" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to fetch YAAGL WINE_INF_CERT_STR"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YAAGL WINE_INF_CERT_STR の取得に失敗しました"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YAAGL WINE_INF_CERT_STR를 가져오지 못했습니다"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "获取 YAAGL WINE_INF_CERT_STR 失败"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取得 YAAGL WINE_INF_CERT_STR 失敗"
+          }
+        }
+      }
+    },
+    "error.hk4e.certificates.httpError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to download certificate payload (HTTP %d): %s"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "証明書データのダウンロードに失敗しました (HTTP %d): %s"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인증서 페이로드 다운로드에 실패했습니다 (HTTP %d): %s"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载证书数据失败（HTTP %d）：%s"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下載憑證資料失敗（HTTP %d）：%s"
+          }
+        }
+      }
+    },
+    "error.hk4e.certificates.wineInfMissing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wine.inf not found: %s"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wine.inf が見つかりません: %s"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wine.inf를 찾을 수 없습니다: %s"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未找到 wine.inf：%s"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到 wine.inf：%s"
+          }
+        }
+      }
+    },
+    "error.hk4e.protonExtras.installFailed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to install protonextras."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "protonextras のインストールに失敗しました。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "protonextras 설치에 실패했습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安装 protonextras 失败。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安裝 protonextras 失敗。"
+          }
+        }
+      }
+    },
+    "error.hk4e.protonExtras.missingContentLength" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Missing Content-Length while downloading protonextras."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "protonextras のダウンロード中に Content-Length がありませんでした。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "protonextras 다운로드 중 Content-Length가 누락되었습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 protonextras 时缺少 Content-Length。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下載 protonextras 時缺少 Content-Length。"
+          }
+        }
+      }
+    },
+    "error.hk4e.protonExtras.sidecarMissing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cannot find a YAAGL app tarball asset containing sidecar/protonextras."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sidecar/protonextras を含む YAAGL のアプリ tarball アセットが見つかりません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sidecar/protonextras를 포함한 YAAGL 앱 tarball 자산을 찾을 수 없습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到包含 sidecar/protonextras 的 YAAGL 应用 tarball 资源。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到包含 sidecar/protonextras 的 YAAGL 應用 tarball 資源。"
+          }
+        }
+      }
+    },
+    "error.hk4e.reshade.zipSignatureNotFound" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to locate embedded zip inside ReShade setup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ReShade セットアップ内の埋め込み zip を見つけられませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ReShade 설치 파일 내부의 내장 zip을 찾을 수 없습니다"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法在 ReShade 安装程序中找到内嵌 zip"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法在 ReShade 安裝程式中找到內嵌 zip"
+          }
+        }
+      }
+    },
     "wineUpdates.available.title" : {
       "localizations" : {
         "en" : {

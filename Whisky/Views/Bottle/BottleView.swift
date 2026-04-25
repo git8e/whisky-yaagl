@@ -31,6 +31,7 @@ struct BottleView: View {
     @State private var path = NavigationPath()
     @State private var programLoading: Bool = false
     @State private var showWinetricksSheet: Bool = false
+    @State private var hoYoPlayInfo: HoYoPlayContent? = LauncherContent.hoyoPlay
 
     private let gridLayout = [GridItem(.adaptive(minimum: 100, maximum: .infinity))]
 
@@ -42,6 +43,9 @@ struct BottleView: View {
                         PinView(
                             bottle: bottle, program: pinnedProgram.program, pin: pinnedProgram.pin, path: $path
                         )
+                    }
+                    if let hoYoPlayInfo, !hoYoPlayInfo.isInstalled(in: bottle) {
+                        HoYoPlayInstallPinView(bottle: bottle, info: hoYoPlayInfo)
                     }
                     PinAddView(bottle: bottle)
                 }
@@ -125,6 +129,10 @@ struct BottleView: View {
             }
             .onAppear {
                 bottle.refreshProgramsAndPinsFromDisk()
+            }
+            .task {
+                await LauncherContent.refreshIfNeeded()
+                hoYoPlayInfo = LauncherContent.hoyoPlay
             }
             .disabled(!bottle.isAvailable)
             .navigationTitle(bottle.settings.name)

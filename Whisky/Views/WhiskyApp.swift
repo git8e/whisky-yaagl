@@ -129,6 +129,7 @@ struct WhiskyApp: App {
                 .environmentObject(BottleVM.shared)
                 .task {
                     await WineRuntimes.refreshCatalogIfNeeded()
+                    await LauncherContent.refreshIfNeeded()
                     await AppUpdateChecker.shared.checkForUpdatesIfNeeded()
                     await WineUpdateChecker.shared.checkForUpdatesIfNeeded {
                         showSetup = true

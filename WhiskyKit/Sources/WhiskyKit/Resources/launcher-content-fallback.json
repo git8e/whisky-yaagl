@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-04-26T00:00:00Z",
+  "hoyoPlay": {
+    "displayName": "Install HoYoPlay",
+    "iconURL": "https://act-webstatic.hoyoverse.com/puzzle/hyp/pz_Bur_m6Btc7/resource/puzzle/2024/10/21/b9992eaa38d4b36641accee82ede7bd3_3188319471762169697.png",
+    "installerURL": "https://download-porter.hoyoverse.com/download-porter/2026/03/30/VYTpXlbWo8_1.14.2.345_1_0_hyp_hoyoverse_prod_202603021207_dJyiMLNi.exe",
+    "fallbackInstallerURL": "https://github.com/git8e/whisky-yaagl/releases/download/v0.1.11/hoyoplay-installer.exe",
+    "manualDownloadURL": "https://hoyoplay.hoyoverse.com/",
+    "detectionPaths": [
+      "drive_c/Program Files/HoYoPlay/launcher.exe",
+      "drive_c/Program Files (x86)/HoYoPlay/launcher.exe"
+    ]
+  }
+}
