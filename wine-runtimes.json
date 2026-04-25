@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-03-30T00:00:00Z",
+  "generatedAt": "2026-04-26T00:00:00Z",
   "defaultRuntimeId": "11.4-dxmt-signed",
   "runtimes": [
     {
@@ -39,6 +39,20 @@
       "revision": 1,
       "sha256": "d38348f90d1e618eebe51a5fb6d08b7a5770563c63066f25a23d3219a1c998e1",
       "remoteURL": "https://github.com/Gcenx/macOS_Wine_builds/releases/download/10.18/wine-devel-10.18-osx64.tar.xz",
+      "renderBackend": "dxmt",
+      "archive": {
+        "winePathInArchive": "Wine Devel.app/Contents/Resources/wine"
+      },
+      "recommended": false
+    },
+    {
+      "id": "11.7-dxmt",
+      "track": "unsigned-dxmt",
+      "displayName": "Wine 11.7 DXMT Experimental",
+      "version": "11.7",
+      "revision": 1,
+      "sha256": "12be8c6a12ac930caf40b67b579a7790d6ce7a79142d144cbb489c6e9b2660fe",
+      "remoteURL": "https://github.com/Gcenx/macOS_Wine_builds/releases/download/11.7/wine-devel-11.7-osx64.tar.xz",
       "renderBackend": "dxmt",
       "archive": {
         "winePathInArchive": "Wine Devel.app/Contents/Resources/wine"
