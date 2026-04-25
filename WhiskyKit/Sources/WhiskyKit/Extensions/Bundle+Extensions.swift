@@ -19,7 +19,27 @@
 import Foundation
 
 public extension Bundle {
+    static let legacyWhiskyBundleIdentifier = "com.isaacmarovitz.Whisky"
+
     static var whiskyBundleIdentifier: String {
         return Bundle.main.bundleIdentifier ?? "com.github.git8e.whisky-yaagl"
+    }
+
+    static func migrateLegacyDefaultsIfNeeded() {
+        let defaults = UserDefaults.standard
+        let currentDomainName = Bundle.main.bundleIdentifier ?? Bundle.whiskyBundleIdentifier
+
+        guard currentDomainName != legacyWhiskyBundleIdentifier,
+              let legacyDomain = defaults.persistentDomain(forName: legacyWhiskyBundleIdentifier),
+              !legacyDomain.isEmpty else {
+            return
+        }
+
+        let currentDomain = defaults.persistentDomain(forName: currentDomainName) ?? [:]
+        let mergedDomain = legacyDomain.merging(currentDomain) { _, current in current }
+
+        guard !NSDictionary(dictionary: mergedDomain).isEqual(to: currentDomain) else { return }
+
+        defaults.setPersistentDomain(mergedDomain, forName: currentDomainName)
     }
 }

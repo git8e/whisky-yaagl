@@ -118,6 +118,7 @@ struct WhiskyApp: App {
     @Environment(\.openURL) var openURL
 
     init() {
+        Bundle.migrateLegacyDefaultsIfNeeded()
         AppLanguage.applyStoredPreference()
     }
 
