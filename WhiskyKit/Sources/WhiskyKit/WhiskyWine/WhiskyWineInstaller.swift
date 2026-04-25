@@ -22,7 +22,6 @@ import SemanticVersion
 public class WhiskyWineInstaller {
     /// The Whisky application folder
     public static var applicationFolder: URL {
-        migrateLegacyLayoutIfNeeded()
         return WhiskyPaths.applicationSupportRoot
     }
 
@@ -34,32 +33,6 @@ public class WhiskyWineInstaller {
     /// URL to the installed `wine` `bin` directory
     public static var binFolder: URL {
         libraryFolder.appending(path: "Wine", directoryHint: .isDirectory).appending(path: "bin", directoryHint: .isDirectory)
-    }
-
-    private static func migrateLegacyLayoutIfNeeded() {
-        let fm = FileManager.default
-        let legacy = WhiskyPaths.legacyApplicationSupportRoot
-        let target = WhiskyPaths.applicationSupportRoot
-
-        guard fm.fileExists(atPath: legacy.path(percentEncoded: false)) else { return }
-        guard !fm.fileExists(atPath: target.path(percentEncoded: false)) else { return }
-
-        do {
-            try fm.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try fm.moveItem(at: legacy, to: target)
-        } catch {
-            // If move fails (different volumes/permissions), fall back to copy best-effort.
-            do {
-                try fm.createDirectory(at: target, withIntermediateDirectories: true)
-                let entries = try fm.contentsOfDirectory(at: legacy, includingPropertiesForKeys: nil)
-                for entry in entries {
-                    let dst = target.appendingPathComponent(entry.lastPathComponent, isDirectory: entry.hasDirectoryPath)
-                    try? FileCopy.copyItem(at: entry, to: dst, replacing: true)
-                }
-            } catch {
-                // ignore
-            }
-        }
     }
 
     public static func isWhiskyWineInstalled() -> Bool {

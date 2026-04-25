@@ -122,7 +122,7 @@ struct WhiskyApp: App {
     }
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup("whisky-yaagl") {
             ContentView(showSetup: $showSetup)
                 .frame(minWidth: ViewWidth.large, minHeight: 316)
                 .environmentObject(BottleVM.shared)

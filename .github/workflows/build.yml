@@ -46,17 +46,17 @@ jobs:
       - name: Package
         run: |
           set -euxo pipefail
-          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/Whisky.app"
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/whisky-yaagl.app"
           test -d "$APP"
 
           # Ad-hoc sign so macOS will run it after quarantine removal.
           /usr/bin/codesign --force --deep --sign - "$APP"
           /usr/bin/codesign --verify --deep --strict --verbose=2 "$APP"
 
-          ditto -c -k --sequesterRsrc --keepParent "$APP" "Whisky.app.zip"
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "whisky-yaagl.app.zip"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Whisky.app
-          path: Whisky.app.zip
+          name: whisky-yaagl.app
+          path: whisky-yaagl.app.zip

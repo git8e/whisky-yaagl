@@ -37,10 +37,10 @@
 
 ## 安装方式
 
-1. 优先从仓库的 `Releases` 下载最新的 `Whisky.app.zip`。
+1. 优先从仓库的 `Releases` 下载最新的 `whisky-yaagl.app.zip`。
 2. `Actions` 里的构建仅建议用于尝鲜和测试，可能不稳定。
 3. 用 `Finder` 双击解压。
-4. 将 `Whisky.app` 拖到 `/Applications`。
+4. 将 `whisky-yaagl.app` 拖到 `/Applications`。
 5. 从“应用程序”里打开；首次启动时会引导你下载 Wine 运行时，推荐默认使用 `Wine 11.4 DXMT (signed)`。
 6. 运行时下载后会缓存到本地；每个容器会基于所选运行时生成自己的独立 runtime。
 
@@ -51,7 +51,7 @@
 
 ## 快速上手
 
-1. 从仓库的 `Releases` 安装 `Whisky.app`（见“安装方式”）。
+1. 从仓库的 `Releases` 安装 `whisky-yaagl.app`（见“安装方式”）。
 2. 首次启动时下载 Wine 运行时（推荐：`Wine 11.4 DXMT (signed)`）。
 3. 选择好游戏可执行文件路径，并创建容器。
 4. 补丁配置建议先保持默认选项，不确定时不要随意改动。

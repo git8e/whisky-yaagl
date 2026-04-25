@@ -47,10 +47,10 @@ Use at your own risk.
 
 ## Installation
 
-1. Prefer downloading the latest `Whisky.app.zip` from `Releases`.
+1. Prefer downloading the latest `whisky-yaagl.app.zip` from `Releases`.
 2. `Actions` builds are mainly for preview/testing and may be unstable.
 3. Unzip it in `Finder`.
-4. Drag `Whisky.app` into `/Applications`.
+4. Drag `whisky-yaagl.app` into `/Applications`.
 5. Launch it from `Applications`; on first launch the app will guide you through downloading a Wine runtime (recommended: `Wine 11.4 DXMT (signed)`).
 6. Runtime downloads are cached locally, and each bottle builds its own isolated runtime from the selected base runtime.
 

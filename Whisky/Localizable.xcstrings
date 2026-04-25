@@ -14825,7 +14825,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Terminate Wine processes when Whisky closes"
+            "value" : "Terminate Wine processes when whisky-yaagl closes"
           }
         },
         "es" : {
@@ -14855,13 +14855,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky の終了時に Wine の全プロセスを停止する"
+            "value" : "whisky-yaagl の終了時に Wine の全プロセスを停止する"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky를 종료할 때 Wine 프로세스도 종료"
+            "value" : "whisky-yaagl을 종료할 때 Wine 프로세스도 종료"
           }
         },
         "nl" : {
@@ -14879,7 +14879,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Terminate Wine processes when Whisky closes"
+            "value" : "Terminate Wine processes when whisky-yaagl closes"
           }
         },
         "pt-PT" : {
@@ -14921,13 +14921,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "关闭 Whisky 时结束 Wine 进程"
+            "value" : "关闭 whisky-yaagl 时结束 Wine 进程"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky 關閉時終止 Wine 進程"
+            "value" : "whisky-yaagl 關閉時終止 Wine 進程"
           }
         }
       }
@@ -14961,7 +14961,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatically check for Whisky updates"
+            "value" : "Automatically check for whisky-yaagl updates"
           }
         },
         "es" : {
@@ -14991,13 +14991,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky のアップデートを自動的に確認する"
+            "value" : "whisky-yaagl のアップデートを自動的に確認する"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky 업데이트를 자동으로 확인"
+            "value" : "whisky-yaagl 업데이트를 자동으로 확인"
           }
         },
         "nl" : {
@@ -15015,7 +15015,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatically check for Whisky updates"
+            "value" : "Automatically check for whisky-yaagl updates"
           }
         },
         "pt-PT" : {
@@ -15057,13 +15057,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自动检查Whisky更新"
+            "value" : "自动检查 whisky-yaagl 更新"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自動檢查 Whisky 更新"
+            "value" : "自動檢查 whisky-yaagl 更新"
           }
         }
       }
@@ -17715,7 +17715,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Manage Whisky's required dependencies."
+            "value" : "Manage whisky-yaagl's required dependencies."
           }
         },
         "es" : {
@@ -17745,13 +17745,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky に必要な依存関係を管理します。"
+            "value" : "whisky-yaagl に必要な依存関係を管理します。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky의 필수 의존성 관리하기."
+            "value" : "whisky-yaagl의 필수 의존성을 관리합니다."
           }
         },
         "nl" : {
@@ -17811,13 +17811,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "管理 Whisky 所需依赖"
+            "value" : "管理 whisky-yaagl 所需依赖"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "管理Whisky需要的相依性套件"
+            "value" : "管理 whisky-yaagl 需要的相依性套件"
           }
         }
       }
@@ -18123,7 +18123,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Welcome to Whisky"
+            "value" : "Welcome to whisky-yaagl"
           }
         },
         "es" : {
@@ -18153,13 +18153,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky へようこそ"
+            "value" : "whisky-yaagl へようこそ"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky에 오신 것을 환영합니다"
+            "value" : "whisky-yaagl에 오신 것을 환영합니다"
           }
         },
         "nl" : {
@@ -18219,13 +18219,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "欢迎使用 Whisky"
+            "value" : "欢迎使用 whisky-yaagl"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "歡迎使用 Whisky"
+            "value" : "歡迎使用 whisky-yaagl"
           }
         }
       }
@@ -19483,7 +19483,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In some cases, Whisky wont't be able to function properly from a different folder"
+            "value" : "In some cases, whisky-yaagl won't be able to function properly from a different folder"
           }
         },
         "es" : {
@@ -19513,13 +19513,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "場合によっては、異なるフォルダから Whisky を適切に使用できない場合があります"
+            "value" : "場合によっては、異なるフォルダから whisky-yaagl を適切に使用できない場合があります"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "경우에 따라 다른 폴더에서는 Whisky가 제대로 동작하지 않을 수 있습니다."
+            "value" : "경우에 따라 다른 폴더에서는 whisky-yaagl이 제대로 동작하지 않을 수 있습니다."
           }
         },
         "nl" : {
@@ -19579,13 +19579,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在某些情况下，Whisky 可能无法在其他的文件夹中正常工作"
+            "value" : "在某些情况下，whisky-yaagl 可能无法在其他的文件夹中正常工作"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在某些情況下，Whisky 可能無法在不同的資料夾中正常運作"
+            "value" : "在某些情況下，whisky-yaagl 可能無法在不同的資料夾中正常運作"
           }
         }
       }
@@ -19619,7 +19619,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Would you like to move Whisky to your Applications folder?"
+            "value" : "Would you like to move whisky-yaagl to your Applications folder?"
           }
         },
         "es" : {
@@ -19649,13 +19649,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky を「アプリケーション」フォルダに移動しますか？"
+            "value" : "whisky-yaagl を「アプリケーション」フォルダに移動しますか？"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Whisky를 애플리케이션 폴더로 옮기시겠습니까?"
+            "value" : "whisky-yaagl을 애플리케이션 폴더로 옮기시겠습니까?"
           }
         },
         "nl" : {
@@ -19715,13 +19715,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "你想要将 Whisky 移动到你的应用程序文件夹吗？"
+            "value" : "你想要将 whisky-yaagl 移动到你的应用程序文件夹吗？"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "你希望將 Whisky 移動到你的應用程式資料夾嗎？"
+            "value" : "你希望將 whisky-yaagl 移動到你的應用程式資料夾嗎？"
           }
         }
       }
