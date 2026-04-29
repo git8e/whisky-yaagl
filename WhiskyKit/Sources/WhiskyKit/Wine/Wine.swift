@@ -123,7 +123,8 @@ public class Wine {
         for await _ in try Self.runWineProcess(
             name: url.lastPathComponent,
             args: ["start", "/unix", url.path(percentEncoded: false)] + args,
-            bottle: bottle, environment: environment
+            bottle: bottle, environment: environment,
+            directory: url.deletingLastPathComponent()
         ) { }
     }
 

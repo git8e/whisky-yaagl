@@ -32,6 +32,7 @@ struct BottleView: View {
     @State private var programLoading: Bool = false
     @State private var showWinetricksSheet: Bool = false
     @State private var hoYoPlayInfo: HoYoPlayContent? = LauncherContent.hoyoPlay
+    @State private var hoYoPlayInstalled = false
 
     private let gridLayout = [GridItem(.adaptive(minimum: 100, maximum: .infinity))]
 
@@ -44,8 +45,10 @@ struct BottleView: View {
                             bottle: bottle, program: pinnedProgram.program, pin: pinnedProgram.pin, path: $path
                         )
                     }
-                    if let hoYoPlayInfo, !hoYoPlayInfo.isInstalled(in: bottle) {
-                        HoYoPlayInstallPinView(bottle: bottle, info: hoYoPlayInfo)
+                    if let hoYoPlayInfo, !hoYoPlayInstalled {
+                        HoYoPlayInstallPinView(bottle: bottle, info: hoYoPlayInfo) {
+                            refreshHoYoPlayInstalledState()
+                        }
                     }
                     PinAddView(bottle: bottle)
                 }
@@ -129,10 +132,12 @@ struct BottleView: View {
             }
             .onAppear {
                 bottle.refreshProgramsAndPinsFromDisk()
+                refreshHoYoPlayInstalledState()
             }
             .task {
                 await LauncherContent.refreshIfNeeded()
                 hoYoPlayInfo = LauncherContent.hoyoPlay
+                refreshHoYoPlayInstalledState()
             }
             .disabled(!bottle.isAvailable)
             .navigationTitle(bottle.settings.name)
@@ -141,8 +146,12 @@ struct BottleView: View {
             }
             .onChange(of: bottle.settings) { oldValue, newValue in
                 guard oldValue != newValue else { return }
+                refreshHoYoPlayInstalledState()
                 // Trigger a reload
                 BottleVM.shared.bottles = BottleVM.shared.bottles
+            }
+            .onChange(of: bottle.programs) {
+                refreshHoYoPlayInstalledState()
             }
             .navigationDestination(for: BottleStage.self) { stage in
                 switch stage {
@@ -160,5 +169,9 @@ struct BottleView: View {
                 ProgramView(program: program)
             }
         }
+    }
+
+    private func refreshHoYoPlayInstalledState() {
+        hoYoPlayInstalled = hoYoPlayInfo?.isInstalled(in: bottle) ?? false
     }
 }

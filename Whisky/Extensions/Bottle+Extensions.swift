@@ -140,23 +140,38 @@ extension Bottle {
             .appending(path: "Windows")
             .appending(path: "Start Menu")
 
-        var startMenuPrograms: [Program] = []
-        var linkURLs: [URL] = []
-        let globalEnumerator = FileManager.default.enumerator(at: globalStartMenu,
-                                                              includingPropertiesForKeys: [.isRegularFileKey],
-                                                              options: [.skipsHiddenFiles])
-        while let url = globalEnumerator?.nextObject() as? URL {
-            if url.pathExtension == "lnk" {
-                linkURLs.append(url)
-            }
-        }
+        return getShortcutPrograms(in: [globalStartMenu, userStartMenu], removeShortcuts: true)
+    }
 
-        let userEnumerator = FileManager.default.enumerator(at: userStartMenu,
+    @discardableResult
+    func getDesktopPrograms() -> [Program] {
+        let userDesktop = url
+            .appending(path: "drive_c")
+            .appending(path: "users")
+            .appending(path: "crossover")
+            .appending(path: "Desktop")
+
+        let publicDesktop = url
+            .appending(path: "drive_c")
+            .appending(path: "users")
+            .appending(path: "Public")
+            .appending(path: "Desktop")
+
+        return getShortcutPrograms(in: [userDesktop, publicDesktop], removeShortcuts: false)
+    }
+
+    private func getShortcutPrograms(in folders: [URL], removeShortcuts: Bool) -> [Program] {
+        var shortcutPrograms: [Program] = []
+        var linkURLs: [URL] = []
+
+        for folder in folders {
+            let enumerator = FileManager.default.enumerator(at: folder,
                                                             includingPropertiesForKeys: [.isRegularFileKey],
                                                             options: [.skipsHiddenFiles])
-        while let url = userEnumerator?.nextObject() as? URL {
-            if url.pathExtension == "lnk" {
-                linkURLs.append(url)
+            while let url = enumerator?.nextObject() as? URL {
+                if url.pathExtension == "lnk" {
+                    linkURLs.append(url)
+                }
             }
         }
 
@@ -167,9 +182,11 @@ extension Bottle {
                 if let program = ShellLinkHeader.getProgram(url: link,
                                                             handle: try FileHandle(forReadingFrom: link),
                                                             bottle: self) {
-                    if !startMenuPrograms.contains(where: { $0.url == program.url }) {
-                        startMenuPrograms.append(program)
-                        try FileManager.default.removeItem(at: link)
+                    if !shortcutPrograms.contains(where: { $0.url == program.url }) {
+                        shortcutPrograms.append(program)
+                        if removeShortcuts {
+                            try FileManager.default.removeItem(at: link)
+                        }
                     }
                 }
             } catch {
@@ -177,7 +194,7 @@ extension Bottle {
             }
         }
 
-        return startMenuPrograms
+        return shortcutPrograms
     }
 
     func updateInstalledPrograms() {
@@ -209,29 +226,32 @@ extension Bottle {
         self.programs = programs.sorted { $0.name.lowercased() < $1.name.lowercased() }
     }
 
-    /// Refreshes `programs` and imports new Start Menu shortcuts into pins.
+    /// Refreshes `programs` and imports new Start Menu/Desktop shortcuts into pins.
     ///
-    /// Some installers only become discoverable via Start Menu `.lnk` files, which are
+    /// Some installers only become discoverable via Start Menu/Desktop `.lnk` files, which are
     /// processed here so newly installed apps can appear without restarting the app.
     @MainActor
     func refreshProgramsAndPinsFromDisk() {
         updateInstalledPrograms()
 
-        let startMenuPrograms = getStartMenuPrograms()
-        for startMenuProgram in startMenuPrograms {
+        let shortcutPrograms = getStartMenuPrograms().map { (program: $0, ignoresBlocklist: false) }
+            + getDesktopPrograms().map { (program: $0, ignoresBlocklist: true) }
+        for shortcutProgram in shortcutPrograms {
             // Match by case-insensitive path because URL equality is case-sensitive.
             let existing = programs.first(where: {
-                $0.url.path().caseInsensitiveCompare(startMenuProgram.url.path()) == .orderedSame
+                $0.url.path().caseInsensitiveCompare(shortcutProgram.program.url.path()) == .orderedSame
             })
 
             let program: Program
             if let existing {
                 program = existing
             } else {
-                // If it's present in Start Menu, surface it even if it's outside Program Files.
-                guard !settings.blocklist.contains(startMenuProgram.url) else { continue }
-                programs.append(startMenuProgram)
-                program = startMenuProgram
+                // Shortcuts should surface apps even when their target lives outside Program Files.
+                guard shortcutProgram.ignoresBlocklist || !settings.blocklist.contains(shortcutProgram.program.url) else {
+                    continue
+                }
+                programs.append(shortcutProgram.program)
+                program = shortcutProgram.program
             }
 
             if !program.pinned {

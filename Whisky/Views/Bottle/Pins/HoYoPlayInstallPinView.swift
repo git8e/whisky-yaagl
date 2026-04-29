@@ -5,9 +5,16 @@ import WhiskyKit
 struct HoYoPlayInstallPinView: View {
     @ObservedObject var bottle: Bottle
     let info: HoYoPlayContent
+    let onInstallFinished: () -> Void
 
     @State private var isWorking = false
     @State private var progress: Double?
+
+    init(bottle: Bottle, info: HoYoPlayContent, onInstallFinished: @escaping () -> Void = {}) {
+        self.bottle = bottle
+        self.info = info
+        self.onInstallFinished = onInstallFinished
+    }
 
     var body: some View {
         Button {
@@ -18,9 +25,10 @@ struct HoYoPlayInstallPinView: View {
                     .frame(height: 8)
                 ZStack(alignment: .topTrailing) {
                     Image("HoYoPlayIcon")
+                        .renderingMode(.template)
                         .resizable()
-                    .frame(width: 45, height: 45)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .foregroundStyle(.primary)
+                        .frame(width: 45, height: 45)
 
                     if isWorking {
                         ZStack {
@@ -119,8 +127,10 @@ struct HoYoPlayInstallPinView: View {
                     bottle: bottle
                 )
 
+                await waitForInstallRefresh(info: latestInfo)
+
                 await MainActor.run {
-                    bottle.refreshProgramsAndPinsFromDisk()
+                    onInstallFinished()
                     isWorking = false
                 }
             } catch {
@@ -130,6 +140,19 @@ struct HoYoPlayInstallPinView: View {
                     showManualInstallAlert(info: latestInfo, reason: error.localizedDescription)
                 }
             }
+        }
+    }
+
+    private func waitForInstallRefresh(info: HoYoPlayContent) async {
+        for attempt in 0..<20 {
+            let installed = await MainActor.run {
+                bottle.refreshProgramsAndPinsFromDisk()
+                return info.isInstalled(in: bottle)
+            }
+            if installed || attempt == 19 {
+                return
+            }
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
         }
     }
 
