@@ -72,25 +72,25 @@
 
 本分支把数据存放在：
 
-- `~/Library/Application Support/Whisky/`
+- `~/Library/Application Support/whisky-yaagl/`
   - `Bottles/`
   - `Libraries/`
   - `Downloads/`
-- `~/Library/Logs/Whisky/`
+- `~/Library/Logs/whisky-yaagl/`
 
-如果检测到旧版 Whisky 数据，会尽量在首次启动时自动迁移。
+如果检测到旧版 `Whisky` 数据，会尽量在首次启动时自动迁移。
 
 ## 日志位置
 
 日志目录：
 
-- `~/Library/Logs/Whisky/`
+- `~/Library/Logs/whisky-yaagl/`
 
 当前版本会尽量把一次启动过程写进同一个日志文件，方便排查问题。
 
 ## 遇到问题时建议先检查
 
-1. `~/Library/Logs/Whisky/` 下最新日志
+1. `~/Library/Logs/whisky-yaagl/` 下最新日志
 2. 游戏 exe 路径是否仍然存在，磁盘是否仍然挂载
 3. 使用 HoYoPlay 检查游戏资源完整性
 

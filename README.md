@@ -82,13 +82,13 @@ This fork borrows HK4e workflow ideas from YAAGL, but adapts them to Whisky's bo
 
 This fork stores data here:
 
-- `~/Library/Application Support/Whisky/`
+- `~/Library/Application Support/whisky-yaagl/`
   - `Bottles/`
   - `Libraries/`
   - `Downloads/`
-- `~/Library/Logs/Whisky/`
+- `~/Library/Logs/whisky-yaagl/`
 
-If older Whisky data exists, the app will try to migrate it on first launch.
+If older `Whisky` data exists, the app will try to migrate it on first launch.
 
 Note: per-bottle runtime isolation works best on APFS volumes (so the app can use clone/copy-on-write when duplicating bottles).
 
@@ -96,7 +96,7 @@ Note: per-bottle runtime isolation works best on APFS volumes (so the app can us
 
 Logs are stored in:
 
-- `~/Library/Logs/Whisky/`
+- `~/Library/Logs/whisky-yaagl/`
 
 Recent versions of this fork try to keep one launch session in one log file, so startup troubleshooting is easier.
 
@@ -104,7 +104,7 @@ Recent versions of this fork try to keep one launch session in one log file, so 
 
 If a game fails to start, the most useful things to check are:
 
-1. The latest log in `~/Library/Logs/Whisky/`
+1. The latest log in `~/Library/Logs/whisky-yaagl/`
 2. Whether the game executable path still exists and the drive is still mounted
 3. Use HoYoPlay to verify game file integrity
 
