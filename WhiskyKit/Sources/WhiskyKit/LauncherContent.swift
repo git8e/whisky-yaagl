@@ -33,13 +33,27 @@ public struct HoYoPlayContent: Hashable, Sendable, Codable {
 
             let url = bottle.url.appending(path: normalized, directoryHint: .notDirectory)
             if fm.fileExists(atPath: url.path(percentEncoded: false)) {
-                return true
+                if !url.hasDirectoryPath {
+                    return true
+                }
+
+                let enumerator = fm.enumerator(
+                    at: url,
+                    includingPropertiesForKeys: nil,
+                    options: [.skipsHiddenFiles]
+                )
+                while let child = enumerator?.nextObject() as? URL {
+                    guard !child.hasDirectoryPath else { continue }
+                    if child.lastPathComponent.caseInsensitiveCompare("HYP.exe") == .orderedSame {
+                        return true
+                    }
+                }
             }
         }
 
         return bottle.programs.contains { program in
             let path = program.url.path(percentEncoded: false).lowercased()
-            return path.contains("/hoyoplay/") || program.name.localizedCaseInsensitiveContains("hoyoplay")
+            return path.contains("/hoyoplay/") || program.name.caseInsensitiveCompare("HYP.exe") == .orderedSame
         }
     }
 }

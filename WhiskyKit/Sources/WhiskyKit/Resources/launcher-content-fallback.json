@@ -8,8 +8,8 @@
     "fallbackInstallerURL": "https://github.com/git8e/whisky-yaagl/releases/download/v0.1.11/hoyoplay-installer.exe",
     "manualDownloadURL": "https://hoyoplay.hoyoverse.com/",
     "detectionPaths": [
-      "drive_c/Program Files/HoYoPlay/launcher.exe",
-      "drive_c/Program Files (x86)/HoYoPlay/launcher.exe"
+      "drive_c/Program Files/HoYoPlay",
+      "drive_c/Program Files (x86)/HoYoPlay"
     ]
   }
 }
