@@ -394,6 +394,12 @@ struct BottleCreationView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
 
+            if gameRegionPreset == .hk4eCn {
+                Text("hk4e.warning.cnCompatibility")
+                    .font(.footnote)
+                    .foregroundStyle(.yellow)
+            }
+
             Text("exePicker.leaveBlankHint")
                 .font(.footnote)
                 .foregroundStyle(.secondary)

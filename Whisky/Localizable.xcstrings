@@ -25411,6 +25411,40 @@
         }
       }
     },
+    "hk4e.warning.cnCompatibility" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note: The CN server may show errors or fail to launch due to stricter environment checks. This is a known compatibility limitation."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "注意：CN 版は環境チェックが厳しく、エラーや起動失敗が起こる場合があります。これは既知の互換性制限です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "참고: CN 서버는 환경 검사가 더 엄격해 오류가 발생하거나 실행되지 않을 수 있습니다. 이는 알려진 호환성 제한입니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "注意：国服可能因环境检测更严格而报错或无法启动，属于已知兼容性限制，暂不保证可用。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "注意：國服可能因環境檢測較嚴格而報錯或無法啟動，屬於已知相容性限制，暫不保證可用。"
+          }
+        }
+      }
+    },
     "nap.height" : {
       "localizations" : {
         "en" : {

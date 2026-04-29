@@ -364,6 +364,12 @@ struct ConfigView: View {
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
+
+                    if gameRegionSelection.wrappedValue == .hk4eCn {
+                        Text("hk4e.warning.cnCompatibility")
+                            .font(.footnote)
+                            .foregroundStyle(.yellow)
+                    }
                 } else if gameRegionSelection.wrappedValue.isNAP {
                     ActionView(
                         text: "nap.gameExecutable",
