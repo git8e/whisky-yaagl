@@ -359,7 +359,7 @@ struct ConfigView: View {
                         }
                     }
 
-                    if bottle.settings.hk4eGameExecutableURL == nil {
+                    if bottle.settings.hk4eGameExecutableURL == nil || gameRegionSelection.wrappedValue == .hk4eCn {
                         Text(exeHintKey)
                             .font(.footnote)
                             .foregroundStyle(.secondary)

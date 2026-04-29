@@ -145,19 +145,28 @@ extension Bottle {
 
     @discardableResult
     func getDesktopPrograms() -> [Program] {
-        let userDesktop = url
+        let usersFolder = url
             .appending(path: "drive_c")
             .appending(path: "users")
-            .appending(path: "crossover")
-            .appending(path: "Desktop")
 
-        let publicDesktop = url
-            .appending(path: "drive_c")
-            .appending(path: "users")
-            .appending(path: "Public")
-            .appending(path: "Desktop")
+        let userFolders = (try? FileManager.default.contentsOfDirectory(
+            at: usersFolder,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        )) ?? []
 
-        return getShortcutPrograms(in: [userDesktop, publicDesktop], removeShortcuts: false)
+        let desktopFolders = userFolders.compactMap { userFolder -> URL? in
+            var isDirectory: ObjCBool = false
+            guard FileManager.default.fileExists(
+                atPath: userFolder.path(percentEncoded: false),
+                isDirectory: &isDirectory
+            ), isDirectory.boolValue else {
+                return nil
+            }
+            return userFolder.appending(path: "Desktop", directoryHint: .isDirectory)
+        }
+
+        return getShortcutPrograms(in: desktopFolders, removeShortcuts: false)
     }
 
     private func getShortcutPrograms(in folders: [URL], removeShortcuts: Bool) -> [Program] {

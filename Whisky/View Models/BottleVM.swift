@@ -275,6 +275,11 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     self.createdBottleURL = newBottleDir
                     self.isCreatingBottle = false
                 }
+
+                Task.detached(priority: .background) {
+                    try? await Task.sleep(nanoseconds: 15_000_000_000)
+                    try? await WineFonts.ensureDefaultFontsInstalled(bottle: bottle)
+                }
             } catch {
                 print("Failed to create new bottle: \(error)")
                 if let bottle = bottleId {

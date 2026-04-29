@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-04-30T00:00:00Z",
+  "defaultFontIds": [
+    "noto-sans-cjk-sc",
+    "noto-sans-cjk-tc",
+    "noto-sans-cjk-jp",
+    "noto-sans-cjk-kr"
+  ],
+  "fonts": [
+    {
+      "id": "noto-sans-cjk-sc",
+      "displayName": "Noto Sans CJK SC",
+      "familyName": "Noto Sans CJK SC",
+      "fileName": "NotoSansCJKsc-Regular.otf",
+      "remoteURL": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf",
+      "aliases": [
+        "Microsoft YaHei",
+        "微软雅黑",
+        "SimSun",
+        "宋体",
+        "NSimSun",
+        "SimHei",
+        "黑体",
+        "KaiTi",
+        "楷体",
+        "FangSong",
+        "仿宋",
+        "DengXian",
+        "等线",
+        "Arial Unicode MS"
+      ]
+    },
+    {
+      "id": "noto-sans-cjk-tc",
+      "displayName": "Noto Sans CJK TC",
+      "familyName": "Noto Sans CJK TC",
+      "fileName": "NotoSansCJKtc-Regular.otf",
+      "remoteURL": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/TraditionalChinese/NotoSansCJKtc-Regular.otf",
+      "aliases": [
+        "Microsoft JhengHei",
+        "微軟正黑體",
+        "MingLiU",
+        "PMingLiU",
+        "新細明體",
+        "DFKai-SB"
+      ]
+    },
+    {
+      "id": "noto-sans-cjk-jp",
+      "displayName": "Noto Sans CJK JP",
+      "familyName": "Noto Sans CJK JP",
+      "fileName": "NotoSansCJKjp-Regular.otf",
+      "remoteURL": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/Japanese/NotoSansCJKjp-Regular.otf",
+      "aliases": [
+        "Meiryo",
+        "MS Gothic",
+        "MS PGothic",
+        "MS UI Gothic",
+        "Yu Gothic",
+        "Yu Mincho"
+      ]
+    },
+    {
+      "id": "noto-sans-cjk-kr",
+      "displayName": "Noto Sans CJK KR",
+      "familyName": "Noto Sans CJK KR",
+      "fileName": "NotoSansCJKkr-Regular.otf",
+      "remoteURL": "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/Korean/NotoSansCJKkr-Regular.otf",
+      "aliases": [
+        "Malgun Gothic",
+        "Gulim",
+        "Dotum",
+        "Batang"
+      ]
+    }
+  ]
+}
