@@ -32,8 +32,9 @@ public struct HoYoPlayContent: Hashable, Sendable, Codable {
             guard !normalized.isEmpty else { continue }
 
             let url = bottle.url.appending(path: normalized, directoryHint: .notDirectory)
-            if fm.fileExists(atPath: url.path(percentEncoded: false)) {
-                if !url.hasDirectoryPath {
+            var isDirectory: ObjCBool = false
+            if fm.fileExists(atPath: url.path(percentEncoded: false), isDirectory: &isDirectory) {
+                if !isDirectory.boolValue {
                     return true
                 }
 
@@ -43,7 +44,9 @@ public struct HoYoPlayContent: Hashable, Sendable, Codable {
                     options: [.skipsHiddenFiles]
                 )
                 while let child = enumerator?.nextObject() as? URL {
-                    guard !child.hasDirectoryPath else { continue }
+                    var childIsDirectory: ObjCBool = false
+                    guard fm.fileExists(atPath: child.path(percentEncoded: false), isDirectory: &childIsDirectory),
+                          !childIsDirectory.boolValue else { continue }
                     if child.lastPathComponent.caseInsensitiveCompare("HYP.exe") == .orderedSame {
                         return true
                     }
