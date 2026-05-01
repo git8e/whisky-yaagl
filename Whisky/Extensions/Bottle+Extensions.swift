@@ -123,6 +123,10 @@ extension Bottle {
 
     @discardableResult
     func getStartMenuPrograms() -> [Program] {
+        getStartMenuShortcuts().map(\.program)
+    }
+
+    private func getStartMenuShortcuts() -> [ShortcutProgram] {
         let globalStartMenu = url
             .appending(path: "drive_c")
             .appending(path: "ProgramData")
@@ -145,6 +149,10 @@ extension Bottle {
 
     @discardableResult
     func getDesktopPrograms() -> [Program] {
+        getDesktopShortcuts().map(\.program)
+    }
+
+    private func getDesktopShortcuts() -> [ShortcutProgram] {
         let usersFolder = url
             .appending(path: "drive_c")
             .appending(path: "users")
@@ -169,8 +177,13 @@ extension Bottle {
         return getShortcutPrograms(in: desktopFolders, removeShortcuts: false)
     }
 
-    private func getShortcutPrograms(in folders: [URL], removeShortcuts: Bool) -> [Program] {
-        var shortcutPrograms: [Program] = []
+    private struct ShortcutProgram {
+        var program: Program
+        var name: String
+    }
+
+    private func getShortcutPrograms(in folders: [URL], removeShortcuts: Bool) -> [ShortcutProgram] {
+        var shortcutPrograms: [ShortcutProgram] = []
         var linkURLs: [URL] = []
 
         for folder in folders {
@@ -191,8 +204,11 @@ extension Bottle {
                 if let program = ShellLinkHeader.getProgram(url: link,
                                                             handle: try FileHandle(forReadingFrom: link),
                                                             bottle: self) {
-                    if !shortcutPrograms.contains(where: { $0.url == program.url }) {
-                        shortcutPrograms.append(program)
+                    if !shortcutPrograms.contains(where: { $0.program.url == program.url }) {
+                        shortcutPrograms.append(ShortcutProgram(
+                            program: program,
+                            name: link.deletingPathExtension().lastPathComponent
+                        ))
                         if removeShortcuts {
                             try FileManager.default.removeItem(at: link)
                         }
@@ -243,12 +259,12 @@ extension Bottle {
     func refreshProgramsAndPinsFromDisk() {
         updateInstalledPrograms()
 
-        let shortcutPrograms = getStartMenuPrograms().map { (program: $0, ignoresBlocklist: false) }
-            + getDesktopPrograms().map { (program: $0, ignoresBlocklist: true) }
+        let shortcutPrograms = getStartMenuShortcuts().map { (shortcut: $0, ignoresBlocklist: false) }
+            + getDesktopShortcuts().map { (shortcut: $0, ignoresBlocklist: true) }
         for shortcutProgram in shortcutPrograms {
             // Match by case-insensitive path because URL equality is case-sensitive.
             let existing = programs.first(where: {
-                $0.url.path().caseInsensitiveCompare(shortcutProgram.program.url.path()) == .orderedSame
+                $0.url.path().caseInsensitiveCompare(shortcutProgram.shortcut.program.url.path()) == .orderedSame
             })
 
             let program: Program
@@ -256,27 +272,31 @@ extension Bottle {
                 program = existing
             } else {
                 // Shortcuts should surface apps even when their target lives outside Program Files.
-                guard shortcutProgram.ignoresBlocklist || !settings.blocklist.contains(shortcutProgram.program.url) else {
+                guard shortcutProgram.ignoresBlocklist || !settings.blocklist.contains(shortcutProgram.shortcut.program.url) else {
                     continue
                 }
-                programs.append(shortcutProgram.program)
-                program = shortcutProgram.program
+                programs.append(shortcutProgram.shortcut.program)
+                program = shortcutProgram.shortcut.program
+            }
+
+            // Ensure a pin exists even if path casing differs.
+            if let pinIndex = settings.pins.firstIndex(where: { pin in
+                guard let pinURL = pin.url else { return false }
+                return pinURL.path().caseInsensitiveCompare(program.url.path()) == .orderedSame
+            }) {
+                let executableName = program.url.deletingPathExtension().lastPathComponent
+                if settings.pins[pinIndex].name == executableName || settings.pins[pinIndex].name == program.name {
+                    settings.pins[pinIndex].name = shortcutProgram.shortcut.name
+                }
+            } else {
+                settings.pins.append(PinnedProgram(
+                    name: shortcutProgram.shortcut.name,
+                    url: program.url
+                ))
             }
 
             if !program.pinned {
                 program.pinned = true
-            }
-
-            // Ensure a pin exists even if path casing differs.
-            let alreadyPinned = settings.pins.contains(where: { pin in
-                guard let pinURL = pin.url else { return false }
-                return pinURL.path().caseInsensitiveCompare(program.url.path()) == .orderedSame
-            })
-            if !alreadyPinned {
-                settings.pins.append(PinnedProgram(
-                    name: program.url.deletingPathExtension().lastPathComponent,
-                    url: program.url
-                ))
             }
         }
 
