@@ -363,9 +363,7 @@ extension Wine {
     }
 
     public static func makeFileHandle() throws -> FileHandle {
-        if !FileManager.default.fileExists(atPath: Self.logsFolder.path) {
-            try FileManager.default.createDirectory(at: Self.logsFolder, withIntermediateDirectories: true)
-        }
+        try ensureLogsFolderExists()
 
         if let sessionURL = Self.currentLogSessionURL {
             let handle = try FileHandle(forWritingTo: sessionURL)
@@ -379,6 +377,8 @@ extension Wine {
     }
 
     private static func createLogSessionURL(bottle: Bottle?) throws -> URL {
+        try ensureLogsFolderExists()
+
         let fileURL = nextLogFileURL()
         try "".write(to: fileURL, atomically: true, encoding: .utf8)
         let fileHandle = try FileHandle(forWritingTo: fileURL)
@@ -393,6 +393,13 @@ extension Wine {
     private static func nextLogFileURL() -> URL {
         let dateString = Date.now.ISO8601Format()
         return Self.logsFolder.appending(path: dateString).appendingPathExtension("log")
+    }
+
+    private static func ensureLogsFolderExists() throws {
+        let logsPath = Self.logsFolder.path(percentEncoded: false)
+        if !FileManager.default.fileExists(atPath: logsPath) {
+            try FileManager.default.createDirectory(at: Self.logsFolder, withIntermediateDirectories: true)
+        }
     }
 }
 
