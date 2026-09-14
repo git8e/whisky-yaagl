@@ -4,8 +4,6 @@
 
 An app for running HK4e, NAP, and HKRPG on macOS with less setup hassle.
 
-![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/build.yml?style=for-the-badge)
-
 </div>
 
 [中文文档](README.zh-CN.md)
@@ -15,6 +13,26 @@ An app for running HK4e, NAP, and HKRPG on macOS with less setup hassle.
 This is a macOS game launcher and management tool for general users. It is mainly intended to make certain anime-style games easier to run, but it is not limited to those games. It is built on top of [Whisky](https://github.com/Whisky-App/Whisky), references the Wine environment setup and patching approach used by [YAAGL](https://github.com/yaagl/yet-another-anime-game-launcher), and follows a workflow closer to CrossOver to make game setup, launching, and day-to-day management easier.
 
 This project is an independently maintained fork and is not affiliated with the original Whisky or YAAGL projects.
+
+## Project Status
+
+This project is actively maintained and works as of **September 2026**.
+
+| | |
+|---|---|
+| Build | ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/build.yml) |
+| SwiftLint | ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/SwiftLint.yml) |
+| Latest Release | ![](https://img.shields.io/github/v/release/git8e/whisky-yaagl) |
+| Last Commit | ![](https://img.shields.io/github/last-commit/git8e/whisky-yaagl) |
+| License | ![](https://img.shields.io/github/license/git8e/whisky-yaagl) |
+
+### Recent Activity
+
+- **v0.1.12** released on May 1, 2026 -- HoYoPlay installer shortcuts, Wine 11.7 support, bilingual issue templates, CN HK4e compatibility notice.
+- All CI builds passing.
+- Supports Wine 11.x DXMT runtimes with remote manifest and SHA256 verification.
+
+If you are having issues, please check [Issues](https://github.com/git8e/whisky-yaagl/issues) or open a new one.
 
 ## Screenshots
 

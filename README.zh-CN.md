@@ -6,6 +6,26 @@
 
 本项目是一个独立维护的 fork，与原版 Whisky 和 YAAGL 项目没有官方关联。
 
+## 项目状态
+
+本项目仍在积极维护，**2026 年 9 月**确认可用。
+
+| | |
+|---|---|
+| 构建 | ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/build.yml) |
+| SwiftLint | ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/SwiftLint.yml) |
+| 最新版本 | ![](https://img.shields.io/github/v/release/git8e/whisky-yaagl) |
+| 最近提交 | ![](https://img.shields.io/github/last-commit/git8e/whisky-yaagl) |
+| 许可证 | ![](https://img.shields.io/github/license/git8e/whisky-yaagl) |
+
+### 近期更新
+
+- **v0.1.12** 于 2026 年 5 月 1 日发布 — 新增 HoYoPlay 安装器快捷方式、Wine 11.7 支持、中英双语 issue 模板、国服 HK4e 兼容性说明。
+- CI 构建全部通过。
+- 支持 Wine 11.x DXMT 运行时，支持远程 manifest 与 SHA256 校验。
+
+如遇问题，请到 [Issues](https://github.com/git8e/whisky-yaagl/issues) 查看或新建 issue。
+
 ## 截图
 
 <p align="center">
