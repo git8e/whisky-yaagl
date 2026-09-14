@@ -13,7 +13,6 @@
 | | |
 |---|---|
 | 构建 | ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/build.yml) |
-| SwiftLint | ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/SwiftLint.yml) |
 | 最新版本 | ![](https://img.shields.io/github/v/release/git8e/whisky-yaagl) |
 | 最近提交 | ![](https://img.shields.io/github/last-commit/git8e/whisky-yaagl) |
 | 许可证 | ![](https://img.shields.io/github/license/git8e/whisky-yaagl) |

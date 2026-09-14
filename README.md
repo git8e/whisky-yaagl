@@ -21,7 +21,6 @@ This project is actively maintained and works as of **September 2026**.
 | | |
 |---|---|
 | Build | ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/build.yml) |
-| SwiftLint | ![](https://img.shields.io/github/actions/workflow/status/git8e/whisky-yaagl/SwiftLint.yml) |
 | Latest Release | ![](https://img.shields.io/github/v/release/git8e/whisky-yaagl) |
 | Last Commit | ![](https://img.shields.io/github/last-commit/git8e/whisky-yaagl) |
 | License | ![](https://img.shields.io/github/license/git8e/whisky-yaagl) |
