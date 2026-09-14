@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-04-26T00:00:00Z",
+  "generatedAt": "2026-09-15T00:00:00Z",
   "defaultRuntimeId": "11.4-dxmt-signed",
   "runtimes": [
     {
@@ -56,6 +56,34 @@
       "renderBackend": "dxmt",
       "archive": {
         "winePathInArchive": "Wine Devel.app/Contents/Resources/wine"
+      },
+      "recommended": false
+    },
+    {
+      "id": "11.17-dxmt",
+      "track": "unsigned-dxmt",
+      "displayName": "Wine 11.17 DXMT Experimental",
+      "version": "11.17",
+      "revision": 1,
+      "sha256": "c2b3a8274dbc594deaa64e40469b607cbc4aa8ef5656dec4c5f6f3dac0da770c",
+      "remoteURL": "https://github.com/Gcenx/macOS_Wine_builds/releases/download/11.17/wine-devel-11.17-osx64.tar.xz",
+      "renderBackend": "dxmt",
+      "archive": {
+        "winePathInArchive": "Wine Devel.app/Contents/Resources/wine"
+      },
+      "recommended": false
+    },
+    {
+      "id": "11.8-dxmt-signed",
+      "track": "signed-dxmt",
+      "displayName": "Wine 11.8 DXMT (signed)",
+      "version": "11.8",
+      "revision": 1,
+      "sha256": "02bb55319b593303a7d8aa4659ecb74063dbcec859e1d923000189eac5a432e4",
+      "remoteURL": "https://github.com/dawn-winery/dawn-signed/releases/download/wine-11.8-osx64/wine-devel-11.8-osx64-signed.tar.xz",
+      "renderBackend": "dxmt",
+      "archive": {
+        "winePathInArchive": "wine-devel-11.8-osx64-signed/wine"
       },
       "recommended": false
     },
