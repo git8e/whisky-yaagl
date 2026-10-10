@@ -149,8 +149,29 @@ sleep 1
 cleanup
 trap - EXIT
 
+# Wait for the mount point to be released; otherwise hdiutil convert can fail
+# with "Resource temporarily unavailable" (a leftover diskimages helper may
+# still hold the writable image).
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+    [ -d "/Volumes/$VOLNAME" ] || break
+    sleep 1
+done
+
 echo "==> Compressing to $DMG"
-hdiutil convert "$RW_DMG" -format UDZO -imagekey zlib-level=9 -o "$DMG" >/dev/null
+convert_ok=0
+for attempt in 1 2 3 4 5; do
+    if hdiutil convert "$RW_DMG" -format UDZO -imagekey zlib-level=9 -o "$DMG" >/dev/null 2>&1; then
+        convert_ok=1
+        break
+    fi
+    echo "    convert attempt $attempt failed, retrying…"
+    hdiutil detach "/Volumes/$VOLNAME" >/dev/null 2>&1 || true
+    sleep 3
+done
+if [ "$convert_ok" != "1" ]; then
+    echo "error: hdiutil convert failed: $RW_DMG" >&2
+    exit 1
+fi
 
 rm -f "$RW_DMG"
 rm -rf "$STAGE" "$BG"
