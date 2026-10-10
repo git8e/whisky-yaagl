@@ -31,6 +31,8 @@ if [ ! -d "$APP" ]; then
     exit 1
 fi
 
+mkdir -p "$BUILD"
+
 echo "==> Drawing DMG background"
 swift "$ROOT/Scripts/make_dmg_background.swift" "$BG" >/dev/null
 
