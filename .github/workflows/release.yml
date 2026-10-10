@@ -104,21 +104,24 @@ jobs:
           set -euo pipefail
           TAG="${{ steps.tag.outputs.name }}"
           VERSION="${{ steps.package.outputs.version }}"
+          DMG="${{ steps.package.outputs.dmg }}"
           PREV="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
           NOTES="build/release-notes.md"
+          # Match the notes style used by previous releases: a changelog of the
+          # commits since the last tag, then a Validation block and the SHA256
+          # of each artifact.
           {
-            printf '## whisky-yaagl %s\n\n' "$VERSION"
-            printf 'Bundled as a drag-to-Applications DMG: open it and drag **whisky-yaagl** onto the **Applications** folder.\n\n'
-            printf '### Install\n\n'
-            printf '1. Download `whisky-yaagl-%s.dmg` below.\n' "$VERSION"
-            printf '2. Open it and drag **whisky-yaagl** onto **Applications**.\n'
-            printf '3. Ad-hoc signed: if macOS blocks the first launch, right-click the app ▸ **Open**. If it reports the app is damaged, run `xattr -dr com.apple.quarantine /Applications/whisky-yaagl.app`.\n'
-            printf '4. On first launch the app guides you through downloading a Wine runtime.\n\n'
             if [ -n "$PREV" ]; then
-              printf '**Full changelog**: https://github.com/%s/compare/%s...%s\n\n' "${{ github.repository }}" "$PREV" "$TAG"
+              git log --no-merges --pretty=format:'- %s' "$PREV..$TAG"
+              printf '\n'
             fi
-            printf 'A `whisky-yaagl.app.zip` is also attached for anyone who prefers the archive.\n'
+            printf '\nValidation:\n'
+            printf -- '- GitHub Actions macOS build passed (macOS 15, Release, ad-hoc signed)\n\n'
+            printf 'SHA256:\n'
+            printf -- '- %s: %s\n' "$(basename "$DMG")" "$(shasum -a 256 "$DMG" | awk '{print $1}')"
+            printf -- '- whisky-yaagl.app.zip: %s\n' "$(shasum -a 256 whisky-yaagl.app.zip | awk '{print $1}')"
           } > "$NOTES"
+          cat "$NOTES"
 
       - name: Publish the release
         env:
