@@ -19,7 +19,7 @@
 
 ### 近期更新
 
-- **v0.1.12** 于 2026 年 5 月 1 日发布 — 新增 HoYoPlay 安装器快捷方式、Wine 11.7 支持、中英双语 issue 模板、国服 HK4e 兼容性说明。
+- **v0.1.14** 于 2026 年 10 月 11 日发布 — 提供可拖拽安装的 DMG，GitHub Actions 在每次推送版本标签时自动构建并发布 Release（DMG + zip）。
 - CI 构建全部通过。
 - 支持 Wine 11.x DXMT 运行时，支持远程 manifest 与 SHA256 校验。
 

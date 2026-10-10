@@ -27,7 +27,7 @@ This project is actively maintained and works as of **September 2026**.
 
 ### Recent Activity
 
-- **v0.1.12** released on May 1, 2026 -- HoYoPlay installer shortcuts, Wine 11.7 support, bilingual issue templates, CN HK4e compatibility notice.
+- **v0.1.14** released on October 11, 2026 -- ships as a drag-to-Applications DMG, with GitHub Actions publishing a release (DMG + zip) automatically on every version tag.
 - All CI builds passing.
 - Supports Wine 11.x DXMT runtimes with remote manifest and SHA256 verification.
 
