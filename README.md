@@ -64,17 +64,24 @@ Use at your own risk.
 
 ## Installation
 
-1. Prefer downloading the latest `whisky-yaagl.app.zip` from `Releases`.
-2. `Actions` builds are mainly for preview/testing and may be unstable.
-3. Unzip it in `Finder`.
-4. Drag `whisky-yaagl.app` into `/Applications`.
-5. Launch it from `Applications`; on first launch the app will guide you through downloading a Wine runtime (recommended: `Wine 11.4 DXMT (signed)`).
-6. Runtime downloads are cached locally, and each bottle builds its own isolated runtime from the selected base runtime.
+1. Download the latest `whisky-yaagl-<version>.dmg` from `Releases`.
+2. Open the DMG. A window appears with **whisky-yaagl** on the left and an **Applications** shortcut on the right — drag the app onto **Applications**.
+3. Eject the DMG when you are done.
+4. Launch it from `Applications`; on first launch the app will guide you through downloading a Wine runtime (recommended: `Wine 11.4 DXMT (signed)`).
+5. Runtime downloads are cached locally, and each bottle builds its own isolated runtime from the selected base runtime.
+
+A `whisky-yaagl.app.zip` is also attached to each release if you prefer the archive. `Actions` builds are mainly for preview/testing and may be unstable.
 
 If macOS blocks the app on first launch:
 
 1. Open `System Settings` -> `Privacy & Security`.
 2. Find the blocked app message and click `Open Anyway`.
+
+Or, if macOS reports the app is damaged:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/whisky-yaagl.app
+```
 
 ## Quick Start
 
@@ -124,6 +131,18 @@ If a game fails to start, the most useful things to check are:
 1. The latest log in `~/Library/Logs/whisky-yaagl/`
 2. Whether the game executable path still exists and the drive is still mounted
 3. Use HoYoPlay to verify game file integrity
+
+## Build from source
+
+Requires macOS 15+ and the Xcode command line tools.
+
+```bash
+make build   # compile the Release app with xcodebuild
+make app     # assemble build/whisky-yaagl.app (ad-hoc signed)
+make dmg     # wrap the app in a drag-to-Applications DMG
+```
+
+The DMG is written to `build/whisky-yaagl-<version>.dmg`. The same steps run in CI: every push produces a DMG artifact, and pushing a `v*` tag builds one and attaches it to a GitHub Release.
 
 ## Credits
 

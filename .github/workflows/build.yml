@@ -43,7 +43,7 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             build
 
-      - name: Package
+      - name: Package app
         run: |
           set -euxo pipefail
           APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/whisky-yaagl.app"
@@ -55,8 +55,21 @@ jobs:
 
           ditto -c -k --sequesterRsrc --keepParent "$APP" "whisky-yaagl.app.zip"
 
-      - name: Upload Artifact
+      - name: Build DMG
+        run: |
+          set -euxo pipefail
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/whisky-yaagl.app"
+          VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$APP/Contents/Info.plist")"
+          Scripts/make_dmg.sh "$APP" "$VERSION"
+
+      - name: Upload app artifact
         uses: actions/upload-artifact@v4
         with:
           name: whisky-yaagl.app
           path: whisky-yaagl.app.zip
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: whisky-yaagl.dmg
+          path: build/whisky-yaagl-*.dmg

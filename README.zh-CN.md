@@ -56,17 +56,24 @@
 
 ## 安装方式
 
-1. 优先从仓库的 `Releases` 下载最新的 `whisky-yaagl.app.zip`。
-2. `Actions` 里的构建仅建议用于尝鲜和测试，可能不稳定。
-3. 用 `Finder` 双击解压。
-4. 将 `whisky-yaagl.app` 拖到 `/Applications`。
-5. 从“应用程序”里打开；首次启动时会引导你下载 Wine 运行时，推荐默认使用 `Wine 11.4 DXMT (signed)`。
-6. 运行时下载后会缓存到本地；每个容器会基于所选运行时生成自己的独立 runtime。
+1. 从仓库的 `Releases` 下载最新的 `whisky-yaagl-<version>.dmg`。
+2. 打开 DMG：窗口左侧是 **whisky-yaagl**，右侧是 **Applications** 快捷方式 —— 把应用拖到 **Applications** 上即可。
+3. 完成后推出（卸载）DMG。
+4. 从“应用程序”里打开；首次启动时会引导你下载 Wine 运行时，推荐默认使用 `Wine 11.4 DXMT (signed)`。
+5. 运行时下载后会缓存到本地；每个容器会基于所选运行时生成自己的独立 runtime。
+
+每个 Release 也会附带 `whisky-yaagl.app.zip`，如果你更习惯用压缩包可以下载它。`Actions` 里的构建仅建议用于尝鲜和测试，可能不稳定。
 
 如果首次打开被系统拦截：
 
 1. 打开“系统设置” -> “隐私与安全性”
 2. 找到拦截提示，点击“仍要打开”
+
+如果系统提示应用已损坏：
+
+```bash
+xattr -dr com.apple.quarantine /Applications/whisky-yaagl.app
+```
 
 ## 快速上手
 
@@ -112,6 +119,18 @@
 1. `~/Library/Logs/whisky-yaagl/` 下最新日志
 2. 游戏 exe 路径是否仍然存在，磁盘是否仍然挂载
 3. 使用 HoYoPlay 检查游戏资源完整性
+
+## 从源码构建
+
+需要 macOS 15+ 与 Xcode 命令行工具。
+
+```bash
+make build   # 用 xcodebuild 编译 Release 版
+make app     # 打包成 build/whisky-yaagl.app（ad-hoc 签名）
+make dmg     # 打包成可拖拽安装的 DMG
+```
+
+DMG 生成在 `build/whisky-yaagl-<version>.dmg`。CI 里执行同样的步骤：每次 push 都会产出 DMG 制品，推送 `v*` 标签时会构建并自动附到 GitHub Release。
 
 ## 致谢
 
