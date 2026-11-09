@@ -39,6 +39,8 @@ struct ConfigView: View {
 
     @State private var runtimeInstallLoadingState: LoadingState = .success
     @State private var runtimeWineVersion: String? = nil
+    @State private var mediaSupportLoadingState: LoadingState = .success
+    @State private var mediaSupportVersion: String? = nil
     @State private var isRevertingRuntimeSelection: Bool = false
     @State private var availableRuntimes: [WineRuntime] = WineRuntimes.all
     @State private var winVersionLoadingState: LoadingState = .loading
@@ -182,6 +184,39 @@ struct ConfigView: View {
                 Text("config.wineRuntime.switchWarning")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+
+                // GStreamer is shared by all runtimes, but each isolated
+                // runtime gets its own symlink/rpath patch (see WineGStreamer).
+                SettingItemView(title: "GStreamer", loadingState: mediaSupportLoadingState) {
+                    HStack(spacing: 8) {
+                        Text(mediaSupportVersion == WineGStreamer.frameworkVersion
+                             ? String(localized: "runtime.status.installed")
+                             : String(localized: "runtime.status.notInstalled"))
+                            .foregroundStyle(.secondary)
+                        if mediaSupportVersion != WineGStreamer.frameworkVersion {
+                            Button(String(localized: "runtime.setup.download")) {
+                                mediaSupportLoadingState = .modifying
+                                Task(priority: .userInitiated) {
+                                    do {
+                                        try await WineRuntimeManager.ensureIsolatedRuntime(
+                                            bottle: bottle,
+                                            baseRuntimeId: bottle.settings.wineRuntimeId
+                                        )
+                                        await MainActor.run {
+                                            mediaSupportVersion = WineGStreamer.installedFrameworkVersion()
+                                            mediaSupportLoadingState = .success
+                                        }
+                                    } catch {
+                                        await MainActor.run {
+                                            mediaSupportLoadingState = .failed
+                                        }
+                                    }
+                                }
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+                }
 
                 SettingItemView(title: "config.winVersion", loadingState: winVersionLoadingState) {
                     Picker("config.winVersion", selection: $bottle.settings.windowsVersion) {
@@ -664,6 +699,7 @@ struct ConfigView: View {
             proxyEnabled = bottle.settings.proxyEnabled
             proxyHost = bottle.settings.proxyHost
             proxyPort = bottle.settings.proxyPort
+            mediaSupportVersion = WineGStreamer.installedFrameworkVersion()
 
             Task(priority: .userInitiated) {
                 let version = try? await Wine.wineVersion(bottle: bottle)

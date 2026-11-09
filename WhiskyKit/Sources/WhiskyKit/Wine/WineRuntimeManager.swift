@@ -18,9 +18,11 @@
 
 import Foundation
 import CryptoKit
+import os.log
 
 public enum WineRuntimeManager {
     private static var fm: FileManager { FileManager.default }
+    private static let logger = Logger(subsystem: "com.whisky.WhiskyKit", category: "WineRuntimeManager")
 
     // Per-bottle isolated runtime folder name (stored inside the bottle directory).
     public static let isolatedRuntimeFolderName = "WineRuntime"
@@ -88,6 +90,7 @@ public enum WineRuntimeManager {
            let current = try? String(contentsOf: marker, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
            current == baseRuntimeId,
            (fm.fileExists(atPath: dstWine64.path(percentEncoded: false)) || fm.fileExists(atPath: dstWine.path(percentEncoded: false))) {
+            await patchMediaSupport(runtimeRoot: dst, status: status, progress: progress)
             return
         }
 
@@ -99,6 +102,30 @@ public enum WineRuntimeManager {
         try FileCopy.copyItem(at: src, to: dst)
         try (baseRuntimeId + "\n").write(to: marker, atomically: true, encoding: .utf8)
         removeQuarantineRecursively(path: dst.path(percentEncoded: false))
+
+        await patchMediaSupport(runtimeRoot: dst, status: status, progress: progress)
+    }
+
+    /// Apply the per-bottle GStreamer media patch to an isolated runtime.
+    ///
+    /// This mirrors DXMT injection: the base runtime stays stock, while the
+    /// disposable runtime copy used by the bottle is patched. Failures are
+    /// logged but never prevent the game from launching.
+    private static func patchMediaSupport(
+        runtimeRoot: URL,
+        status: (@Sendable (String) -> Void)?,
+        progress: (@Sendable (Double) -> Void)?
+    ) async {
+        do {
+            try await WineGStreamer.shared.ensureInstalledAndPatch(
+                runtimeRoot: runtimeRoot,
+                createFrameworkLink: true,
+                status: status,
+                progress: progress
+            )
+        } catch {
+            logger.error("GStreamer media patch failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     public static func binFolder(runtimeId: String) -> URL {

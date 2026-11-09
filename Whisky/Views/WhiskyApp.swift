@@ -134,6 +134,17 @@ struct WhiskyApp: App {
                     await WineUpdateChecker.shared.checkForUpdatesIfNeeded {
                         showSetup = true
                     }
+                    // Install the shared GStreamer runtime in the background so
+                    // the first game launch does not have to wait for it. The
+                    // per-bottle patch itself is applied when the isolated
+                    // runtime is prepared.
+                    Task.detached(priority: .utility) {
+                        do {
+                            try await WineGStreamer.shared.ensureInstalled()
+                        } catch {
+                            print("Failed to install GStreamer: \(error)")
+                        }
+                    }
                 }
                 .onAppear {
                     NSWindow.allowsAutomaticWindowTabbing = false

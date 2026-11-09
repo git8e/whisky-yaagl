@@ -300,6 +300,23 @@ public class Wine {
             result["GST_PLUGIN_FEATURE_RANK"] = "atdec:MAX,avdec_h264:MAX"
         }
         bottle.settings.environmentVariables(wineEnv: &result)
+
+        // Make the per-runtime GStreamer framework visible to Wine's media
+        // stack. The patched winegstreamer.so uses a relative rpath, so this is
+        // a fallback for base runtimes and for plugin/scanner discovery.
+        let mediaEnvironment = WineGStreamer.environment(
+            forRuntimeRoot: WineRuntimeManager.effectiveWineRoot(bottle: bottle)
+        )
+        for (key, value) in mediaEnvironment {
+            if let existing = result[key], !existing.isEmpty {
+                if key == "DYLD_FALLBACK_LIBRARY_PATH" {
+                    result[key] = value + ":" + existing
+                }
+            } else {
+                result[key] = value
+            }
+        }
+
         guard !environment.isEmpty else { return result }
         result.merge(environment, uniquingKeysWith: { $1 })
         return result
