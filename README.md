@@ -16,7 +16,7 @@ This project is an independently maintained fork and is not affiliated with the 
 
 ## Project Status
 
-This project is actively maintained and works as of **September 2026**.
+This project is actively maintained and works as of **November 2026**.
 
 | | |
 |---|---|
@@ -27,7 +27,9 @@ This project is actively maintained and works as of **September 2026**.
 
 ### Recent Activity
 
+- **v0.1.16** released on November 12, 2026 -- fixes HoYoPlay on DXMT runtimes: the launcher renders and installs reliably, pins are named after the launcher, and the duplicate macOS title bar is gone.
 - **v0.1.15** released on November 12, 2026 -- adds per-bottle GStreamer media support for in-game video and audio, including ADTS AAC and MPEG-TS/HLS playback.
+- **v0.1.14** released on October 11, 2026 -- ships as a drag-to-Applications DMG, with GitHub Actions publishing a release (DMG + zip) automatically on every version tag.
 - All CI builds passing.
 - Supports Wine 11.x DXMT runtimes with remote manifest and SHA256 verification.
 
