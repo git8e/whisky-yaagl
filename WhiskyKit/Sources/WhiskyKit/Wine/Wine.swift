@@ -120,9 +120,24 @@ public class Wine {
             try enableDXVK(bottle: bottle)
         }
 
+        var arguments = args
+        if usesDXMT(bottle: bottle) {
+            let extraArguments = HoYoPlayLaunch.additionalArguments(for: url, existing: arguments)
+            if !extraArguments.isEmpty {
+                // A headless instance left behind by the installer keeps
+                // HoYoPlay's singleton and makes new launches exit at once.
+                HoYoPlayLaunch.terminateInstallerLaunchedProcesses()
+                arguments += extraArguments
+            }
+        }
+
+        // The helper polls for HoYoPlay's window, so start it before the
+        // launcher itself. A stale instance was terminated above already.
+        HoYoPlayLaunch.hideNativeTitleBarIfNeeded(for: url, bottle: bottle)
+
         for await _ in try Self.runWineProcess(
             name: url.lastPathComponent,
-            args: ["start", "/unix", url.path(percentEncoded: false)] + args,
+            args: ["start", "/unix", url.path(percentEncoded: false)] + arguments,
             bottle: bottle, environment: environment
         ) { }
     }
@@ -131,10 +146,29 @@ public class Wine {
         at url: URL, bottle: Bottle, args: String, environment: [String: String]
     ) -> String {
         let wineBinary = WineRuntimeManager.wineBinary(bottle: bottle)
-        var wineCmd = "\(wineBinary.esc) start /unix \(url.esc) \(args)"
+        var arguments = args
+        if usesDXMT(bottle: bottle) {
+            let existing = arguments.split(whereSeparator: { $0.isWhitespace }).map(String.init)
+            let extraArguments = HoYoPlayLaunch.additionalArguments(for: url, existing: existing)
+            if !extraArguments.isEmpty {
+                HoYoPlayLaunch.terminateInstallerLaunchedProcesses()
+                arguments = ([arguments] + extraArguments).joined(separator: " ")
+            }
+        }
+        var wineCmd = "\(wineBinary.esc) start /unix \(url.esc) \(arguments)"
         let env = constructWineEnvironment(for: bottle, environment: environment)
         for environment in env {
             wineCmd = "\(environment.key)=\"\(environment.value)\" " + wineCmd
+        }
+
+        if let helper = HoYoPlayLaunch.titleBarHelperURL, HoYoPlayLaunch.isLauncher(at: url) {
+            var helperCmd = "\(wineBinary.esc) \(helper.esc)"
+            for environment in env {
+                helperCmd = "\(environment.key)=\"\(environment.value)\" " + helperCmd
+            }
+            // The helper waits for HoYoPlay's window, so run it in the
+            // background and start the launcher right away.
+            wineCmd = "( \(helperCmd) >/dev/null 2>&1 & ) ; " + wineCmd
         }
 
         return wineCmd
@@ -275,6 +309,11 @@ public class Wine {
             in: bottle.url.appending(path: "drive_c").appending(path: "windows").appending(path: "syswow64"),
             withContentsIn: Wine.dxvkFolder.appending(path: "x32")
         )
+    }
+
+    /// Whether the bottle's runtime uses DXMT for D3D translation.
+    private static func usesDXMT(bottle: Bottle) -> Bool {
+        WineRuntimes.runtime(id: bottle.settings.wineRuntimeId)?.renderBackend == .dxmt
     }
 
     /// Construct an environment merging the bottle values with the given values

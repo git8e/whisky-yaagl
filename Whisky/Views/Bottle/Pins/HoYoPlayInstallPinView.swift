@@ -124,10 +124,22 @@ struct HoYoPlayInstallPinView: View {
 
                 _ = try await Wine.runWine(
                     ["start", "/wait", "/unix", localInstallerURL.path(percentEncoded: false)],
-                    bottle: bottle
+                    bottle: bottle,
+                    environment: HoYoPlayLaunch.installerEnvironment
                 )
 
+                // Under DXMT the installer finishes by starting a headless
+                // `HYP.exe --jump=installer` that holds the launcher singleton
+                // and blocks later launches, so get rid of it first.
+                let relaunchLauncher = HoYoPlayLaunch.terminateInstallerLaunchedProcesses()
+
                 await waitForInstallRefresh(info: latestInfo)
+
+                // Honour the installer's "launch HoYoPlay" option, but start
+                // the launcher through the same path the pin uses.
+                if relaunchLauncher, let launcherURL = launcherURL(for: latestInfo) {
+                    try? await Wine.runProgram(at: launcherURL, bottle: bottle)
+                }
 
                 await MainActor.run {
                     onInstallFinished()
@@ -154,6 +166,18 @@ struct HoYoPlayInstallPinView: View {
             }
             try? await Task.sleep(nanoseconds: 1_000_000_000)
         }
+    }
+
+    private func launcherURL(for info: HoYoPlayContent) -> URL? {
+        for path in info.detectionPaths {
+            let url = bottle.url
+                .appending(path: path, directoryHint: .isDirectory)
+                .appending(path: "launcher.exe", directoryHint: .notDirectory)
+            if FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) {
+                return url
+            }
+        }
+        return nil
     }
 
     private func installerDestination(for remoteURL: URL) throws -> URL {

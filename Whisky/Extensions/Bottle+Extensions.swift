@@ -134,17 +134,29 @@ extension Bottle {
             .appending(path: "Windows")
             .appending(path: "Start Menu")
 
-        let userStartMenu = url
+        let usersFolder = url
             .appending(path: "drive_c")
             .appending(path: "users")
-            .appending(path: "crossover")
-            .appending(path: "AppData")
-            .appending(path: "Roaming")
-            .appending(path: "Microsoft")
-            .appending(path: "Windows")
-            .appending(path: "Start Menu")
 
-        return getShortcutPrograms(in: [globalStartMenu, userStartMenu], removeShortcuts: true)
+        let userFolders = (try? FileManager.default.contentsOfDirectory(
+            at: usersFolder,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        )) ?? []
+
+        let userStartMenus = userFolders.compactMap { userFolder -> URL? in
+            var isDirectory: ObjCBool = false
+            guard FileManager.default.fileExists(
+                atPath: userFolder.path(percentEncoded: false),
+                isDirectory: &isDirectory
+            ), isDirectory.boolValue else {
+                return nil
+            }
+            return userFolder.appending(path: "AppData/Roaming/Microsoft/Windows/Start Menu",
+                                        directoryHint: .isDirectory)
+        }
+
+        return getShortcutPrograms(in: [globalStartMenu] + userStartMenus, removeShortcuts: true)
     }
 
     @discardableResult
@@ -261,10 +273,28 @@ extension Bottle {
 
         let shortcutPrograms = getStartMenuShortcuts().map { (shortcut: $0, ignoresBlocklist: false) }
             + getDesktopShortcuts().map { (shortcut: $0, ignoresBlocklist: true) }
-        for shortcutProgram in shortcutPrograms {
+
+        // Installers may create several shortcuts for one executable. HoYoPlay,
+        // for example, creates one shortcut per game that all point at its
+        // launcher, so grouping avoids naming the pin after an arbitrary game.
+        var groups: [String: (program: Program, names: [String], ignoresBlocklist: Bool)] = [:]
+        for entry in shortcutPrograms {
+            let key = entry.shortcut.program.url.path().lowercased()
+            if var group = groups[key] {
+                group.names.append(entry.shortcut.name)
+                group.ignoresBlocklist = group.ignoresBlocklist || entry.ignoresBlocklist
+                groups[key] = group
+            } else {
+                groups[key] = (program: entry.shortcut.program,
+                               names: [entry.shortcut.name],
+                               ignoresBlocklist: entry.ignoresBlocklist)
+            }
+        }
+
+        for group in groups.values.sorted(by: { $0.program.url.path() < $1.program.url.path() }) {
             // Match by case-insensitive path because URL equality is case-sensitive.
             let existing = programs.first(where: {
-                $0.url.path().caseInsensitiveCompare(shortcutProgram.shortcut.program.url.path()) == .orderedSame
+                $0.url.path().caseInsensitiveCompare(group.program.url.path()) == .orderedSame
             })
 
             let program: Program
@@ -272,25 +302,32 @@ extension Bottle {
                 program = existing
             } else {
                 // Shortcuts should surface apps even when their target lives outside Program Files.
-                guard shortcutProgram.ignoresBlocklist || !settings.blocklist.contains(shortcutProgram.shortcut.program.url) else {
+                guard group.ignoresBlocklist || !settings.blocklist.contains(group.program.url) else {
                     continue
                 }
-                programs.append(shortcutProgram.shortcut.program)
-                program = shortcutProgram.shortcut.program
+                programs.append(group.program)
+                program = group.program
             }
+
+            let name = preferredShortcutName(for: program.url, candidates: group.names)
+            let automaticNames = Set(group.names + [
+                program.name,
+                program.url.deletingPathExtension().lastPathComponent
+            ])
 
             // Ensure a pin exists even if path casing differs.
             if let pinIndex = settings.pins.firstIndex(where: { pin in
                 guard let pinURL = pin.url else { return false }
                 return pinURL.path().caseInsensitiveCompare(program.url.path()) == .orderedSame
             }) {
-                let executableName = program.url.deletingPathExtension().lastPathComponent
-                if settings.pins[pinIndex].name == executableName || settings.pins[pinIndex].name == program.name {
-                    settings.pins[pinIndex].name = shortcutProgram.shortcut.name
+                // Only update names that look auto-generated; keep user renames.
+                if automaticNames.contains(settings.pins[pinIndex].name),
+                   settings.pins[pinIndex].name != name {
+                    settings.pins[pinIndex].name = name
                 }
             } else {
                 settings.pins.append(PinnedProgram(
-                    name: shortcutProgram.shortcut.name,
+                    name: name,
                     url: program.url
                 ))
             }
@@ -302,6 +339,32 @@ extension Bottle {
 
         // Re-sort after adding Start Menu programs.
         programs = programs.sorted { $0.name.lowercased() < $1.name.lowercased() }
+    }
+
+    /// Picks the most representative shortcut name for a program.
+    ///
+    /// Prefer the name matching the target's folder or executable so a
+    /// multi-game launcher is named after itself ("HoYoPlay") instead of an
+    /// arbitrary game shortcut.
+    private func preferredShortcutName(for url: URL, candidates: [String]) -> String {
+        let expected = [
+            url.deletingLastPathComponent().lastPathComponent.lowercased(),
+            url.deletingPathExtension().lastPathComponent.lowercased()
+        ].filter { !$0.isEmpty }
+
+        if let match = candidates.first(where: { expected.contains($0.lowercased()) }) {
+            return match
+        }
+
+        if let match = candidates.first(where: { candidate in
+            let lowered = candidate.lowercased()
+            return expected.contains(where: { lowered.contains($0) })
+        }) {
+            return match
+        }
+
+        return candidates.sorted { $0.lowercased() < $1.lowercased() }.first
+            ?? url.deletingPathExtension().lastPathComponent
     }
 
     @MainActor
