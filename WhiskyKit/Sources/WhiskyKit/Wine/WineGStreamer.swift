@@ -34,8 +34,9 @@ import os.log
 public actor WineGStreamer {
     public static let shared = WineGStreamer()
 
-    /// Version of the pinned GStreamer runtime package.
-    public static let frameworkVersion = "1.28.8"
+    /// Version of the pinned GStreamer runtime package. The `-rN` suffix is our
+    /// component-set revision, not a different upstream GStreamer release.
+    public static let frameworkVersion = "1.28.8-r2"
 
     private static let packageName = "gstreamer-1.0-1.28.8-universal.pkg"
     private static let packageURL = URL(
@@ -53,6 +54,7 @@ public actor WineGStreamer {
         "gstreamer-1.0-core",
         "gstreamer-1.0-playback",
         "gstreamer-1.0-codecs",
+        "gstreamer-1.0-codecs-restricted",
         "gstreamer-1.0-libav",
         "gstreamer-1.0-system",
         "gstreamer-1.0-effects"
@@ -335,7 +337,13 @@ public actor WineGStreamer {
         var result: [String: String] = [
             "GST_PLUGIN_SYSTEM_PATH": plugins.path(percentEncoded: false),
             "GST_PLUGIN_SYSTEM_PATH_1_0": plugins.path(percentEncoded: false),
-            "DYLD_FALLBACK_LIBRARY_PATH": lib.path(percentEncoded: false)
+            "DYLD_FALLBACK_LIBRARY_PATH": lib.path(percentEncoded: false),
+            // Some Media Foundation sources pass raw AAC frames, while others
+            // use ADTS. `atdec` (AudioToolbox) rejects the ADTS caps and then
+            // never produces output, so prefer libav's AAC decoder. Keep
+            // `aacparse` enabled because it is what turns ADTS input into raw
+            // frames that the decoder can consume.
+            "GST_PLUGIN_FEATURE_RANK": "atdec:NONE,avdec_aac:MAX"
         ]
         if fm.fileExists(atPath: scanner.path(percentEncoded: false)) {
             let path = scanner.path(percentEncoded: false)
@@ -382,6 +390,10 @@ public actor WineGStreamer {
             "lib/libgstreamer-1.0.0.dylib",
             "lib/gstreamer-1.0/libgstcoreelements.dylib",
             "lib/gstreamer-1.0/libgstlibav.dylib",
+            // MPEG-TS demuxing is needed by the HLS clips the launcher and
+            // in-game browser play. It lives in the "restricted" codecs
+            // component, which is easy to omit from a curated install.
+            "lib/gstreamer-1.0/libgstmpegtsdemux.dylib",
             "libexec/gstreamer-1.0/gst-plugin-scanner"
         ]
         return required.allSatisfy { relative in

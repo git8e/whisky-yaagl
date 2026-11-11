@@ -297,7 +297,13 @@ public class Wine {
             result["DXMT_CONFIG"] = "d3d11.preferredMaxFrameRate=60;"
             // Keep DXMT config per-bottle to avoid cross-bottle side effects.
             result["DXMT_CONFIG_FILE"] = bottle.url.appending(path: "dxmt.conf").path(percentEncoded: false)
-            result["GST_PLUGIN_FEATURE_RANK"] = "atdec:MAX,avdec_h264:MAX"
+            // `atdec` (AudioToolbox AAC) only accepts raw AAC with a valid
+            // codec_data/magic cookie. Media Foundation sources also deliver
+            // ADTS AAC, and `atdec` rejects those caps, leaving the transform
+            // with no output forever. Prefer libav's AAC decoder and keep
+            // `aacparse` available so ADTS input is converted to raw frames
+            // before decoding.
+            result["GST_PLUGIN_FEATURE_RANK"] = "atdec:NONE,avdec_h264:MAX,avdec_aac:MAX"
         }
         bottle.settings.environmentVariables(wineEnv: &result)
 
