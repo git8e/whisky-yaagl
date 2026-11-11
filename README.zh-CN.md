@@ -19,7 +19,7 @@
 
 ### 近期更新
 
-- **v0.1.14** 于 2026 年 10 月 11 日发布 — 提供可拖拽安装的 DMG，GitHub Actions 在每次推送版本标签时自动构建并发布 Release（DMG + zip）。
+- **v0.1.15** 于 2026 年 11 月 12 日发布 — 为每个 Wine 环境提供 GStreamer 媒体支持，修复游戏内视频与 ADTS AAC、MPEG-TS/HLS 音频播放。
 - CI 构建全部通过。
 - 支持 Wine 11.x DXMT 运行时，支持远程 manifest 与 SHA256 校验。
 

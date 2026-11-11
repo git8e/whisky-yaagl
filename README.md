@@ -27,7 +27,7 @@ This project is actively maintained and works as of **September 2026**.
 
 ### Recent Activity
 
-- **v0.1.14** released on October 11, 2026 -- ships as a drag-to-Applications DMG, with GitHub Actions publishing a release (DMG + zip) automatically on every version tag.
+- **v0.1.15** released on November 12, 2026 -- adds per-bottle GStreamer media support for in-game video and audio, including ADTS AAC and MPEG-TS/HLS playback.
 - All CI builds passing.
 - Supports Wine 11.x DXMT runtimes with remote manifest and SHA256 verification.
 
