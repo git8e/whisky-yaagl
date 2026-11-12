@@ -91,6 +91,7 @@ public enum WineRuntimeManager {
            current == baseRuntimeId,
            (fm.fileExists(atPath: dstWine64.path(percentEncoded: false)) || fm.fileExists(atPath: dstWine.path(percentEncoded: false))) {
             await patchMediaSupport(runtimeRoot: dst, status: status, progress: progress)
+            syncWinemacClipCursorResetPatch(runtimeRoot: dst, bottle: bottle, baseRuntimeId: baseRuntimeId)
             return
         }
 
@@ -104,6 +105,39 @@ public enum WineRuntimeManager {
         removeQuarantineRecursively(path: dst.path(percentEncoded: false))
 
         await patchMediaSupport(runtimeRoot: dst, status: status, progress: progress)
+        syncWinemacClipCursorResetPatch(runtimeRoot: dst, bottle: bottle, baseRuntimeId: baseRuntimeId)
+    }
+
+    /// Keep the optional winemac ClipCursor reset workaround in sync with the
+    /// bottle setting. Only the isolated runtime is touched.
+    private static func syncWinemacClipCursorResetPatch(
+        runtimeRoot: URL,
+        bottle: Bottle,
+        baseRuntimeId: String
+    ) {
+        let enabled = bottle.settings.winemacClipCursorResetFixEnabled
+        let runtime = WineRuntimes.runtime(id: baseRuntimeId)
+        let affected = runtime.map {
+            WinemacClipCursorResetPatch.isAffected(runtimeVersion: $0.version)
+        } ?? false
+
+        do {
+            if enabled && affected {
+                let result = try WinemacClipCursorResetPatch.apply(to: runtimeRoot)
+                switch result {
+                case .applied:
+                    logger.info("Applied winemac ClipCursor reset fix")
+                case .unsupported(let reason):
+                    logger.error("winemac ClipCursor reset fix skipped: \(reason, privacy: .public)")
+                case .alreadyApplied, .reverted, .notApplied:
+                    break
+                }
+            } else {
+                _ = try WinemacClipCursorResetPatch.revert(from: runtimeRoot)
+            }
+        } catch {
+            logger.error("winemac ClipCursor reset patch failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     /// Apply the per-bottle GStreamer media patch to an isolated runtime.

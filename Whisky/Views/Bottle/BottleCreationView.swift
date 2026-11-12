@@ -58,6 +58,7 @@ struct BottleCreationView: View {
     @State private var initialHK4eLaunchFixBlockNetwork: Bool = false
     @State private var initialNapLaunchFixBlockNetwork: Bool = true
     @State private var initialHKRPGLaunchFixBlockNetwork: Bool = false
+    @State private var initialWinemacClipCursorResetFix: Bool = false
     @State private var initialHK4eLeftCommandIsCtrl: Bool = false
     @State private var initialSteamPatch: Bool = true
     @State private var initialEnableHDR: Bool = false
@@ -158,6 +159,10 @@ struct BottleCreationView: View {
                         proxySettings
                         resolutionSettings
                         gameSpecificToggles
+                        Toggle(
+                            "config.winemacClipCursorResetFix",
+                            isOn: $initialWinemacClipCursorResetFix
+                        )
 
                         Text("patchOptions.keepDefaultHint")
                             .font(.footnote)
@@ -453,6 +458,7 @@ struct BottleCreationView: View {
             initialNapFixWebview: napFixWebview,
             initialHKRPGRegion: gameRegionPreset.hkrpgRegion,
             initialHKRPGLaunchFixBlockNetwork: hkrpgLaunchFixBlockNetwork,
+            initialWinemacClipCursorResetFix: initialWinemacClipCursorResetFix,
             initialProxyEnabled: initialProxyEnabled,
             initialProxyHost: initialProxyHost,
             initialProxyPort: initialProxyPort,

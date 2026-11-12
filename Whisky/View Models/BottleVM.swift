@@ -68,6 +68,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
         initialNapFixWebview: Bool = true,
         initialHKRPGRegion: HKRPGGame.Region = .os,
         initialHKRPGLaunchFixBlockNetwork: Bool = false,
+        initialWinemacClipCursorResetFix: Bool = false,
         initialProxyEnabled: Bool = false,
         initialProxyHost: String = "",
         initialProxyPort: String = "",
@@ -105,6 +106,7 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                 }
 
                 bottle.settings.wineRuntimeId = wineRuntimeId
+                bottle.settings.winemacClipCursorResetFixEnabled = initialWinemacClipCursorResetFix
                 try await WineRuntimeManager.ensureInstalled(
                     runtimeId: wineRuntimeId,
                     localArchive: wineArchiveURL,

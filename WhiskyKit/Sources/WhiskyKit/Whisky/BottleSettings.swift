@@ -99,6 +99,7 @@ public struct BottleWineConfig: Codable, Equatable {
     var proxyHost: String = ""
     var proxyPort: String = ""
     var runtimeId: String = WineRuntimes.whiskyDefaultId
+    var winemacClipCursorResetFix: Bool = false
 
     public init() {}
 
@@ -113,6 +114,10 @@ public struct BottleWineConfig: Codable, Equatable {
         self.proxyHost = try container.decodeIfPresent(String.self, forKey: .proxyHost) ?? ""
         self.proxyPort = try container.decodeIfPresent(String.self, forKey: .proxyPort) ?? ""
         self.runtimeId = try container.decodeIfPresent(String.self, forKey: .runtimeId) ?? WineRuntimes.whiskyDefaultId
+        self.winemacClipCursorResetFix = try container.decodeIfPresent(
+            Bool.self,
+            forKey: .winemacClipCursorResetFix
+        ) ?? false
     }
     // swiftlint:enable line_length
 }
@@ -331,6 +336,12 @@ public struct BottleSettings: Codable, Equatable {
     public var wineRuntimeId: String {
         get { return wineConfig.runtimeId }
         set { wineConfig.runtimeId = newValue }
+    }
+
+    /// Optional workaround for the winemac ClipCursor reset bug in Wine < 11.10.
+    public var winemacClipCursorResetFixEnabled: Bool {
+        get { return wineConfig.winemacClipCursorResetFix }
+        set { wineConfig.winemacClipCursorResetFix = newValue }
     }
 
     public var gamePreset: BottleGamePreset {

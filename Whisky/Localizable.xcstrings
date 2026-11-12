@@ -24051,6 +24051,50 @@
         }
       }
     },
+    "config.winemacClipCursorResetFix" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fix cursor stuck at screen center after Cmd+Tab"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修复 Cmd+Tab 后鼠标卡在屏幕中央"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修復 Cmd+Tab 後滑鼠卡在螢幕中央"
+          }
+        }
+      }
+    },
+    "config.winemacClipCursorResetFix.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixes the cursor being locked to the center of the screen after Cmd+Tab on Wine versions before 11.10. Applies only to this bottle's isolated runtime. Disabled by default; takes effect on the next launch."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修复 Wine 11.10 之前版本在 Cmd+Tab 后鼠标被锁定在屏幕中央的问题。仅作用于当前容器的独立运行时，默认关闭，下次启动游戏时生效。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修復 Wine 11.10 之前版本在 Cmd+Tab 後滑鼠被鎖定在螢幕中央的問題。僅作用於目前容器的獨立執行環境，預設關閉，下次啟動遊戲時生效。"
+          }
+        }
+      }
+    },
     "patchOptions.keepDefaultHint" : {
       "localizations" : {
         "ar" : {

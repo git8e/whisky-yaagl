@@ -555,10 +555,6 @@ struct ConfigView: View {
                     Text("hk4e.description")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
-
-                    Text("patchOptions.keepDefaultHint")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
                 } else if gameRegionSelection.wrappedValue.isNAP {
                     Toggle("nap.launchFixBlockNetwork", isOn: $bottle.settings.napLaunchFixBlockNetwork)
                         .onChange(of: bottle.settings.napLaunchFixBlockNetwork) { _, enabled in
@@ -593,10 +589,6 @@ struct ConfigView: View {
                         .disabled(!bottle.settings.napCustomResolutionEnabled)
                         Spacer()
                     }
-
-                    Text("patchOptions.keepDefaultHint")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
                 } else {
                     Toggle("hkrpg.launchFixBlockNetwork", isOn: $bottle.settings.hkrpgLaunchFixBlockNetwork)
                         .onChange(of: bottle.settings.hkrpgLaunchFixBlockNetwork) { _, enabled in
@@ -605,11 +597,28 @@ struct ConfigView: View {
                                 try? await WineProxySettings.restoreDesiredState(bottle: bottle)
                             }
                         }
-
-                    Text("patchOptions.keepDefaultHint")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
                 }
+
+                Toggle(
+                    "config.winemacClipCursorResetFix",
+                    isOn: $bottle.settings.winemacClipCursorResetFixEnabled
+                )
+                .onChange(of: bottle.settings.winemacClipCursorResetFixEnabled) { _, _ in
+                    Task(priority: .userInitiated) {
+                        try? await WineRuntimeManager.ensureIsolatedRuntime(
+                            bottle: bottle,
+                            baseRuntimeId: bottle.settings.wineRuntimeId
+                        )
+                    }
+                }
+
+                Text("config.winemacClipCursorResetFix.description")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                Text("patchOptions.keepDefaultHint")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
