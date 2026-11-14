@@ -24,11 +24,11 @@ enum BottleStage {
     case config
     case programs
     case processes
+    case keyMacros
 }
 
 struct BottleView: View {
     @ObservedObject var bottle: Bottle
-    @Environment(\.openWindow) private var openWindow
     @State private var path = NavigationPath()
     @State private var programLoading: Bool = false
     @State private var showWinetricksSheet: Bool = false
@@ -61,11 +61,8 @@ struct BottleView: View {
                     NavigationLink(value: BottleStage.config) {
                         Label("tab.config", systemImage: "gearshape")
                     }
-                    Button {
-                        KeyMacroService.shared.focus(on: bottle)
-                        openWindow(id: "keyMacros")
-                    } label: {
-                        Label("按键宏", systemImage: "keyboard")
+                    NavigationLink(value: BottleStage.keyMacros) {
+                        Label("keyMacros.title", systemImage: "keyboard")
                     }
 //                    NavigationLink(value: BottleStage.processes) {
 //                        Label("tab.processes", systemImage: "hockey.puck.circle")
@@ -170,6 +167,8 @@ struct BottleView: View {
                     )
                 case .processes:
                     RunningProcessesView(bottle: bottle)
+                case .keyMacros:
+                    KeyMacroView(bottle: bottle)
                 }
             }
             .navigationDestination(for: Program.self) { program in

@@ -20,7 +20,6 @@ import SwiftUI
 import WhiskyKit
 
 struct SettingsView: View {
-    @Environment(\.openWindow) private var openWindow
     @AppStorage("SUEnableAutomaticChecks") var whiskyUpdate = true
     @AppStorage("killOnTerminate") var killOnTerminate = true
     @AppStorage("checkWineRuntimeUpdates") var checkWineRuntimeUpdates = false
@@ -79,14 +78,6 @@ struct SettingsView: View {
                     if let url = URL(string: "https://github.com/git8e/whisky-yaagl/releases") {
                         NSWorkspace.shared.open(url)
                     }
-                }
-            }
-            Section("按键宏") {
-                Text("每个容器分别保存按键宏。宏只会在该容器的 Wine 游戏位于前台时触发。")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Button("打开按键宏设置") {
-                    openWindow(id: "keyMacros")
                 }
             }
         }

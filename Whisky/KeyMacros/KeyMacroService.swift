@@ -34,6 +34,23 @@ enum KeyMacroPermission {
         let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
         _ = AXIsProcessTrustedWithOptions(options)
     }
+
+    static func openSettings() {
+        openPrivacyPane("Privacy_Accessibility")
+    }
+
+    static func openInputMonitoringSettings() {
+        openPrivacyPane("Privacy_ListenEvent")
+    }
+
+    private static func openPrivacyPane(_ pane: String) {
+        guard let url = URL(
+            string: "x-apple.systempreferences:com.apple.preference.security?\(pane)"
+        ) else {
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
 }
 
 /// Reads another process's environment with `KERN_PROCARGS2`.
@@ -112,7 +129,6 @@ final class KeyMacroService: ObservableObject {
     @Published private(set) var macroStatus: MacroRunner.Status = .idle
     @Published private(set) var captureActive = false
     @Published private(set) var lastError: String?
-    @Published var requestedBottleURL: URL?
 
     @Published var enabled: Bool {
         didSet {
@@ -196,6 +212,14 @@ final class KeyMacroService: ObservableObject {
         }
     }
 
+    func openAccessibilitySettings() {
+        KeyMacroPermission.openSettings()
+    }
+
+    func openInputMonitoringSettings() {
+        KeyMacroPermission.openInputMonitoringSettings()
+    }
+
     func refreshPermission() {
         let trusted = KeyMacroPermission.isTrusted
         if permissionGranted != trusted {
@@ -222,7 +246,7 @@ final class KeyMacroService: ObservableObject {
             callback: keyMacroTapCallback,
             userInfo: Unmanaged.passUnretained(self).toOpaque()
         ) else {
-            lastError = "无法创建事件监听，请确认已授予辅助功能权限。"
+            lastError = String(localized: "keyMacros.error.eventTap")
             monitorRunning = false
             return
         }
@@ -362,16 +386,16 @@ final class KeyMacroService: ObservableObject {
     @discardableResult
     func beginCapture(handler: @escaping (MacroTrigger) -> Void) -> Bool {
         guard enabled else {
-            lastError = "按键宏功能已关闭。"
+            lastError = String(localized: "keyMacros.error.disabled")
             return false
         }
         guard permissionGranted else {
-            lastError = "请先授予辅助功能权限。"
+            lastError = String(localized: "keyMacros.error.permission")
             return false
         }
         refreshPermission()
         guard monitorRunning else {
-            lastError = "事件监听尚未启动，请确认辅助功能权限后重试。"
+            lastError = String(localized: "keyMacros.error.listener")
             return false
         }
 
@@ -390,13 +414,13 @@ final class KeyMacroService: ObservableObject {
 
     func test(script: MacroScript, store: BottleMacroStore) {
         guard activeTargetPID > 0 else {
-            lastError = "请先让目标游戏窗口位于前台。"
+            lastError = String(localized: "keyMacros.error.foreground")
             return
         }
         do {
             let items = try MacroDSL.parse(script.text, defaultHoldMs: store.settings.defaultHoldMs)
             guard !items.isEmpty else {
-                lastError = "宏内容为空。"
+                lastError = String(localized: "keyMacros.error.emptyMacro")
                 return
             }
             runner.runOnce(items: items, targetPID: activeTargetPID)
@@ -408,10 +432,6 @@ final class KeyMacroService: ObservableObject {
     func stopMacro() {
         runner.stopAll()
         MacroHeldInputRegistry.shared.releaseAll()
-    }
-
-    func focus(on bottle: Bottle) {
-        requestedBottleURL = bottle.url.standardizedFileURL
     }
 
     // MARK: - Event handling
@@ -582,7 +602,7 @@ final class KeyMacroService: ObservableObject {
         }
 
         guard !items.isEmpty else {
-            lastError = "宏内容为空。"
+            lastError = String(localized: "keyMacros.error.emptyMacro")
             return
         }
 

@@ -157,7 +157,6 @@ struct WhiskyApp: App {
         // Don't ask me how this works, it just does
         .handlesExternalEvents(matching: ["{same path of URL?}"])
         .commands {
-            KeyMacroCommands()
             CommandGroup(after: .appInfo) {
                 SparkleView()
             }
@@ -216,11 +215,6 @@ struct WhiskyApp: App {
         Settings {
             SettingsView()
         }
-        Window("按键宏", id: "keyMacros") {
-            KeyMacroView()
-                .environmentObject(BottleVM.shared)
-        }
-        .defaultSize(width: 1_120, height: 720)
     }
 
     static func killBottles() {

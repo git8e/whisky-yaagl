@@ -53,7 +53,7 @@ public final class BottleMacroStore: ObservableObject {
         }
 
         if self.settings.scripts.isEmpty {
-            let script = MacroScript(name: "默认宏", text: "")
+            let script = MacroScript(name: "", text: "")
             self.settings.scripts = [script]
             self.settings.selectedScriptID = script.id
         }
@@ -84,7 +84,7 @@ public final class BottleMacroStore: ObservableObject {
     }
 
     @discardableResult
-    public func addScript(name: String = "新宏", text: String = "") -> UUID {
+    public func addScript(name: String = "New Macro", text: String = "") -> UUID {
         let script = MacroScript(name: uniqueName(base: name), text: text)
         settings.scripts.append(script)
         settings.selectedScriptID = script.id
@@ -93,17 +93,15 @@ public final class BottleMacroStore: ObservableObject {
     }
 
     @discardableResult
-    public func duplicateScript(id: UUID) -> UUID? {
+    public func duplicateScript(id: UUID, nameSuffix: String = " Copy") -> UUID? {
         guard let index = settings.scripts.firstIndex(where: { $0.id == id }) else { return nil }
         var copy = settings.scripts[index]
         copy.id = UUID()
-        copy.name = uniqueName(base: copy.name + " 副本")
+        copy.name = uniqueName(base: copy.name + nameSuffix)
         copy.updatedAt = Date()
-        copy.bindings = copy.bindings.map { binding in
-            var newBinding = binding
-            newBinding.id = UUID()
-            return newBinding
-        }
+        // A trigger key must be unique inside one container, so a duplicated
+        // macro starts without a trigger and can be recorded independently.
+        copy.binding = nil
         settings.scripts.insert(copy, at: index + 1)
         settings.selectedScriptID = copy.id
         saveSoon()
@@ -114,7 +112,7 @@ public final class BottleMacroStore: ObservableObject {
         guard let index = settings.scripts.firstIndex(where: { $0.id == id }) else { return }
         settings.scripts.remove(at: index)
         if settings.scripts.isEmpty {
-            let script = MacroScript(name: "默认宏", text: "")
+            let script = MacroScript(name: "", text: "")
             settings.scripts = [script]
             settings.selectedScriptID = script.id
         } else if settings.selectedScriptID == id {
@@ -139,54 +137,67 @@ public final class BottleMacroStore: ObservableObject {
         saveSoon()
     }
 
+    /// Replaces the macro's single trigger. Returns the binding id, or nil when
+    /// another macro in this container already owns the trigger.
     @discardableResult
-    public func addBinding(scriptID: UUID, trigger: MacroTrigger, mode: MacroTriggerMode = .holdLoop) -> UUID? {
+    public func setBinding(scriptID: UUID, trigger: MacroTrigger, mode: MacroTriggerMode = .holdLoop) -> UUID? {
         guard let scriptIndex = settings.scripts.firstIndex(where: { $0.id == scriptID }) else { return nil }
         guard !settings.scripts.contains(where: { script in
-            script.bindings.contains(where: { $0.trigger == trigger })
+            script.id != scriptID && script.binding?.trigger == trigger
         }) else {
             return nil
         }
+
+        if var binding = settings.scripts[scriptIndex].binding {
+            binding.trigger = trigger
+            settings.scripts[scriptIndex].binding = binding
+            saveSoon()
+            return binding.id
+        }
+
         let binding = MacroTriggerBinding(trigger: trigger, mode: mode)
-        settings.scripts[scriptIndex].bindings.append(binding)
+        settings.scripts[scriptIndex].binding = binding
         saveSoon()
         return binding.id
     }
 
-    public func removeBinding(scriptID: UUID, bindingID: UUID) {
+    public func clearBinding(scriptID: UUID) {
         guard let scriptIndex = settings.scripts.firstIndex(where: { $0.id == scriptID }) else { return }
-        settings.scripts[scriptIndex].bindings.removeAll(where: { $0.id == bindingID })
+        guard settings.scripts[scriptIndex].binding != nil else { return }
+        settings.scripts[scriptIndex].binding = nil
         saveSoon()
     }
 
     public func updateBinding(
         scriptID: UUID,
-        bindingID: UUID,
         mode: MacroTriggerMode? = nil,
         preventSystemShortcut: Bool? = nil,
         enabled: Bool? = nil
     ) {
         guard let scriptIndex = settings.scripts.firstIndex(where: { $0.id == scriptID }),
-              let bindingIndex = settings.scripts[scriptIndex].bindings.firstIndex(where: { $0.id == bindingID }) else {
+              var binding = settings.scripts[scriptIndex].binding else {
             return
         }
         if let mode {
-            settings.scripts[scriptIndex].bindings[bindingIndex].mode = mode
+            binding.mode = mode
         }
         if let preventSystemShortcut {
-            settings.scripts[scriptIndex].bindings[bindingIndex].preventSystemShortcut = preventSystemShortcut
+            binding.preventSystemShortcut = preventSystemShortcut
         }
         if let enabled {
-            settings.scripts[scriptIndex].bindings[bindingIndex].enabled = enabled
+            binding.enabled = enabled
         }
+        settings.scripts[scriptIndex].binding = binding
         saveSoon()
     }
 
     public func binding(for trigger: MacroTrigger) -> (script: MacroScript, binding: MacroTriggerBinding)? {
         for script in settings.scripts {
-            guard let binding = script.bindings.first(where: {
-                $0.enabled && $0.trigger == trigger
-            }) else { continue }
+            guard let binding = script.binding,
+                  binding.enabled,
+                  binding.trigger == trigger else {
+                continue
+            }
             return (script, binding)
         }
         return nil

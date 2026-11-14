@@ -207,20 +207,57 @@ public struct MacroScript: Identifiable, Codable, Equatable, Sendable {
     public var name: String
     public var text: String
     public var updatedAt: Date
-    public var bindings: [MacroTriggerBinding]
+    /// A macro has exactly one trigger key. The optional value means the trigger
+    /// has not been recorded yet.
+    public var binding: MacroTriggerBinding?
 
     public init(
         id: UUID = UUID(),
         name: String,
         text: String,
         updatedAt: Date = Date(),
-        bindings: [MacroTriggerBinding] = []
+        binding: MacroTriggerBinding? = nil
     ) {
         self.id = id
         self.name = name
         self.text = text
         self.updatedAt = updatedAt
-        self.bindings = bindings
+        self.binding = binding
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case text
+        case updatedAt
+        case binding
+        /// Old profiles allowed several triggers per macro. Keep the key so
+        /// those files still load and migrate to the first trigger.
+        case bindings
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        text = try container.decode(String.self, forKey: .text)
+        updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? Date()
+
+        if let single = try container.decodeIfPresent(MacroTriggerBinding.self, forKey: .binding) {
+            binding = single
+        } else {
+            let legacy = try container.decodeIfPresent([MacroTriggerBinding].self, forKey: .bindings) ?? []
+            binding = legacy.first
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(text, forKey: .text)
+        try container.encode(updatedAt, forKey: .updatedAt)
+        try container.encodeIfPresent(binding, forKey: .binding)
     }
 
     public var displayName: String {
