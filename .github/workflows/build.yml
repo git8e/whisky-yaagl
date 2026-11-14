@@ -9,6 +9,8 @@ jobs:
     runs-on: macos-15
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+      APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,41 +28,37 @@ jobs:
       - name: Show Xcode Version
         run: xcodebuild -version
 
-      - name: Build
+      - name: Import Developer ID certificate
+        if: env.APPLE_CERTIFICATE_BASE64 != ''
+        run: Scripts/import_signing_cert.sh
+
+      - name: Build app
         env:
           SKIP_SWIFTLINT: "1"
         run: |
           set -euxo pipefail
-          DERIVED_DATA="$RUNNER_TEMP/DerivedData"
-          xcodebuild \
-            -project "Whisky.xcodeproj" \
-            -scheme "Whisky" \
-            -configuration Release \
-            -destination 'platform=macOS' \
-            -derivedDataPath "$DERIVED_DATA" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            build
+          Scripts/build_app.sh \
+            --configuration Release \
+            --derived-data "$RUNNER_TEMP/DerivedData" \
+            --output "$RUNNER_TEMP/whisky-yaagl.app"
 
       - name: Package app
         run: |
           set -euxo pipefail
-          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/whisky-yaagl.app"
+          APP="$RUNNER_TEMP/whisky-yaagl.app"
           test -d "$APP"
-
-          # Ad-hoc sign so macOS will run it after quarantine removal.
-          /usr/bin/codesign --force --deep --sign - "$APP"
           /usr/bin/codesign --verify --deep --strict --verbose=2 "$APP"
-
           ditto -c -k --sequesterRsrc --keepParent "$APP" "whisky-yaagl.app.zip"
 
       - name: Build DMG
         run: |
           set -euxo pipefail
-          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/whisky-yaagl.app"
+          APP="$RUNNER_TEMP/whisky-yaagl.app"
           VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$APP/Contents/Info.plist")"
           Scripts/make_dmg.sh "$APP" "$VERSION"
+          if [ -n "${SIGN_IDENTITY:-}" ]; then
+            /usr/bin/codesign --force --timestamp --sign "$SIGN_IDENTITY" "build/whisky-yaagl-$VERSION.dmg"
+          fi
 
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
@@ -73,3 +71,7 @@ jobs:
         with:
           name: whisky-yaagl.dmg
           path: build/whisky-yaagl-*.dmg
+
+      - name: Remove signing keychain
+        if: always() && env.SIGNING_KEYCHAIN != ''
+        run: security delete-keychain "$SIGNING_KEYCHAIN" || true
