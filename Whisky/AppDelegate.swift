@@ -33,6 +33,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        KeyMacroService.shared.start()
+
         if !hasShownMoveToApplicationsAlert && !AppDelegate.insideAppsFolder {
             DispatchQueue.main.asyncAfter(deadline: .now()) {
                 NSApp.activate(ignoringOtherApps: true)
@@ -43,6 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        KeyMacroService.shared.shutdown()
         if UserDefaults.standard.bool(forKey: "killOnTerminate") {
             WhiskyApp.killBottles()
         }

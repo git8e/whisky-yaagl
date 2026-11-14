@@ -24,6 +24,7 @@ import SemanticVersion
 struct ContentView: View {
     @AppStorage("selectedBottleURL") private var selectedBottleURL: URL?
     @EnvironmentObject var bottleVM: BottleVM
+    @Environment(\.openWindow) private var openWindow
     @Binding var showSetup: Bool
 
     @State private var selected: URL?
@@ -44,6 +45,14 @@ struct ContentView: View {
             detail
         }
         .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    openWindow(id: "keyMacros")
+                } label: {
+                    Image(systemName: "keyboard")
+                        .help("按键宏")
+                }
+            }
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     showBottleCreation.toggle()

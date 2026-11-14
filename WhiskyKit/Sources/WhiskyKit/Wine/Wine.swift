@@ -322,6 +322,7 @@ public class Wine {
     ) -> [String: String] {
         var result: [String: String] = [
             "WINEPREFIX": bottle.url.path,
+            "WHISKY_BOTTLE_ID": bottle.url.standardizedFileURL.path,
             "WINEDEBUG": "fixme-all",
             "GST_DEBUG": "1"
         ]
@@ -373,6 +374,7 @@ public class Wine {
     ) -> [String: String] {
         var result: [String: String] = [
             "WINEPREFIX": bottle.url.path,
+            "WHISKY_BOTTLE_ID": bottle.url.standardizedFileURL.path,
             "WINEDEBUG": "fixme-all",
             "GST_DEBUG": "1"
         ]
