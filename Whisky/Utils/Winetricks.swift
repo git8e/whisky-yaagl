@@ -16,6 +16,7 @@
 //  If not, see https://www.gnu.org/licenses/.
 //
 
+import CryptoKit
 import Foundation
 import AppKit
 import WhiskyKit
@@ -45,7 +46,79 @@ class Winetricks {
     static let winetricksURL: URL = WhiskyWineInstaller.libraryFolder
         .appending(path: "winetricks")
 
+    /// Pinned winetricks release used when the support files are not present.
+    /// Older WhiskyWine installs placed these in `Libraries`; the per-bottle
+    /// runtime layout does not, which leaves the verb list empty.
+    private static let supportDownloadURLString =
+        "https://raw.githubusercontent.com/Winetricks/winetricks/20260125/src/winetricks"
+    private static let supportSHA256 =
+        "431f82fc74000e6c864409f1d8fb495d696c03928808e3e8acffc45179312a7b"
+
+    private static func ensureSupportFiles() async {
+        let fileManager = FileManager.default
+        let library = WhiskyWineInstaller.libraryFolder
+        try? fileManager.createDirectory(at: library, withIntermediateDirectories: true)
+
+        let scriptPath = winetricksURL.path(percentEncoded: false)
+        if !fileManager.fileExists(atPath: scriptPath) {
+            guard let supportDownloadURL = URL(string: supportDownloadURLString) else { return }
+            do {
+                var request = URLRequest(url: supportDownloadURL)
+                request.timeoutInterval = 30
+                let (data, response) = try await URLSession.shared.data(for: request)
+                guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                    return
+                }
+                let digest = SHA256.hash(data: data)
+                    .map { String(format: "%02x", $0) }
+                    .joined()
+                guard digest.caseInsensitiveCompare(supportSHA256) == .orderedSame else {
+                    return
+                }
+                try data.write(to: winetricksURL, options: .atomic)
+                try fileManager.setAttributes(
+                    [.posixPermissions: 0o755],
+                    ofItemAtPath: scriptPath
+                )
+            } catch {
+                return
+            }
+        } else if !fileManager.isExecutableFile(atPath: scriptPath) {
+            try? fileManager.setAttributes(
+                [.posixPermissions: 0o755],
+                ofItemAtPath: scriptPath
+            )
+        }
+
+        let verbsURL = library.appending(path: "verbs.txt")
+        let existing = (try? Data(contentsOf: verbsURL)) ?? Data()
+        guard existing.isEmpty else { return }
+        guard let output = generateVerbs(), !output.isEmpty else { return }
+        try? output.write(to: verbsURL, atomically: true, encoding: .utf8)
+    }
+
+    private static func generateVerbs() -> String? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/sh")
+        process.arguments = [winetricksURL.path(percentEncoded: false), "list-all"]
+
+        let outputPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = FileHandle.nullDevice
+        do {
+            try process.run()
+        } catch {
+            return nil
+        }
+
+        let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        guard process.terminationStatus == 0 else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
     static func runCommand(command: String, bottle: Bottle) async {
+        await ensureSupportFiles()
         guard let resourcesURL = Bundle.main.url(forResource: "cabextract", withExtension: nil)?
             .deletingLastPathComponent() else { return }
         let binFolder = WineRuntimeManager.binFolder(bottle: bottle)
@@ -83,6 +156,8 @@ class Winetricks {
     }
 
     static func parseVerbs() async -> [WinetricksCategory] {
+        await ensureSupportFiles()
+
         // Grab the verbs file
         let verbsURL = WhiskyWineInstaller.libraryFolder.appending(path: "verbs.txt")
         let verbs: String = await { () async -> String in
