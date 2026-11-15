@@ -16,6 +16,7 @@
 //  If not, see https://www.gnu.org/licenses/.
 //
 
+import Darwin
 import Foundation
 import os.log
 
@@ -120,16 +121,24 @@ public class Wine {
             try enableDXVK(bottle: bottle)
         }
 
+        let isLauncher = HoYoPlayLaunch.isLauncher(at: url)
+        if isLauncher {
+            // A hidden/stale HYP process keeps HoYoPlay's singleton and makes a
+            // new launch silently exit without showing its window.
+            HoYoPlayLaunch.terminateStaleLauncherProcesses()
+        }
+
         var arguments = args
         if usesDXMT(bottle: bottle) {
             let extraArguments = HoYoPlayLaunch.additionalArguments(for: url, existing: arguments)
             if !extraArguments.isEmpty {
-                // A headless instance left behind by the installer keeps
-                // HoYoPlay's singleton and makes new launches exit at once.
-                HoYoPlayLaunch.terminateInstallerLaunchedProcesses()
                 arguments += extraArguments
             }
         }
+
+        // Snapshot before the helper starts, so only a new visible window
+        // satisfies the wait below.
+        let windowSnapshot = isLauncher ? WineWindowSnapshot.capture() : nil
 
         // The helper polls for HoYoPlay's window, so start it before the
         // launcher itself. A stale instance was terminated above already.
@@ -140,6 +149,18 @@ public class Wine {
             args: ["start", "/unix", url.path(percentEncoded: false)] + arguments,
             bottle: bottle, environment: environment
         ) { }
+
+        // `wine start` exits before HoYoPlay's CEF window is visible. Keep the
+        // launch spinner alive until the launcher actually appears, otherwise
+        // the UI looks finished while the window is still missing and the user
+        // clicks the pin again.
+        if let windowSnapshot, !windowSnapshot.hasVisibleWindow {
+            _ = await WineWindowSnapshot.waitForNewWindow(since: windowSnapshot, timeout: 25)
+        }
+
+        if isLauncher {
+            HoYoPlayLaunch.startStaleProcessMonitor()
+        }
     }
 
     public static func generateRunCommand(
@@ -147,11 +168,13 @@ public class Wine {
     ) -> String {
         let wineBinary = WineRuntimeManager.wineBinary(bottle: bottle)
         var arguments = args
+        if HoYoPlayLaunch.isLauncher(at: url) {
+            HoYoPlayLaunch.terminateStaleLauncherProcesses()
+        }
         if usesDXMT(bottle: bottle) {
             let existing = arguments.split(whereSeparator: { $0.isWhitespace }).map(String.init)
             let extraArguments = HoYoPlayLaunch.additionalArguments(for: url, existing: existing)
             if !extraArguments.isEmpty {
-                HoYoPlayLaunch.terminateInstallerLaunchedProcesses()
                 arguments = ([arguments] + extraArguments).joined(separator: " ")
             }
         }
@@ -296,7 +319,46 @@ public class Wine {
 
     public static func killBottle(bottle: Bottle) throws {
         Task.detached(priority: .userInitiated) {
-            try await runWineserver(["-k"], bottle: bottle)
+            await killBottleAndWait(bottle: bottle)
+        }
+    }
+
+    /// Terminate every process in a bottle and wait (with a bounded timeout)
+    /// for `wineserver -k` to finish.
+    ///
+    /// App termination uses this instead of the old fire-and-forget task. A
+    /// detached task was often cancelled when the app exited, leaving HYP/CEF
+    /// and wineserver processes behind.
+    public static func killBottleAndWait(bottle: Bottle, timeout: TimeInterval = 2.0) async {
+        await Task.detached(priority: .userInitiated) {
+            killBottleSynchronously(bottle: bottle, timeout: timeout)
+        }.value
+    }
+
+    private static func killBottleSynchronously(bottle: Bottle, timeout: TimeInterval) {
+        let process = Process()
+        process.executableURL = WineRuntimeManager.wineserverBinary(bottle: bottle)
+        process.arguments = ["-k"]
+        process.environment = constructWineServerEnvironment(for: bottle)
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+
+        let semaphore = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in
+            semaphore.signal()
+        }
+
+        do {
+            try process.run()
+        } catch {
+            return
+        }
+
+        if semaphore.wait(timeout: .now() + timeout) == .timedOut {
+            process.terminate()
+            if semaphore.wait(timeout: .now() + 1) == .timedOut {
+                kill(process.processIdentifier, SIGKILL)
+            }
         }
     }
 

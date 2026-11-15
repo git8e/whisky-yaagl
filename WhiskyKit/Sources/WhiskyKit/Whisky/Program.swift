@@ -51,7 +51,15 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
     }
 
     @Published public var isLaunching: Bool = false
+    @Published public var hasVisibleWindow: Bool = false
     @Published public var lastExitCode: Int? = nil
+
+    /// True only while the app is starting and its window has not appeared yet.
+    /// `isLaunching` intentionally stays true for the lifetime of a game so a
+    /// second click cannot start another instance.
+    public var isStarting: Bool {
+        isLaunching && !hasVisibleWindow
+    }
 
     public let peFile: PEFile?
 

@@ -21,14 +21,6 @@ public enum HK4ePatch {
         return "\"\(escaped)\""
     }
 
-    private static func waitUntilServerOff(bottle: Bottle) async {
-        do {
-            for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
-        } catch {
-            // best-effort
-        }
-    }
-
     private static func workDir(bottle: Bottle) throws -> URL {
         let dir = bottle.url.appendingPathComponent("HK4e", isDirectory: true)
         if !fm.fileExists(atPath: dir.path(percentEncoded: false)) {
@@ -159,8 +151,6 @@ public enum HK4ePatch {
             mergedEnv["WINEDLLOVERRIDES"] = "d3d11,dxgi=n,b"
         }
 
-        await waitUntilServerOff(bottle: bottle)
-
         let work = try workDir(bottle: bottle)
         let batURL = work.appending(path: "hk4e_run.bat", directoryHint: .notDirectory)
         let exeWine = toWinePath(exeURL.path(percentEncoded: false))
@@ -221,14 +211,12 @@ public enum HK4ePatch {
                 }
             }
         } catch {
-            await waitUntilServerOff(bottle: bottle)
             if let state {
                 await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL, state: state)
             }
             throw error
         }
 
-        await waitUntilServerOff(bottle: bottle)
         if let state {
             await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL, state: state)
         }

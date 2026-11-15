@@ -47,18 +47,40 @@ extension Program {
 
         let arguments = settings.arguments.split { $0.isWhitespace }.map(String.init)
         let environment = generateEnvironment()
+        let hk4eExe = bottle.settings.hk4eGameExecutableURL
+        let napExe = bottle.settings.napGameExecutableURL
+        let hkrpgExe = bottle.settings.hkrpgGameExecutableURL
+        let usesGamePatch = hk4eExe == url || napExe == url || hkrpgExe == url
+        let windowSnapshot = usesGamePatch ? WineWindowSnapshot.capture() : nil
 
         Task.detached(priority: .userInitiated) {
             await MainActor.run {
                 self.isLaunching = true
+                self.hasVisibleWindow = false
                 self.lastExitCode = nil
             }
+
+            // The game patch waits for the real game process/host to exit, but
+            // the window can appear much earlier. Stop the spinner when the
+            // window is actually visible while keeping `isLaunching` set so a
+            // second click cannot start another game instance.
+            let windowWatcher: Task<Void, Never>?
+            if let windowSnapshot {
+                windowWatcher = Task {
+                    _ = await WineWindowSnapshot.waitForNewWindow(since: windowSnapshot, timeout: 25)
+                    await MainActor.run {
+                        if self.isLaunching {
+                            self.hasVisibleWindow = true
+                        }
+                    }
+                }
+            } else {
+                windowWatcher = nil
+            }
+            defer { windowWatcher?.cancel() }
+
             do {
                 try await Wine.withLogSession(for: self.bottle) {
-                    let hk4eExe = self.bottle.settings.hk4eGameExecutableURL
-                    let napExe = self.bottle.settings.napGameExecutableURL
-                    let hkrpgExe = self.bottle.settings.hkrpgGameExecutableURL
-
                     if hk4eExe == self.url {
                         try await HK4ePatch.applyAndRun(program: self, args: arguments, environment: environment)
                     } else if napExe == self.url {
@@ -89,6 +111,7 @@ extension Program {
 
                 await MainActor.run {
                     self.isLaunching = false
+                    self.hasVisibleWindow = false
                     self.lastExitCode = exitCode
                     self.showRunError(message: error.localizedDescription, exitCode: exitCode)
                 }

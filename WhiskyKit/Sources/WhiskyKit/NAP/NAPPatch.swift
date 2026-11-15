@@ -20,14 +20,6 @@ public enum NAPPatch {
         return "\"\(escaped)\""
     }
 
-    private static func waitUntilServerOff(bottle: Bottle) async {
-        do {
-            for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
-        } catch {
-            // best-effort
-        }
-    }
-
     private static func workDir(bottle: Bottle) throws -> URL {
         let dir = bottle.url.appendingPathComponent("NAP", isDirectory: true)
         if !fm.fileExists(atPath: dir.path(percentEncoded: false)) {
@@ -102,8 +94,6 @@ public enum NAPPatch {
             ]
         }
 
-        await waitUntilServerOff(bottle: bottle)
-
         let work = try workDir(bottle: bottle)
         let batURL = work.appending(path: "nap_run.bat", directoryHint: .notDirectory)
         defer { try? fm.removeItem(at: batURL) }
@@ -158,14 +148,12 @@ public enum NAPPatch {
                 }
             }
         } catch {
-            await waitUntilServerOff(bottle: bottle)
             if bottle.settings.napCustomResolutionEnabled {
                 await NapResolution.revertIfNeeded(bottle: bottle, region: region)
             }
             throw error
         }
 
-        await waitUntilServerOff(bottle: bottle)
         if bottle.settings.napCustomResolutionEnabled {
             await NapResolution.revertIfNeeded(bottle: bottle, region: region)
         }

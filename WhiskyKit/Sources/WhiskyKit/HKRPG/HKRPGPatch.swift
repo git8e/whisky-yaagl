@@ -20,14 +20,6 @@ public enum HKRPGPatch {
         return "\"\(escaped)\""
     }
 
-    private static func waitUntilServerOff(bottle: Bottle) async {
-        do {
-            for await _ in try Wine.runWineserverProcess(args: ["-w"], bottle: bottle) { }
-        } catch {
-            // best-effort
-        }
-    }
-
     private static func workDir(bottle: Bottle) throws -> URL {
         let dir = bottle.url.appendingPathComponent("HKRPG", isDirectory: true)
         if !fm.fileExists(atPath: dir.path(percentEncoded: false)) {
@@ -165,8 +157,6 @@ public enum HKRPGPatch {
             }
         }
 
-        await waitUntilServerOff(bottle: bottle)
-
         // Ensure Jadeite is installed into the prefix.
         try await HKRPGJadeite.ensureInstalled(bottle: bottle)
 
@@ -221,14 +211,12 @@ public enum HKRPGPatch {
                 }
             }
         } catch {
-            await waitUntilServerOff(bottle: bottle)
             if let state {
                 await postRevert(bottle: bottle, gameDir: gameDir, prefixURL: prefixURL, state: state)
             }
             throw error
         }
 
-        await waitUntilServerOff(bottle: bottle)
         if let state {
             await postRevert(bottle: bottle, gameDir: gameDir, prefixURL: prefixURL, state: state)
         }

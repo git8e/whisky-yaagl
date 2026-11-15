@@ -18,9 +18,12 @@
 
 import Foundation
 import SwiftUI
+import WhiskyKit
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     @AppStorage("hasShownMoveToApplicationsAlert") private var hasShownMoveToApplicationsAlert = false
+    private var cleanupStarted = false
 
     func application(_ application: NSApplication, open urls: [URL]) {
         // Test if automatic window tabbing is enabled
@@ -46,9 +49,33 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         KeyMacroService.shared.shutdown()
-        if UserDefaults.standard.bool(forKey: "killOnTerminate") {
-            WhiskyApp.killBottles()
+    }
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        // `@AppStorage` defaults to true, but `UserDefaults.bool(forKey:)`
+        // returns false when the key has never been written. Keep the behavior
+        // consistent with the settings toggle.
+        let killOnTerminate = (UserDefaults.standard.object(forKey: "killOnTerminate") as? Bool) ?? true
+        guard killOnTerminate else {
+            return .terminateNow
         }
+        guard !cleanupStarted else {
+            return .terminateLater
+        }
+
+        cleanupStarted = true
+        Task { @MainActor in
+            let bottles = BottleVM.shared.bottles
+            await withTaskGroup(of: Void.self) { group in
+                for bottle in bottles {
+                    group.addTask {
+                        await Wine.killBottleAndWait(bottle: bottle)
+                    }
+                }
+            }
+            NSApp.reply(toApplicationShouldTerminate: true)
+        }
+        return .terminateLater
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

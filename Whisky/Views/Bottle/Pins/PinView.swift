@@ -30,8 +30,8 @@ struct PinView: View {
     @State private var name: String = ""
     @State private var opening: Bool = false
 
-    private var isLaunching: Bool {
-        program.isLaunching
+    private var isStarting: Bool {
+        program.isStarting
     }
 
     var body: some View {
@@ -52,7 +52,7 @@ struct PinView: View {
                 .scaleEffect(opening ? 2 : 1)
                 .opacity(opening ? 0 : 1)
 
-                if isLaunching {
+                if isStarting {
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(.black.opacity(0.18))
@@ -95,10 +95,10 @@ struct PinView: View {
             .labelStyle(.titleAndIcon)
         }
         .onTapGesture(count: 2) {
-            guard !isLaunching else { return }
+            guard !program.isLaunching else { return }
             runProgram()
         }
-        .allowsHitTesting(!isLaunching)
+        .allowsHitTesting(!program.isLaunching)
         .sheet(isPresented: $showRenameSheet) {
             RenameView("rename.pin.title", name: name) { newName in
                 name = newName
@@ -113,6 +113,12 @@ struct PinView: View {
             }
             self.image = await task.value
         }
+        .task {
+            // Start wineserver/winedevice while the user is still choosing a
+            // pin. The actual game process then starts in about a second
+            // instead of paying Wine's cold-start cost after the click.
+            await Wine.prewarm(bottle: bottle)
+        }
         .onChange(of: name) {
             if let index = bottle.settings.pins.firstIndex(where: {
                 return $0.url == pin.url
@@ -120,7 +126,7 @@ struct PinView: View {
                 bottle.settings.pins[index].name = name
             }
         }
-        .onChange(of: program.isLaunching) { _, newValue in
+        .onChange(of: program.isStarting) { _, newValue in
             if !newValue {
                 opening = false
             }
