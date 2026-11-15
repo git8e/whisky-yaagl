@@ -44,17 +44,17 @@ public enum MacroDSL {
         public var errorDescription: String? {
             switch self {
             case .empty:
-                return "宏内容为空"
+                return String(localized: "keyMacros.parseError.empty")
             case .unclosedTag:
-                return "标签没有闭合"
+                return String(localized: "keyMacros.parseError.unclosedTag")
             case .invalidTag(let tag):
-                return "无效标签：\(tag)"
+                return String(format: String(localized: "keyMacros.parseError.invalidTag"), tag)
             case .missingArgument(let tag):
-                return "标签缺少参数：\(tag)"
+                return String(format: String(localized: "keyMacros.parseError.missingArgument"), tag)
             case .invalidArgument(let tag):
-                return "标签参数无效：\(tag)"
+                return String(format: String(localized: "keyMacros.parseError.invalidArgument"), tag)
             case .unsupportedKey(let key):
-                return "不支持的按键：\(key)"
+                return String(format: String(localized: "keyMacros.parseError.unsupportedKey"), key)
             }
         }
     }
@@ -255,8 +255,8 @@ public enum MacroDSL {
     public static func durationText(of items: [MacroItem]) -> String {
         let total = durationSeconds(of: items)
         if total < 60 {
-            return String(format: "%.1f 秒", total)
+            return String(format: String(localized: "keyMacros.duration.seconds"), total)
         }
-        return String(format: "%.1f 分钟", total / 60)
+        return String(format: String(localized: "keyMacros.duration.minutes"), total / 60)
     }
 }

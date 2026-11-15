@@ -40,7 +40,7 @@ struct KeyMacroView: View {
     }
 
     private var bannerKind: PermissionBannerKind? {
-        if !service.enabled {
+        if !service.enabled || !store.settings.enabled {
             return .disabled
         }
         if !service.permissionGranted {
@@ -58,28 +58,31 @@ struct KeyMacroView: View {
                 permissionBanner
             }
 
-            HSplitView {
-                MacroListView(
-                    store: store,
-                    selection: $selectedScriptID,
-                    bottleName: bottle.settings.name,
-                    isForeground: isForegroundBottle,
-                    onRecordTrigger: beginCapture
-                )
-                .frame(minWidth: 250, idealWidth: 280, maxWidth: 340)
-
-                editor
-                    .frame(minWidth: 500, maxWidth: .infinity, maxHeight: .infinity)
+            GeometryReader { proxy in
+                Group {
+                    if proxy.size.width < 720 {
+                        VSplitView {
+                            macroList
+                                .frame(minHeight: 180, idealHeight: 210, maxHeight: 250)
+                            editor
+                                .frame(minHeight: 280, maxHeight: .infinity)
+                        }
+                    } else {
+                        HSplitView {
+                            macroList
+                                .frame(minWidth: 220, idealWidth: 260, maxWidth: 320)
+                            editor
+                                .frame(minWidth: 360, maxWidth: .infinity, maxHeight: .infinity)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .frame(minWidth: 820, minHeight: 580)
         .navigationTitle("keyMacros.title")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Toggle(isOn: Binding(
-                    get: { service.enabled },
-                    set: { service.enabled = $0 }
-                )) {
+                Toggle(isOn: macroEnabledBinding) {
                     Label("keyMacros.enabled", systemImage: "keyboard")
                 }
                 .toggleStyle(.switch)
@@ -87,16 +90,21 @@ struct KeyMacroView: View {
             }
 
             ToolbarItem(placement: .primaryAction) {
-                Button {
-                    service.refreshPermission()
-                } label: {
-                    Label("keyMacros.permission.refresh", systemImage: "arrow.clockwise")
+                Button(action: addMacro) {
+                    Label("keyMacros.new", systemImage: "doc.badge.plus")
+                        .labelStyle(.titleAndIcon)
                 }
+                .help("keyMacros.new")
             }
         }
         .onAppear {
             service.start()
             ensureSelection()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            // Permissions are changed in System Settings. Refresh when the user
+            // comes back instead of showing a second refresh button.
+            service.refreshPermission()
         }
         .onChange(of: selectedScriptID) { _, newValue in
             store.selectScript(id: newValue)
@@ -114,6 +122,32 @@ struct KeyMacroView: View {
         } message: {
             Text(triggerError ?? "")
         }
+    }
+
+    private var macroList: some View {
+        MacroListView(
+            store: store,
+            selection: $selectedScriptID,
+            bottleName: bottle.settings.name,
+            isForeground: isForegroundBottle,
+            onRecordTrigger: beginCapture
+        )
+    }
+
+    private var macroEnabledBinding: Binding<Bool> {
+        Binding(
+            get: { service.enabled && store.settings.enabled },
+            set: { enabled in
+                service.enabled = enabled
+                store.setEnabled(enabled)
+            }
+        )
+    }
+
+    private func addMacro() {
+        let id = store.addScript(name: String(localized: "keyMacros.newName"))
+        selectedScriptID = id
+        store.selectScript(id: id)
     }
 
     private var permissionBanner: some View {
@@ -142,29 +176,18 @@ struct KeyMacroView: View {
             Spacer(minLength: 12)
 
             switch bannerKind {
-            case .disabled:
-                Button("keyMacros.enabled") {
-                    service.enabled = true
-                }
-                .buttonStyle(.borderedProminent)
             case .permission:
                 Button("keyMacros.permission.open") {
                     service.requestPermission()
                     service.openAccessibilitySettings()
                 }
                 .buttonStyle(.borderedProminent)
-                Button("keyMacros.permission.refresh") {
-                    service.refreshPermission()
-                }
             case .listener:
                 Button("keyMacros.permission.inputMonitoring") {
                     service.openInputMonitoringSettings()
                 }
                 .buttonStyle(.borderedProminent)
-                Button("keyMacros.permission.refresh") {
-                    service.refreshPermission()
-                }
-            case nil:
+            case .disabled, nil:
                 EmptyView()
             }
         }
@@ -320,10 +343,11 @@ private struct MacroListView: View {
             }
             .listStyle(.sidebar)
 
-            Divider()
-
-            footer
-                .padding(12)
+            if store.lastSavedAt != nil {
+                Divider()
+                footer
+                    .padding(12)
+            }
         }
         .alert("keyMacros.rename.title", isPresented: Binding(
             get: { renameTarget != nil },
@@ -372,15 +396,6 @@ private struct MacroListView: View {
             }
 
             Spacer(minLength: 4)
-
-            Button {
-                let id = store.addScript(name: String(localized: "keyMacros.newName"))
-                selection = id
-            } label: {
-                Image(systemName: "plus")
-            }
-            .buttonStyle(.borderless)
-            .help("keyMacros.new")
         }
     }
 
@@ -434,15 +449,7 @@ private struct MacroListView: View {
 
     private var footer: some View {
         HStack {
-            Toggle("keyMacros.container.enabled", isOn: Binding(
-                get: { store.settings.enabled },
-                set: { store.setEnabled($0) }
-            ))
-            .toggleStyle(.switch)
-            .font(.caption)
-
             Spacer()
-
             if let saved = store.lastSavedAt {
                 Text(String(
                     format: NSLocalizedString("keyMacros.saved", comment: ""),
@@ -487,16 +494,19 @@ private struct MacroEditorView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if let script {
-                header(script: script)
-                Divider()
-                scriptEditor(script: script)
-                Divider()
-                triggerSection(script: script)
-            } else {
-                ContentUnavailableView("keyMacros.missing.title", systemImage: "exclamationmark.triangle")
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                if let script {
+                    header(script: script)
+                    Divider()
+                    scriptEditor(script: script)
+                    Divider()
+                    triggerSection(script: script)
+                } else {
+                    ContentUnavailableView("keyMacros.missing.title", systemImage: "exclamationmark.triangle")
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -527,7 +537,7 @@ private struct MacroEditorView: View {
                     systemImage: service.macroRunning ? "waveform" : "pause.circle"
                 )
                 .font(.caption)
-                    .foregroundStyle(service.macroRunning ? .blue : .secondary)
+                .foregroundStyle(service.macroRunning ? .blue : .secondary)
                 if service.macroRunning {
                     Button("keyMacros.stop") {
                         service.stopMacro()
@@ -547,7 +557,7 @@ private struct MacroEditorView: View {
     private func scriptEditor(script: MacroScript) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             ScriptTextView(text: textBinding)
-                .frame(minHeight: 210, maxHeight: .infinity)
+                .frame(minHeight: 180, idealHeight: 220, maxHeight: 260)
                 .overlay {
                     if script.text.isEmpty {
                         Text("keyMacros.script.example")

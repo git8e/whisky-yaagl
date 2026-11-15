@@ -55,15 +55,9 @@ struct BottleView: View {
                 }
                 .padding()
                 Form {
-                    NavigationLink(value: BottleStage.programs) {
-                        Label("tab.programs", systemImage: "list.bullet")
-                    }
-                    NavigationLink(value: BottleStage.config) {
-                        Label("tab.config", systemImage: "gearshape")
-                    }
-                    NavigationLink(value: BottleStage.keyMacros) {
-                        Label("keyMacros.title", systemImage: "keyboard")
-                    }
+                    sidebarLink("tab.programs", systemImage: "list.bullet", stage: .programs)
+                    sidebarLink("tab.config", systemImage: "gearshape", stage: .config)
+                    sidebarLink("keyMacros.title", systemImage: "keyboard", stage: .keyMacros)
 //                    NavigationLink(value: BottleStage.processes) {
 //                        Label("tab.processes", systemImage: "hockey.puck.circle")
 //                    }
@@ -173,6 +167,21 @@ struct BottleView: View {
             }
             .navigationDestination(for: Program.self) { program in
                 ProgramView(program: program)
+            }
+        }
+    }
+
+    private func sidebarLink(
+        _ title: LocalizedStringKey,
+        systemImage: String,
+        stage: BottleStage
+    ) -> some View {
+        NavigationLink(value: stage) {
+            HStack(spacing: 8) {
+                Image(systemName: systemImage)
+                    .frame(width: 22, alignment: .center)
+                Text(title)
+                Spacer(minLength: 0)
             }
         }
     }

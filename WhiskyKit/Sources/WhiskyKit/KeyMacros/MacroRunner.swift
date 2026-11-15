@@ -53,11 +53,11 @@ public final class MacroRunner {
 
         public var label: String {
             switch self {
-            case .idle: return "空闲"
-            case .stopped: return "已停止"
-            case .runningLoop: return "循环运行中"
-            case .runningOnce: return "执行一次"
-            case .emptyMacro: return "宏为空"
+            case .idle: return String(localized: "keyMacros.status.idle")
+            case .stopped: return String(localized: "keyMacros.status.stopped")
+            case .runningLoop: return String(localized: "keyMacros.status.runningLoop")
+            case .runningOnce: return String(localized: "keyMacros.status.runningOnce")
+            case .emptyMacro: return String(localized: "keyMacros.status.emptyMacro")
             }
         }
     }

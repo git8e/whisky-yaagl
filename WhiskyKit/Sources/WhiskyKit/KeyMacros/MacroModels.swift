@@ -30,11 +30,11 @@ public enum MacroMouseButton: String, Codable, Sendable, CaseIterable, Identifia
 
     public var displayName: String {
         switch self {
-        case .left: return "鼠标左键"
-        case .right: return "鼠标右键"
-        case .middle: return "鼠标中键"
-        case .button4: return "鼠标侧键 4"
-        case .button5: return "鼠标侧键 5"
+        case .left: return String(localized: "keyMacros.mouse.left")
+        case .right: return String(localized: "keyMacros.mouse.right")
+        case .middle: return String(localized: "keyMacros.mouse.middle")
+        case .button4: return String(localized: "keyMacros.mouse.button4")
+        case .button5: return String(localized: "keyMacros.mouse.button5")
         }
     }
 
@@ -105,19 +105,19 @@ public enum MacroTriggerMode: String, Codable, CaseIterable, Sendable, Identifia
 
     public var title: String {
         switch self {
-        case .once: return "按一次"
-        case .holdLoop: return "按住循环，松开停止"
-        case .holdFinish: return "按住循环，松开跑完这一遍"
-        case .toggle: return "点一下开始/停止"
+        case .once: return String(localized: "keyMacros.mode.once")
+        case .holdLoop: return String(localized: "keyMacros.mode.holdLoop")
+        case .holdFinish: return String(localized: "keyMacros.mode.holdFinish")
+        case .toggle: return String(localized: "keyMacros.mode.toggle")
         }
     }
 
     public var detail: String {
         switch self {
-        case .once: return "每次按下触发键执行一次宏。"
-        case .holdLoop: return "按住触发键时循环执行，松开立即停止。"
-        case .holdFinish: return "按住触发键时循环执行，松开后执行完当前这一遍再停止。"
-        case .toggle: return "按一下开始循环，再按一下停止，适合鼠标侧键。"
+        case .once: return String(localized: "keyMacros.mode.once.detail")
+        case .holdLoop: return String(localized: "keyMacros.mode.holdLoop.detail")
+        case .holdFinish: return String(localized: "keyMacros.mode.holdFinish.detail")
+        case .toggle: return String(localized: "keyMacros.mode.toggle.detail")
         }
     }
 }
@@ -133,7 +133,10 @@ public enum MacroTrigger: Codable, Hashable, Sendable {
         case .key(let code, let flags):
             return Self.modifierPrefix(flags) + KeyCodeMap.displayName(for: CGKeyCode(code))
         case .mouse(let buttonNumber):
-            return "鼠标键 \(buttonNumber + 1)"
+            return String(
+                format: String(localized: "keyMacros.mouseButton"),
+                buttonNumber + 1
+            )
         }
     }
 
@@ -262,12 +265,18 @@ public struct MacroScript: Identifiable, Codable, Equatable, Sendable {
 
     public var displayName: String {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "未命名宏" : trimmed
+        return trimmed.isEmpty ? String(localized: "keyMacros.untitled") : trimmed
     }
 
     public var summary: String {
-        guard let items = try? MacroDSL.parse(text) else { return "解析失败" }
-        return "\(items.count) 个动作 · \(MacroDSL.durationText(of: items))"
+        guard let items = try? MacroDSL.parse(text) else {
+            return String(localized: "keyMacros.parse.failed")
+        }
+        return String(
+            format: String(localized: "keyMacros.summary"),
+            items.count,
+            MacroDSL.durationText(of: items)
+        )
     }
 }
 

@@ -38,13 +38,13 @@ enum KeyCodeMap {
     static func displayName(for code: CGKeyCode) -> String {
         switch Int(code) {
         case kVK_Shift: return "Shift"
-        case kVK_RightShift: return "右 Shift"
+        case kVK_RightShift: return String(localized: "keyMacros.key.rightShift")
         case kVK_Control: return "Control"
-        case kVK_RightControl: return "右 Control"
+        case kVK_RightControl: return String(localized: "keyMacros.key.rightControl")
         case kVK_Command: return "Command"
-        case kVK_RightCommand: return "右 Command"
+        case kVK_RightCommand: return String(localized: "keyMacros.key.rightCommand")
         case kVK_Option: return "Option"
-        case kVK_RightOption: return "右 Option"
+        case kVK_RightOption: return String(localized: "keyMacros.key.rightOption")
         case kVK_CapsLock: return "Caps Lock"
         case kVK_Function: return "Fn"
         case kVK_Space: return "Space"
@@ -133,7 +133,7 @@ enum KeyCodeMap {
         case kVK_ANSI_Grave: return "`"
 
         default:
-            return "键码 \(Int(code))"
+            return String(format: String(localized: "keyMacros.key.code"), Int64(code))
         }
     }
 
