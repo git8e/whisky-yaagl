@@ -584,20 +584,21 @@ private struct MacroEditorView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                if let script {
-                    header(script: script)
-                    Divider()
-                    scriptEditor(script: script)
-                    Divider()
-                    triggerSection(script: script)
-                } else {
-                    ContentUnavailableView("keyMacros.missing.title", systemImage: "exclamationmark.triangle")
-                }
+        VStack(alignment: .leading, spacing: 0) {
+            if let script {
+                header(script: script)
+                Divider()
+                scriptEditor(script: script)
+                    .frame(maxHeight: .infinity)
+                Divider()
+                triggerSection(script: script)
+                    .layoutPriority(1)
+            } else {
+                ContentUnavailableView("keyMacros.missing.title", systemImage: "exclamationmark.triangle")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
@@ -648,7 +649,7 @@ private struct MacroEditorView: View {
     private func scriptEditor(script: MacroScript) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             ScriptTextView(text: textBinding)
-                .frame(minHeight: 220, idealHeight: 250, maxHeight: 300)
+                .frame(minHeight: 120, maxHeight: .infinity)
                 .overlay {
                     if script.text.isEmpty {
                         Text("keyMacros.script.example")
