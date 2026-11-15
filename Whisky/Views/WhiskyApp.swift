@@ -154,6 +154,7 @@ struct WhiskyApp: App {
                     }
                 }
         }
+        .windowResizability(.contentMinSize)
         // Don't ask me how this works, it just does
         .handlesExternalEvents(matching: ["{same path of URL?}"])
         .commands {

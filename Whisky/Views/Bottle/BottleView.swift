@@ -29,7 +29,6 @@ enum BottleStage {
 
 struct BottleView: View {
     @ObservedObject var bottle: Bottle
-    @Binding var keyMacroActive: Bool
     @State private var path = NavigationPath()
     @State private var programLoading: Bool = false
     @State private var showWinetricksSheet: Bool = false
@@ -163,10 +162,7 @@ struct BottleView: View {
                 case .processes:
                     RunningProcessesView(bottle: bottle)
                 case .keyMacros:
-                    KeyMacroView(
-                        bottle: bottle,
-                        onActiveChange: { keyMacroActive = $0 }
-                    )
+                    KeyMacroView(bottle: bottle)
                 }
             }
             .navigationDestination(for: Program.self) { program in

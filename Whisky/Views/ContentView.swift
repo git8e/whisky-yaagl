@@ -34,7 +34,6 @@ struct ContentView: View {
     @State private var openedFileURL: URL?
     @State private var triggerRefresh: Bool = false
     @State private var refreshAnimation: Angle = .degrees(0)
-    @State private var keyMacroActive = false
 
     @State private var bottleFilter = ""
 
@@ -47,15 +46,15 @@ struct ContentView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    if keyMacroActive {
-                        NotificationCenter.default.post(name: .newMacroRequested, object: nil)
+                    if KeyMacroToolbarCoordinator.shared.isActive {
+                        KeyMacroToolbarCoordinator.shared.requestNewMacro()
                     } else {
                         showBottleCreation.toggle()
                     }
                 } label: {
                     Image(systemName: "plus")
                 }
-                .help(keyMacroActive ? Text("keyMacros.new") : Text("button.createBottle"))
+                .help("button.createBottle")
             }
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -89,7 +88,7 @@ struct ContentView: View {
         }
         .onChange(of: selected) {
             selectedBottleURL = selected
-            keyMacroActive = false
+            KeyMacroToolbarCoordinator.shared.deactivate()
         }
         .handlesExternalEvents(preferring: [], allowing: ["*"])
         .onOpenURL { url in
@@ -160,7 +159,7 @@ struct ContentView: View {
     var detail: some View {
         if let bottle = selected {
             if let bottle = bottleVM.bottles.first(where: { $0.url == bottle }) {
-                BottleView(bottle: bottle, keyMacroActive: $keyMacroActive)
+                BottleView(bottle: bottle)
                     .disabled(bottle.inFlight)
                     .id(bottle.url)
             }

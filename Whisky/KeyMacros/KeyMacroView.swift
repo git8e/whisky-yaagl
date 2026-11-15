@@ -19,12 +19,33 @@
 // swiftlint:disable file_length
 
 import AppKit
+import Combine
 import SwiftUI
 import WhiskyKit
 
+@MainActor
+final class KeyMacroToolbarCoordinator {
+    static let shared = KeyMacroToolbarCoordinator()
+
+    private(set) var isActive = false
+    let newMacro = PassthroughSubject<Void, Never>()
+
+    func activate() {
+        isActive = true
+    }
+
+    func deactivate() {
+        isActive = false
+    }
+
+    func requestNewMacro() {
+        guard isActive else { return }
+        newMacro.send()
+    }
+}
+
 struct KeyMacroView: View {
     @ObservedObject var bottle: Bottle
-    let onActiveChange: (Bool) -> Void
     @StateObject private var service = KeyMacroService.shared
 
     @State private var selectedScriptID: UUID?
@@ -78,14 +99,14 @@ struct KeyMacroView: View {
             }
         }
         .onAppear {
-            onActiveChange(true)
+            KeyMacroToolbarCoordinator.shared.activate()
             service.start()
             ensureSelection()
         }
         .onDisappear {
-            onActiveChange(false)
+            KeyMacroToolbarCoordinator.shared.deactivate()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .newMacroRequested)) { _ in
+        .onReceive(KeyMacroToolbarCoordinator.shared.newMacro) { _ in
             addMacro()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
@@ -547,7 +568,7 @@ private struct MacroEditorView: View {
     private func scriptEditor(script: MacroScript) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             ScriptTextView(text: textBinding)
-                .frame(minHeight: 180, idealHeight: 220, maxHeight: 260)
+                .frame(minHeight: 220, idealHeight: 250, maxHeight: 300)
                 .overlay {
                     if script.text.isEmpty {
                         Text("keyMacros.script.example")
@@ -577,14 +598,6 @@ private struct MacroEditorView: View {
                     .monospacedDigit()
                     .frame(width: 58, alignment: .trailing)
             }
-
-            Text(
-                "{WAITMS:n} {WAIT:n} {HOLDMS:n} {HOLD:n} {LMB} {RMB} {MMB} {MB4} {MB5} "
-                    + "{SHIFT} {CTRL} {ALT} {CMD} {CLEAR}"
-            )
-            .font(.caption2)
-            .foregroundStyle(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
         }
         .padding(14)
     }
@@ -925,7 +938,3 @@ struct ScriptTextView: NSViewRepresentable {
 }
 
 // swiftlint:enable file_length
-
-extension Notification.Name {
-    static let newMacroRequested = Notification.Name("WhiskyNewMacroRequested")
-}
