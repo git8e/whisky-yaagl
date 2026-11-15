@@ -88,16 +88,11 @@ struct KeyMacroView: View {
             }
         }
         .frame(minWidth: 820, minHeight: 580)
+        .background(
+            MacroWindowSizer(minimumContentSize: NSSize(width: 820, height: 580))
+                .frame(width: 0, height: 0)
+        )
         .navigationTitle("keyMacros.title")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Toggle(isOn: macroEnabledBinding) {
-                    Label("keyMacros.enabled", systemImage: "keyboard")
-                }
-                .toggleStyle(.switch)
-                .help("keyMacros.enabled")
-            }
-        }
         .onAppear {
             KeyMacroToolbarCoordinator.shared.activate()
             service.start()
@@ -138,6 +133,7 @@ struct KeyMacroView: View {
             selection: $selectedScriptID,
             bottleName: bottle.settings.name,
             isForeground: isForegroundBottle,
+            enabled: macroEnabledBinding,
             onRecordTrigger: beginCapture
         )
     }
@@ -333,6 +329,7 @@ private struct MacroListView: View {
     @Binding var selection: UUID?
     let bottleName: String
     let isForeground: Bool
+    @Binding var enabled: Bool
     let onRecordTrigger: (UUID) -> Void
 
     @State private var renameTarget: MacroScript?
@@ -407,6 +404,12 @@ private struct MacroListView: View {
             }
 
             Spacer(minLength: 4)
+
+            Toggle("keyMacros.enabled", isOn: $enabled)
+                .toggleStyle(.switch)
+                .controlSize(.small)
+                .labelsHidden()
+                .help("keyMacros.enabled")
         }
     }
 
@@ -933,6 +936,45 @@ struct ScriptTextView: NSViewRepresentable {
             if parent.text != textView.string {
                 parent.text = textView.string
             }
+        }
+    }
+}
+
+private struct MacroWindowSizer: NSViewRepresentable {
+    let minimumContentSize: NSSize
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView(frame: .zero)
+        DispatchQueue.main.async {
+            guard let window = view.window else { return }
+
+            window.contentMinSize = minimumContentSize
+            let current = window.contentView?.bounds.size ?? window.contentLayoutRect.size
+            let target = NSSize(
+                width: max(current.width, minimumContentSize.width),
+                height: max(current.height, minimumContentSize.height)
+            )
+            guard target.width > current.width + 0.5 || target.height > current.height + 0.5 else { return }
+
+            let contentRect = NSRect(origin: .zero, size: target)
+            let frameSize = window.frameRect(forContentRect: contentRect).size
+            var frame = window.frame
+            // Keep the top edge in place when growing.
+            frame.origin.y -= frameSize.height - frame.height
+            frame.size = frameSize
+            window.setFrame(frame, display: true)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
+
+    static func dismantleNSView(_ nsView: NSView, coordinator: Void) {
+        DispatchQueue.main.async {
+            nsView.window?.contentMinSize = NSSize(
+                width: CGFloat(ViewWidth.large),
+                height: 316
+            )
         }
     }
 }
