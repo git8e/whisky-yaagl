@@ -981,6 +981,7 @@ struct ScriptTextView: NSViewRepresentable {
         textView.isAutomaticLinkDetectionEnabled = false
         textView.isAutomaticDataDetectionEnabled = false
         textView.textContainerInset = NSSize(width: 12, height: 12)
+        textView.textContainer?.lineFragmentPadding = 0
         textView.delegate = context.coordinator
         textView.string = text
         textView.isVerticallyResizable = true
