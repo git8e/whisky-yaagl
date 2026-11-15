@@ -150,6 +150,8 @@ final class KeyMacroService: ObservableObject {
     private var activationObserver: NSObjectProtocol?
     private var captureHandler: ((MacroTrigger) -> Void)?
     private var pressedTriggers: [MacroTrigger: (binding: MacroTriggerBinding, pid: pid_t)] = [:]
+    private var restoreFocusAfterTest = false
+    private var testPending = false
     private var started = false
 
     private init() {
@@ -161,6 +163,10 @@ final class KeyMacroService: ObservableObject {
         runner.onStateChange = { [weak self] running, status in
             self?.macroRunning = running
             self?.macroStatus = status
+            if !running, self?.restoreFocusAfterTest == true {
+                self?.restoreFocusAfterTest = false
+                _ = NSRunningApplication.current.activate(options: [.activateIgnoringOtherApps])
+            }
         }
     }
 
@@ -275,6 +281,8 @@ final class KeyMacroService: ObservableObject {
         captureHandler = nil
         captureActive = false
         pressedTriggers.removeAll()
+        restoreFocusAfterTest = false
+        testPending = false
         runner.stopAll()
     }
 
@@ -344,6 +352,8 @@ final class KeyMacroService: ObservableObject {
             guard let targetBottle = bottleURL(for: pid), targetBottle == frontBottle else {
                 return nil
             }
+            activeBottleURL = targetBottle
+            activeTargetPID = pid
             return KeyMacroTarget(pid: pid, bottleURL: targetBottle)
         }
 
@@ -353,6 +363,8 @@ final class KeyMacroService: ObservableObject {
            let targetApp = NSRunningApplication(processIdentifier: eventPID),
            targetApp.isActive,
            let targetBottle = bottleURL(for: eventPID) {
+            activeBottleURL = targetBottle
+            activeTargetPID = eventPID
             return KeyMacroTarget(pid: eventPID, bottleURL: targetBottle)
         }
 
@@ -373,6 +385,10 @@ final class KeyMacroService: ObservableObject {
         if let url = bottleURL(for: app.processIdentifier) {
             activeBottleURL = url
             activeTargetPID = app.processIdentifier
+        } else if app.processIdentifier == activeTargetPID, activeTargetPID > 0 {
+            // Some Wine games do not expose the bottle environment. Keep the
+            // target that was resolved from the game window or event tap.
+            return
         } else {
             activeBottleURL = nil
             activeTargetPID = 0
@@ -413,20 +429,135 @@ final class KeyMacroService: ObservableObject {
     // MARK: - Testing
 
     func test(script: MacroScript, store: BottleMacroStore) {
-        guard activeTargetPID > 0 else {
-            lastError = String(localized: "keyMacros.error.foreground")
+        lastError = nil
+        guard !runner.isRunning, !testPending else { return }
+        guard permissionGranted else {
+            lastError = String(localized: "keyMacros.error.permission")
             return
         }
+        guard let target = resolveGameTarget(for: store.bottleURL) else {
+            lastError = String(localized: "keyMacros.error.noTarget")
+            return
+        }
+
+        let items: [MacroItem]
         do {
-            let items = try MacroDSL.parse(script.text, defaultHoldMs: store.settings.defaultHoldMs)
-            guard !items.isEmpty else {
-                lastError = String(localized: "keyMacros.error.emptyMacro")
-                return
-            }
-            runner.runOnce(items: items, targetPID: activeTargetPID)
+            items = try MacroDSL.parse(script.text, defaultHoldMs: store.settings.defaultHoldMs)
         } catch {
             lastError = error.localizedDescription
+            return
         }
+        guard !items.isEmpty else {
+            lastError = String(localized: "keyMacros.error.emptyMacro")
+            return
+        }
+
+        let targetPID = target.pid
+        let game = NSRunningApplication(processIdentifier: targetPID)
+        let activated = game?.activate(options: [.activateIgnoringOtherApps]) ?? false
+        let raised = raiseWindow(for: targetPID)
+        guard activated || raised else {
+            lastError = String(localized: "keyMacros.error.focus")
+            return
+        }
+        restoreFocusAfterTest = true
+        testPending = true
+
+        // Wine routes keyboard events to the active window; give macOS a moment
+        // to bring the game forward before the first event is posted.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self else { return }
+            self.testPending = false
+            guard self.permissionGranted else {
+                self.restoreFocusAfterTest = false
+                return
+            }
+            guard !self.runner.isRunning else {
+                self.restoreFocusAfterTest = false
+                return
+            }
+            self.runner.runOnce(items: items, targetPID: targetPID)
+        }
+    }
+
+    private func resolveGameTarget(for bottleURL: URL) -> KeyMacroTarget? {
+        let standardized = bottleURL.standardizedFileURL
+
+        if let pid = windowTargetPID(for: standardized) {
+            activeBottleURL = standardized
+            activeTargetPID = pid
+            return KeyMacroTarget(pid: pid, bottleURL: standardized)
+        }
+
+        if activeTargetPID > 0,
+           let app = NSRunningApplication(processIdentifier: activeTargetPID),
+           !app.isTerminated,
+           self.bottleURL(for: activeTargetPID)?.standardizedFileURL == standardized {
+            activeBottleURL = standardized
+            return KeyMacroTarget(pid: activeTargetPID, bottleURL: standardized)
+        }
+
+        for app in NSWorkspace.shared.runningApplications {
+            let pid = app.processIdentifier
+            guard pid > 0, pid != getpid(), !app.isTerminated,
+                  self.bottleURL(for: pid)?.standardizedFileURL == standardized else {
+                continue
+            }
+            activeBottleURL = standardized
+            activeTargetPID = pid
+            return KeyMacroTarget(pid: pid, bottleURL: standardized)
+        }
+
+        return nil
+    }
+
+    private func windowTargetPID(for bottleURL: URL) -> pid_t? {
+        let options: CGWindowListOption = [.optionAll, .excludeDesktopElements]
+        guard let windows = CGWindowListCopyWindowInfo(options, kCGNullWindowID) as? [[String: Any]] else {
+            return nil
+        }
+
+        var best: (pid: pid_t, area: Double)?
+        for window in windows {
+            guard let layer = window[kCGWindowLayer as String] as? Int, layer == 0 else { continue }
+            guard let owner = window[kCGWindowOwnerPID as String] as? NSNumber else { continue }
+            let pid = pid_t(owner.int32Value)
+            guard pid > 0, pid != getpid() else { continue }
+
+            let bounds = window[kCGWindowBounds as String] as? [String: Any] ?? [:]
+            let width = (bounds["Width"] as? NSNumber)?.doubleValue ?? 0
+            let height = (bounds["Height"] as? NSNumber)?.doubleValue ?? 0
+            guard width >= 320, height >= 240 else { continue }
+            guard self.bottleURL(for: pid)?.standardizedFileURL == bottleURL else { continue }
+
+            let area = width * height
+            if let current = best, area <= current.area {
+                continue
+            }
+            best = (pid, area)
+        }
+        return best?.pid
+    }
+
+    private func raiseWindow(for pid: pid_t) -> Bool {
+        let appElement = AXUIElementCreateApplication(pid)
+        _ = AXUIElementSetAttributeValue(
+            appElement,
+            kAXFrontmostAttribute as CFString,
+            kCFBooleanTrue
+        )
+
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+            appElement,
+            kAXWindowsAttribute as CFString,
+            &value
+        ) == .success,
+        let windows = value as? [AXUIElement],
+        let window = windows.first else {
+            return false
+        }
+        return AXUIElementPerformAction(window, kAXRaiseAction as CFString) == .success
     }
 
     func stopMacro() {

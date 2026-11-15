@@ -560,6 +560,8 @@ private struct MacroEditorView: View {
     let scriptID: UUID
     let onCaptureTrigger: () -> Void
 
+    @State private var testError: String?
+
     private var script: MacroScript? {
         store.script(id: scriptID)
     }
@@ -602,6 +604,16 @@ private struct MacroEditorView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Color(nsColor: .windowBackgroundColor))
+        .alert("keyMacros.test.error.title", isPresented: Binding(
+            get: { testError != nil },
+            set: { if !$0 { testError = nil } }
+        )) {
+            Button("keyMacros.confirm") {
+                testError = nil
+            }
+        } message: {
+            Text(testError ?? "")
+        }
     }
 
     private func header(script: MacroScript) -> some View {
@@ -618,10 +630,11 @@ private struct MacroEditorView: View {
                 }
                 Button {
                     service.test(script: script, store: store)
+                    testError = service.lastError
                 } label: {
                     Label("keyMacros.test", systemImage: "play.fill")
                 }
-                .disabled(service.activeTargetPID == 0)
+                .disabled(service.macroRunning)
                 .help("keyMacros.test.help")
             }
 

@@ -27790,19 +27790,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bring the game to the foreground before testing"
+            "value" : "Testing switches to the game window automatically"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "让游戏位于前台后测试宏"
+            "value" : "测试时会自动切换到游戏窗口"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "讓遊戲位於前景後測試巨集"
+            "value" : "測試時會自動切換到遊戲視窗"
           }
         }
       }
@@ -29387,6 +29387,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "錄製觸發鍵需要輸入監控權限。請在系統設定中允許 Whisky 監聽輸入，然後重試。"
+          }
+        }
+      }
+    },
+    "keyMacros.test.error.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to Test Macro"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法测试宏"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法測試巨集"
+          }
+        }
+      }
+    },
+    "keyMacros.error.noTarget" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No running game was found for this container. Start the game first."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有找到该容器中正在运行的游戏。请先启动游戏。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到此容器中正在執行的遊戲。請先啟動遊戲。"
+          }
+        }
+      }
+    },
+    "keyMacros.error.focus" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not switch to the game window. Bring the game forward and try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法切换到游戏窗口。请将游戏切换到前台后重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法切換到遊戲視窗。請將遊戲切換到前景後重試。"
           }
         }
       }
