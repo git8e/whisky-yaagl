@@ -126,6 +126,17 @@ struct KeyMacroView: View {
         } message: {
             Text(triggerError ?? "")
         }
+    }
+
+    private var macroList: some View {
+        MacroListView(
+            store: store,
+            selection: $selectedScriptID,
+            bottleName: bottle.settings.name,
+            isForeground: isForegroundBottle,
+            enabled: macroEnabledBinding,
+            onRecordTrigger: beginCapture
+        )
         .alert("keyMacros.permission.required.title", isPresented: Binding(
             get: { captureAuthorizationIssue != nil },
             set: { if !$0 { captureAuthorizationIssue = nil } }
@@ -144,17 +155,6 @@ struct KeyMacroView: View {
                 Text(issue.messageKey)
             }
         }
-    }
-
-    private var macroList: some View {
-        MacroListView(
-            store: store,
-            selection: $selectedScriptID,
-            bottleName: bottle.settings.name,
-            isForeground: isForegroundBottle,
-            enabled: macroEnabledBinding,
-            onRecordTrigger: beginCapture
-        )
     }
 
     private var macroEnabledBinding: Binding<Bool> {
