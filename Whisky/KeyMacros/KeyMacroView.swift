@@ -52,6 +52,7 @@ struct KeyMacroView: View {
     @State private var captureScriptID: UUID?
     @State private var showCapture = false
     @State private var triggerError: String?
+    @State private var captureAuthorizationIssue: CaptureAuthorizationIssue?
 
     private var store: BottleMacroStore {
         service.store(for: bottle)
@@ -124,6 +125,24 @@ struct KeyMacroView: View {
             }
         } message: {
             Text(triggerError ?? "")
+        }
+        .alert("keyMacros.permission.required.title", isPresented: Binding(
+            get: { captureAuthorizationIssue != nil },
+            set: { if !$0 { captureAuthorizationIssue = nil } }
+        )) {
+            if let issue = captureAuthorizationIssue {
+                Button(issue.actionKey) {
+                    handleCaptureAuthorizationAction(issue)
+                    captureAuthorizationIssue = nil
+                }
+            }
+            Button("keyMacros.cancel", role: .cancel) {
+                captureAuthorizationIssue = nil
+            }
+        } message: {
+            if let issue = captureAuthorizationIssue {
+                Text(issue.messageKey)
+            }
         }
     }
 
@@ -299,8 +318,35 @@ struct KeyMacroView: View {
     }
 
     private func beginCapture(scriptID: UUID) {
+        if let bannerKind {
+            switch bannerKind {
+            case .disabled:
+                captureAuthorizationIssue = .macroDisabled
+            case .permission:
+                captureAuthorizationIssue = .accessibility
+            case .listener:
+                captureAuthorizationIssue = .inputMonitoring
+            }
+            return
+        }
+
         captureScriptID = scriptID
         showCapture = true
+    }
+
+    private func handleCaptureAuthorizationAction(_ issue: CaptureAuthorizationIssue) {
+        switch issue {
+        case .macroDisabled:
+            service.enabled = true
+            store.setEnabled(true)
+            service.requestPermission()
+            service.openAccessibilitySettings()
+        case .accessibility:
+            service.requestPermission()
+            service.openAccessibilitySettings()
+        case .inputMonitoring:
+            service.openInputMonitoringSettings()
+        }
     }
 
     private func ensureSelection() {
@@ -322,6 +368,34 @@ private enum PermissionBannerKind {
     case disabled
     case permission
     case listener
+}
+
+private enum CaptureAuthorizationIssue {
+    case macroDisabled
+    case accessibility
+    case inputMonitoring
+
+    var messageKey: LocalizedStringKey {
+        switch self {
+        case .macroDisabled:
+            return "keyMacros.error.macroDisabled"
+        case .accessibility:
+            return "keyMacros.error.accessibility"
+        case .inputMonitoring:
+            return "keyMacros.error.inputMonitoring"
+        }
+    }
+
+    var actionKey: LocalizedStringKey {
+        switch self {
+        case .macroDisabled:
+            return "keyMacros.enabled"
+        case .accessibility:
+            return "keyMacros.permission.open"
+        case .inputMonitoring:
+            return "keyMacros.permission.inputMonitoring"
+        }
+    }
 }
 
 private struct MacroListView: View {
@@ -349,7 +423,8 @@ private struct MacroListView: View {
                         }
                 }
             }
-            .listStyle(.sidebar)
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
 
             if store.lastSavedAt != nil {
                 Divider()
@@ -357,6 +432,7 @@ private struct MacroListView: View {
                     .padding(12)
             }
         }
+        .background(Color(nsColor: .windowBackgroundColor))
         .alert("keyMacros.rename.title", isPresented: Binding(
             get: { renameTarget != nil },
             set: { if !$0 { renameTarget = nil } }
@@ -522,6 +598,7 @@ private struct MacroEditorView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .background(Color(nsColor: .windowBackgroundColor))
     }
 
     private func header(script: MacroScript) -> some View {
@@ -902,7 +979,7 @@ struct ScriptTextView: NSViewRepresentable {
         textView.isGrammarCheckingEnabled = false
         textView.isAutomaticLinkDetectionEnabled = false
         textView.isAutomaticDataDetectionEnabled = false
-        textView.textContainerInset = NSSize(width: 6, height: 6)
+        textView.textContainerInset = NSSize(width: 12, height: 12)
         textView.delegate = context.coordinator
         textView.string = text
         textView.isVerticallyResizable = true

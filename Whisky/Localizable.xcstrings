@@ -29302,6 +29302,94 @@
           }
         }
       }
+    },
+    "keyMacros.permission.required.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permission Required"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要权限"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要權限"
+          }
+        }
+      }
+    },
+    "keyMacros.error.macroDisabled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Key Macros before recording a trigger."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请先启用按键宏，再录制触发键。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請先啟用按鍵巨集，再錄製觸發鍵。"
+          }
+        }
+      }
+    },
+    "keyMacros.error.accessibility" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording a trigger needs Accessibility permission. Allow Whisky in System Settings, then try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制触发键需要辅助功能权限。请在系统设置中允许 Whisky 控制这台电脑，然后重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錄製觸發鍵需要輔助功能權限。請在系統設定中允許 Whisky 控制這台電腦，然後重試。"
+          }
+        }
+      }
+    },
+    "keyMacros.error.inputMonitoring" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording a trigger needs Input Monitoring permission. Allow Whisky in System Settings, then try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制触发键需要输入监控权限。请在系统设置中允许 Whisky 监听输入，然后重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錄製觸發鍵需要輸入監控權限。請在系統設定中允許 Whisky 監聽輸入，然後重試。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

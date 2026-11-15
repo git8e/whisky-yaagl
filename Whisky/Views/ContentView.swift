@@ -16,6 +16,7 @@
 //  If not, see https://www.gnu.org/licenses/.
 //
 
+import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 import WhiskyKit
@@ -40,6 +41,7 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView {
             sidebar
+                .navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 320)
         } detail: {
             detail
         }
@@ -75,6 +77,10 @@ struct ContentView: View {
                 }
             }
         }
+        .background(
+            WindowConfigurator()
+                .frame(width: 0, height: 0)
+        )
         .sheet(isPresented: $showBottleCreation) {
             BottleCreationView(newlyCreatedBottleURL: $newlyCreatedBottleURL)
         }
@@ -193,6 +199,32 @@ struct ContentView: View {
                 .sorted()
         }
     }
+}
+
+private struct WindowConfigurator: NSViewRepresentable {
+    private static let resetKey = "didResetWindowFor017"
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView(frame: .zero)
+        DispatchQueue.main.async {
+            guard let window = view.window else { return }
+            guard !UserDefaults.standard.bool(forKey: Self.resetKey) else { return }
+
+            let targetSize = NSSize(width: 1280, height: 720)
+            var frame = window.frame
+            // Keep the top edge in place while changing the size.
+            frame.origin.y -= targetSize.height - frame.height
+            frame.size = targetSize
+            if let screen = window.screen {
+                frame = window.constrainFrameRect(frame, to: screen)
+            }
+            window.setFrame(frame, display: true)
+            UserDefaults.standard.set(true, forKey: Self.resetKey)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
 #Preview {
