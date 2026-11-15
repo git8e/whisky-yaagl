@@ -296,7 +296,6 @@ struct KeyMacroView: View {
     private func captureSheet(for scriptID: UUID) -> some View {
         if store.script(id: scriptID) != nil {
             TriggerCaptureView(service: service) { trigger in
-                captureTarget = nil
                 if let owner = store.enabledBindingOwner(for: trigger, excluding: scriptID) {
                     pendingTrigger = PendingTrigger(
                         scriptID: scriptID,
