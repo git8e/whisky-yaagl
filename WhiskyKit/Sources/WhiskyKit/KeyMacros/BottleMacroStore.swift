@@ -29,6 +29,12 @@ public final class BottleMacroStore: ObservableObject {
     private var pendingSave: Task<Void, Never>?
     @Published public private(set) var lastSavedAt: Date?
 
+    /// New macros start with the first side mouse button (displayed as
+    /// "Mouse Button 4") so the trigger section always has a concrete target.
+    private static let defaultTrigger: MacroTrigger = .mouse(
+        buttonNumber: MacroMouseButton.button4.buttonNumber
+    )
+
     public static func fileURL(forBottleURL bottleURL: URL) -> URL {
         bottleURL.appending(path: "Macros").appendingPathExtension("plist")
     }
@@ -53,7 +59,8 @@ public final class BottleMacroStore: ObservableObject {
         }
 
         if self.settings.scripts.isEmpty {
-            let script = MacroScript(name: "", text: "")
+            var script = MacroScript(name: "", text: "")
+            script.binding = MacroTriggerBinding(trigger: Self.defaultTrigger)
             self.settings.scripts = [script]
             self.settings.selectedScriptID = script.id
         }
@@ -85,7 +92,8 @@ public final class BottleMacroStore: ObservableObject {
 
     @discardableResult
     public func addScript(name: String = "New Macro", text: String = "") -> UUID {
-        let script = MacroScript(name: uniqueName(base: name), text: text)
+        var script = MacroScript(name: uniqueName(base: name), text: text)
+        script.binding = defaultBinding()
         settings.scripts.append(script)
         settings.selectedScriptID = script.id
         saveSoon()
@@ -99,9 +107,9 @@ public final class BottleMacroStore: ObservableObject {
         copy.id = UUID()
         copy.name = uniqueName(base: copy.name + nameSuffix)
         copy.updatedAt = Date()
-        // A trigger key must be unique inside one container, so a duplicated
-        // macro starts without a trigger and can be recorded independently.
-        copy.binding = nil
+        // The duplicate gets the default trigger too, but it stays disabled
+        // when another macro already owns that trigger.
+        copy.binding = defaultBinding()
         settings.scripts.insert(copy, at: index + 1)
         settings.selectedScriptID = copy.id
         saveSoon()
@@ -112,7 +120,8 @@ public final class BottleMacroStore: ObservableObject {
         guard let index = settings.scripts.firstIndex(where: { $0.id == id }) else { return }
         settings.scripts.remove(at: index)
         if settings.scripts.isEmpty {
-            let script = MacroScript(name: "", text: "")
+            var script = MacroScript(name: "", text: "")
+            script.binding = MacroTriggerBinding(trigger: Self.defaultTrigger)
             settings.scripts = [script]
             settings.selectedScriptID = script.id
         } else if settings.selectedScriptID == id {
@@ -242,6 +251,14 @@ public final class BottleMacroStore: ObservableObject {
         pendingSave?.cancel()
         pendingSave = nil
         writeNow()
+    }
+
+    private func defaultBinding() -> MacroTriggerBinding {
+        let trigger = Self.defaultTrigger
+        let alreadyActive = settings.scripts.contains { script in
+            script.binding?.trigger == trigger && script.binding?.enabled == true
+        }
+        return MacroTriggerBinding(trigger: trigger, enabled: !alreadyActive)
     }
 
     private func uniqueName(base: String) -> String {

@@ -739,6 +739,7 @@ private struct MacroEditorView: View {
                     .frame(maxHeight: .infinity)
                 Divider()
                 triggerSection(script: script)
+                    .frame(height: 290, alignment: .topLeading)
                     .layoutPriority(1)
             } else {
                 ContentUnavailableView("keyMacros.missing.title", systemImage: "exclamationmark.triangle")
@@ -902,18 +903,11 @@ private struct MacroEditorView: View {
                 }
             }
 
-            if let binding = script.binding {
-                TriggerBindingRow(
-                    store: store,
-                    scriptID: script.id,
-                    binding: binding
-                )
-            } else {
-                Text("keyMacros.trigger.empty")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.vertical, 8)
-            }
+            TriggerBindingRow(
+                store: store,
+                scriptID: script.id,
+                binding: script.binding
+            )
         }
         .padding(14)
     }
@@ -922,37 +916,47 @@ private struct MacroEditorView: View {
 private struct TriggerBindingRow: View {
     @ObservedObject var store: BottleMacroStore
     let scriptID: UUID
-    let binding: MacroTriggerBinding
+    let binding: MacroTriggerBinding?
+
+    private var mode: MacroTriggerMode {
+        binding?.mode ?? .holdLoop
+    }
+
+    private var modeDetail: LocalizedStringKey {
+        guard let binding else { return "keyMacros.trigger.unsetDetail" }
+        return binding.mode.localizedDetail
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
-                Text(binding.trigger.localizedDisplayName)
-                    .font(.system(.body, design: .monospaced))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
+                Group {
+                    if let binding {
+                        Text(binding.trigger.localizedDisplayName)
+                    } else {
+                        Text("keyMacros.trigger.unset")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .font(.system(.body, design: .monospaced))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
 
                 Spacer(minLength: 8)
 
-                HStack(spacing: 4) {
-                    Image(systemName: binding.enabled ? "power.circle.fill" : "power.circle")
-                        .foregroundStyle(binding.enabled ? .green : .secondary)
-                    Text(binding.enabled
-                        ? LocalizedStringKey("keyMacros.trigger.enabledState")
-                        : LocalizedStringKey("keyMacros.trigger.disabledState"))
+                if let binding {
+                    HStack(spacing: 4) {
+                        Image(systemName: binding.enabled ? "power.circle.fill" : "power.circle")
+                            .foregroundStyle(binding.enabled ? .green : .secondary)
+                        Text(binding.enabled
+                            ? LocalizedStringKey("keyMacros.trigger.enabledState")
+                            : LocalizedStringKey("keyMacros.trigger.disabledState"))
+                    }
+                    .font(.caption)
                 }
-                .font(.caption)
-
-                Button(role: .destructive) {
-                    store.clearBinding(scriptID: scriptID)
-                } label: {
-                    Image(systemName: "xmark.circle")
-                }
-                .buttonStyle(.borderless)
-                .help("keyMacros.clearTrigger")
             }
 
             HStack(alignment: .firstTextBaseline, spacing: 10) {
@@ -961,7 +965,7 @@ private struct TriggerBindingRow: View {
                     .foregroundStyle(.secondary)
 
                 Picker("keyMacros.mode", selection: Binding(
-                    get: { binding.mode },
+                    get: { mode },
                     set: { store.updateBinding(scriptID: scriptID, mode: $0) }
                 )) {
                     ForEach(MacroTriggerMode.allCases) { mode in
@@ -971,20 +975,22 @@ private struct TriggerBindingRow: View {
                 .labelsHidden()
                 .pickerStyle(.menu)
                 .frame(maxWidth: 220, alignment: .leading)
+                .disabled(binding == nil)
                 Spacer(minLength: 0)
             }
 
-            Text(binding.mode.localizedDetail)
+            Text(modeDetail)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             Toggle("keyMacros.preventShortcut", isOn: Binding(
-                get: { binding.preventSystemShortcut },
+                get: { binding?.preventSystemShortcut ?? false },
                 set: { store.updateBinding(scriptID: scriptID, preventSystemShortcut: $0) }
             ))
             .toggleStyle(.switch)
             .font(.caption)
+            .disabled(binding == nil)
 
             Text("keyMacros.preventShortcut.detail")
                 .font(.caption2)
