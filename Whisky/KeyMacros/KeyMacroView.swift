@@ -49,8 +49,7 @@ struct KeyMacroView: View {
     @StateObject private var service = KeyMacroService.shared
 
     @State private var selectedScriptID: UUID?
-    @State private var captureScriptID: UUID?
-    @State private var showCapture = false
+    @State private var captureTarget: CaptureTarget?
     @State private var triggerError: String?
     @State private var captureAuthorizationIssue: CaptureAuthorizationIssue?
 
@@ -113,8 +112,9 @@ struct KeyMacroView: View {
         .onChange(of: selectedScriptID) { _, newValue in
             store.selectScript(id: newValue)
         }
-        .sheet(isPresented: $showCapture) {
-            captureSheet
+        .sheet(item: $captureTarget) { target in
+            captureSheet(for: target.id)
+                .onDisappear { captureTarget = nil }
         }
         .alert("keyMacros.error.triggerInUse.title", isPresented: Binding(
             get: { triggerError != nil },
@@ -275,8 +275,8 @@ struct KeyMacroView: View {
     }
 
     @ViewBuilder
-    private var captureSheet: some View {
-        if let scriptID = captureScriptID, store.script(id: scriptID) != nil {
+    private func captureSheet(for scriptID: UUID) -> some View {
+        if store.script(id: scriptID) != nil {
             TriggerCaptureView(service: service) { trigger in
                 guard store.setBinding(scriptID: scriptID, trigger: trigger) != nil else {
                     triggerError = String(localized: "keyMacros.error.triggerInUse")
@@ -284,12 +284,13 @@ struct KeyMacroView: View {
                 }
                 selectedScriptID = scriptID
                 store.selectScript(id: scriptID)
+                captureTarget = nil
             }
         } else {
             VStack(spacing: 12) {
-                Text("keyMacros.empty.title")
+                Text("keyMacros.missing.title")
                 Button("keyMacros.close") {
-                    showCapture = false
+                    captureTarget = nil
                 }
             }
             .padding(24)
@@ -330,8 +331,9 @@ struct KeyMacroView: View {
             return
         }
 
-        captureScriptID = scriptID
-        showCapture = true
+        selectedScriptID = scriptID
+        store.selectScript(id: scriptID)
+        captureTarget = CaptureTarget(id: scriptID)
     }
 
     private func handleCaptureAuthorizationAction(_ issue: CaptureAuthorizationIssue) {
@@ -368,6 +370,10 @@ private enum PermissionBannerKind {
     case disabled
     case permission
     case listener
+}
+
+private struct CaptureTarget: Identifiable {
+    let id: UUID
 }
 
 private enum CaptureAuthorizationIssue {
@@ -417,6 +423,7 @@ private struct MacroListView: View {
             List(selection: $selection) {
                 ForEach(store.settings.scripts) { script in
                     macroRow(script)
+                        .listRowInsets(EdgeInsets(top: 5, leading: 14, bottom: 5, trailing: 14))
                         .tag(script.id)
                         .contextMenu {
                             contextMenu(for: script)
@@ -454,8 +461,9 @@ private struct MacroListView: View {
         HStack(alignment: .top, spacing: 8) {
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
-                    Text("keyMacros.title")
+                    Text(bottleName)
                         .font(.headline)
+                        .lineLimit(1)
                     if isForeground {
                         Text("keyMacros.foreground")
                             .font(.caption2)
@@ -465,11 +473,6 @@ private struct MacroListView: View {
                             .foregroundStyle(.green)
                     }
                 }
-
-                Text(bottleName)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
 
                 Text(String(
                     format: NSLocalizedString("keyMacros.list.count", comment: ""),
@@ -505,7 +508,6 @@ private struct MacroListView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(.vertical, 3)
     }
 
     @ViewBuilder
