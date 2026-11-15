@@ -27834,19 +27834,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Example: {WAITMS:100}s{WAITMS:100}{LMB}"
+            "value" : "Compatible with X-Mouse Button Control (XMBC) macros on Windows.\n\nExamples:\n{WAITMS:300}{LMB}  Wait 300 ms, then left click.\n{HOLDMS:300}{LMB}  Hold left click for 300 ms.\n{WAIT:1}{SHIFT}{F1}{CLEAR}  Wait 1 s, press Shift+F1, then clear modifiers.\n\nTags: {WAITMS:n} {WAIT:n} {HOLDMS:n} {HOLD:n}\n{LMB} {RMB} {MMB} {MB4} {MB5} {SHIFT} {CTRL} {ALT} {CMD} {CLEAR}"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "例如：{WAITMS:100}s{WAITMS:100}{LMB}"
+            "value" : "兼容 Windows 上的 X-Mouse Button Control（XMBC）宏。\n\n示例：\n{WAITMS:300}{LMB}  等待 300 毫秒后左键单击。\n{HOLDMS:300}{LMB}  按住左键 300 毫秒。\n{WAIT:1}{SHIFT}{F1}{CLEAR}  等待 1 秒，按 Shift+F1，然后清除修饰键。\n\n标签：{WAITMS:n} {WAIT:n} {HOLDMS:n} {HOLD:n}\n{LMB} {RMB} {MMB} {MB4} {MB5} {SHIFT} {CTRL} {ALT} {CMD} {CLEAR}"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "例如：{WAITMS:100}s{WAITMS:100}{LMB}"
+            "value" : "兼容 Windows 上的 X-Mouse Button Control（XMBC）宏。\n\n示例：\n{WAITMS:300}{LMB}  等待 300 毫秒后左键单击。\n{HOLDMS:300}{LMB}  按住左键 300 毫秒。\n{WAIT:1}{SHIFT}{F1}{CLEAR}  等待 1 秒，按 Shift+F1，然后清除修饰键。\n\n标签：{WAITMS:n} {WAIT:n} {HOLDMS:n} {HOLD:n}\n{LMB} {RMB} {MMB} {MB4} {MB5} {SHIFT} {CTRL} {ALT} {CMD} {CLEAR}"
           }
         }
       }

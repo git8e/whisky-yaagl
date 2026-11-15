@@ -24,6 +24,7 @@ import WhiskyKit
 
 struct KeyMacroView: View {
     @ObservedObject var bottle: Bottle
+    let onActiveChange: (Bool) -> Void
     @StateObject private var service = KeyMacroService.shared
 
     @State private var selectedScriptID: UUID?
@@ -58,27 +59,14 @@ struct KeyMacroView: View {
                 permissionBanner
             }
 
-            GeometryReader { proxy in
-                Group {
-                    if proxy.size.width < 720 {
-                        VSplitView {
-                            macroList
-                                .frame(minHeight: 180, idealHeight: 210, maxHeight: 250)
-                            editor
-                                .frame(minHeight: 280, maxHeight: .infinity)
-                        }
-                    } else {
-                        HSplitView {
-                            macroList
-                                .frame(minWidth: 220, idealWidth: 260, maxWidth: 320)
-                            editor
-                                .frame(minWidth: 360, maxWidth: .infinity, maxHeight: .infinity)
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            HSplitView {
+                macroList
+                    .frame(minWidth: 250, idealWidth: 280, maxWidth: 340)
+                editor
+                    .frame(minWidth: 500, maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .frame(minWidth: 820, minHeight: 580)
         .navigationTitle("keyMacros.title")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -88,18 +76,17 @@ struct KeyMacroView: View {
                 .toggleStyle(.switch)
                 .help("keyMacros.enabled")
             }
-
-            ToolbarItem(placement: .primaryAction) {
-                Button(action: addMacro) {
-                    Label("keyMacros.new", systemImage: "doc.badge.plus")
-                        .labelStyle(.titleAndIcon)
-                }
-                .help("keyMacros.new")
-            }
         }
         .onAppear {
+            onActiveChange(true)
             service.start()
             ensureSelection()
+        }
+        .onDisappear {
+            onActiveChange(false)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .newMacroRequested)) { _ in
+            addMacro()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             // Permissions are changed in System Settings. Refresh when the user
@@ -176,6 +163,12 @@ struct KeyMacroView: View {
             Spacer(minLength: 12)
 
             switch bannerKind {
+            case .disabled:
+                Button("keyMacros.enabled") {
+                    service.enabled = true
+                    store.setEnabled(true)
+                }
+                .buttonStyle(.borderedProminent)
             case .permission:
                 Button("keyMacros.permission.open") {
                     service.requestPermission()
@@ -187,7 +180,7 @@ struct KeyMacroView: View {
                     service.openInputMonitoringSettings()
                 }
                 .buttonStyle(.borderedProminent)
-            case .disabled, nil:
+            case nil:
                 EmptyView()
             }
         }
@@ -935,3 +928,7 @@ struct ScriptTextView: NSViewRepresentable {
 }
 
 // swiftlint:enable file_length
+
+extension Notification.Name {
+    static let newMacroRequested = Notification.Name("WhiskyNewMacroRequested")
+}
