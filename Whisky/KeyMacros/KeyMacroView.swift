@@ -50,7 +50,7 @@ struct KeyMacroView: View {
 
     @State private var selectedScriptID: UUID?
     @State private var captureTarget: CaptureTarget?
-    @State private var triggerError: String?
+    @State private var pendingTrigger: PendingTrigger?
     @State private var captureAuthorizationIssue: CaptureAuthorizationIssue?
 
     private var store: BottleMacroStore {
@@ -117,14 +117,25 @@ struct KeyMacroView: View {
                 .onDisappear { captureTarget = nil }
         }
         .alert("keyMacros.error.triggerInUse.title", isPresented: Binding(
-            get: { triggerError != nil },
-            set: { if !$0 { triggerError = nil } }
+            get: { pendingTrigger != nil },
+            set: { if !$0 { pendingTrigger = nil } }
         )) {
-            Button("keyMacros.confirm") {
-                triggerError = nil
+            Button("keyMacros.cancel", role: .cancel) {
+                pendingTrigger = nil
+            }
+            Button("keyMacros.triggerConflict.confirm", role: .destructive) {
+                if let pending = pendingTrigger {
+                    applyTrigger(pending.trigger, to: pending.scriptID)
+                }
+                pendingTrigger = nil
             }
         } message: {
-            Text(triggerError ?? "")
+            if let pending = pendingTrigger {
+                Text(String(
+                    format: NSLocalizedString("keyMacros.triggerConflict.message", comment: ""),
+                    pending.ownerName
+                ))
+            }
         }
     }
 
@@ -171,6 +182,13 @@ struct KeyMacroView: View {
         let id = store.addScript(name: String(localized: "keyMacros.newName"))
         selectedScriptID = id
         store.selectScript(id: id)
+    }
+
+    private func applyTrigger(_ trigger: MacroTrigger, to scriptID: UUID) {
+        guard store.setBinding(scriptID: scriptID, trigger: trigger) != nil else { return }
+        selectedScriptID = scriptID
+        store.selectScript(id: scriptID)
+        captureTarget = nil
     }
 
     private var permissionBanner: some View {
@@ -278,13 +296,16 @@ struct KeyMacroView: View {
     private func captureSheet(for scriptID: UUID) -> some View {
         if store.script(id: scriptID) != nil {
             TriggerCaptureView(service: service) { trigger in
-                guard store.setBinding(scriptID: scriptID, trigger: trigger) != nil else {
-                    triggerError = String(localized: "keyMacros.error.triggerInUse")
+                captureTarget = nil
+                if let owner = store.enabledBindingOwner(for: trigger, excluding: scriptID) {
+                    pendingTrigger = PendingTrigger(
+                        scriptID: scriptID,
+                        trigger: trigger,
+                        ownerName: owner.script.localizedDisplayName
+                    )
                     return
                 }
-                selectedScriptID = scriptID
-                store.selectScript(id: scriptID)
-                captureTarget = nil
+                applyTrigger(trigger, to: scriptID)
             }
         } else {
             VStack(spacing: 12) {
@@ -376,6 +397,12 @@ private struct CaptureTarget: Identifiable {
     let id: UUID
 }
 
+private struct PendingTrigger {
+    let scriptID: UUID
+    let trigger: MacroTrigger
+    let ownerName: String
+}
+
 private enum CaptureAuthorizationIssue {
     case macroDisabled
     case accessibility
@@ -414,6 +441,7 @@ private struct MacroListView: View {
 
     @State private var renameTarget: MacroScript?
     @State private var renameText = ""
+    @State private var deleteTarget: MacroScript?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -422,16 +450,45 @@ private struct MacroListView: View {
 
             List(selection: $selection) {
                 ForEach(store.settings.scripts) { script in
-                    macroRow(script)
-                        .listRowInsets(EdgeInsets(top: 5, leading: 14, bottom: 5, trailing: 14))
-                        .tag(script.id)
-                        .contextMenu {
-                            contextMenu(for: script)
-                        }
+                    MacroRow(
+                        store: store,
+                        script: script,
+                        macrosEnabled: enabled,
+                        onDelete: { deleteTarget = $0 }
+                    )
+                    .listRowInsets(EdgeInsets(top: 5, leading: 14, bottom: 5, trailing: 14))
+                    .tag(script.id)
+                    .contextMenu {
+                        contextMenu(for: script)
+                    }
                 }
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
+            .alert("keyMacros.delete.title", isPresented: Binding(
+                get: { deleteTarget != nil },
+                set: { if !$0 { deleteTarget = nil } }
+            )) {
+                Button("keyMacros.cancel", role: .cancel) {
+                    deleteTarget = nil
+                }
+                Button("keyMacros.delete", role: .destructive) {
+                    if let target = deleteTarget {
+                        store.deleteScript(id: target.id)
+                        if selection == target.id {
+                            selection = store.settings.selectedScriptID
+                        }
+                    }
+                    deleteTarget = nil
+                }
+            } message: {
+                if let target = deleteTarget {
+                    Text(String(
+                        format: NSLocalizedString("keyMacros.delete.message", comment: ""),
+                        target.localizedDisplayName
+                    ))
+                }
+            }
 
             if store.lastSavedAt != nil {
                 Divider()
@@ -488,25 +545,7 @@ private struct MacroListView: View {
                 .toggleStyle(.switch)
                 .controlSize(.small)
                 .labelsHidden()
-                .help("keyMacros.enabled")
-        }
-    }
-
-    private func macroRow(_ script: MacroScript) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(script.localizedDisplayName)
-                .lineLimit(1)
-
-            if let binding = script.binding {
-                Text(binding.trigger.localizedDisplayName)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            } else {
-                Text("keyMacros.unbound")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
+                .help("keyMacros.enabled.all")
         }
     }
 
@@ -524,6 +563,11 @@ private struct MacroListView: View {
             selection = script.id
             onRecordTrigger(script.id)
         }
+        if script.binding != nil {
+            Button("keyMacros.clearTrigger") {
+                store.clearBinding(scriptID: script.id)
+            }
+        }
         Divider()
         Button("keyMacros.duplicate") {
             selection = store.duplicateScript(
@@ -532,10 +576,7 @@ private struct MacroListView: View {
             )
         }
         Button("keyMacros.delete", role: .destructive) {
-            store.deleteScript(id: script.id)
-            if selection == script.id {
-                selection = store.settings.scripts.first?.id
-            }
+            deleteTarget = script
         }
     }
 
@@ -554,6 +595,107 @@ private struct MacroListView: View {
     }
 }
 
+private struct MacroRow: View {
+    @ObservedObject var store: BottleMacroStore
+    let script: MacroScript
+    let macrosEnabled: Bool
+    let onDelete: (MacroScript) -> Void
+
+    @State private var isHovering = false
+
+    private var binding: MacroTriggerBinding? {
+        script.binding
+    }
+
+    private var effectivelyEnabled: Bool {
+        macrosEnabled && binding?.enabled == true
+    }
+
+    private var stateIcon: String {
+        guard binding != nil else { return "minus.circle" }
+        return effectivelyEnabled ? "power.circle.fill" : "power.circle"
+    }
+
+    private var stateColor: Color {
+        guard binding != nil else { return .secondary.opacity(0.35) }
+        return effectivelyEnabled ? .green : .secondary.opacity(0.55)
+    }
+
+    private var stateHelp: LocalizedStringKey {
+        guard binding != nil else { return "keyMacros.unbound" }
+        return effectivelyEnabled
+            ? "keyMacros.trigger.enabledState"
+            : "keyMacros.trigger.disabledState"
+    }
+
+    private var toggleHelp: LocalizedStringKey {
+        macrosEnabled ? "keyMacros.trigger.toggle" : "keyMacros.globalDisabled"
+    }
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 8) {
+            VStack(alignment: .leading, spacing: 5) {
+                Text(script.localizedDisplayName)
+                    .lineLimit(1)
+
+                if let binding {
+                    Text(binding.trigger.localizedDisplayName)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                } else {
+                    Text("keyMacros.unbound")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            trailingControls
+                .frame(width: 66, alignment: .trailing)
+        }
+        .contentShape(Rectangle())
+        .onHover { isHovering = $0 }
+    }
+
+    @ViewBuilder
+    private var trailingControls: some View {
+        if isHovering {
+            HStack(spacing: 5) {
+                if binding != nil {
+                    Toggle("keyMacros.trigger.enabled", isOn: Binding(
+                        get: { store.script(id: script.id)?.binding?.enabled ?? false },
+                        set: { store.updateBinding(scriptID: script.id, enabled: $0) }
+                    ))
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+                    .labelsHidden()
+                    .disabled(!macrosEnabled)
+                    .help(toggleHelp)
+                } else {
+                    Image(systemName: "minus.circle")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                        .help("keyMacros.unbound")
+                }
+
+                Button(role: .destructive) {
+                    onDelete(script)
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .buttonStyle(.borderless)
+                .help("keyMacros.delete")
+            }
+        } else {
+            Image(systemName: stateIcon)
+                .font(.caption)
+                .foregroundStyle(stateColor)
+                .help(stateHelp)
+        }
+    }
+}
+
 private struct MacroEditorView: View {
     @ObservedObject var service: KeyMacroService
     @ObservedObject var store: BottleMacroStore
@@ -561,6 +703,8 @@ private struct MacroEditorView: View {
     let onCaptureTrigger: () -> Void
 
     @State private var testError: String?
+    @State private var savedFeedback = false
+    @State private var saveFeedbackToken = UUID()
 
     private var script: MacroScript? {
         store.script(id: scriptID)
@@ -625,8 +769,24 @@ private struct MacroEditorView: View {
                 Spacer()
                 Button {
                     store.saveNow()
+                    let token = UUID()
+                    saveFeedbackToken = token
+                    savedFeedback = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        guard saveFeedbackToken == token else { return }
+                        savedFeedback = false
+                    }
                 } label: {
-                    Label("keyMacros.save", systemImage: "square.and.arrow.down")
+                    Label {
+                        Text(savedFeedback
+                            ? LocalizedStringKey("keyMacros.savedNow")
+                            : LocalizedStringKey("keyMacros.save"))
+                    } icon: {
+                        Image(systemName: savedFeedback
+                            ? "checkmark.circle.fill"
+                            : "square.and.arrow.down")
+                    }
+                    .foregroundStyle(savedFeedback ? .green : .primary)
                 }
                 Button {
                     service.test(script: script, store: store)
@@ -778,20 +938,22 @@ private struct TriggerBindingRow: View {
 
                 Spacer(minLength: 8)
 
-                Toggle("keyMacros.trigger.enabled", isOn: Binding(
-                    get: { binding.enabled },
-                    set: { store.updateBinding(scriptID: scriptID, enabled: $0) }
-                ))
-                .toggleStyle(.switch)
+                HStack(spacing: 4) {
+                    Image(systemName: binding.enabled ? "power.circle.fill" : "power.circle")
+                        .foregroundStyle(binding.enabled ? .green : .secondary)
+                    Text(binding.enabled
+                        ? LocalizedStringKey("keyMacros.trigger.enabledState")
+                        : LocalizedStringKey("keyMacros.trigger.disabledState"))
+                }
                 .font(.caption)
 
                 Button(role: .destructive) {
                     store.clearBinding(scriptID: scriptID)
                 } label: {
-                    Image(systemName: "trash")
+                    Image(systemName: "xmark.circle")
                 }
                 .buttonStyle(.borderless)
-                .help("keyMacros.delete")
+                .help("keyMacros.clearTrigger")
             }
 
             HStack(alignment: .firstTextBaseline, spacing: 10) {
@@ -809,7 +971,8 @@ private struct TriggerBindingRow: View {
                 }
                 .labelsHidden()
                 .pickerStyle(.menu)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: 220, alignment: .leading)
+                Spacer(minLength: 0)
             }
 
             Text(binding.mode.localizedDetail)

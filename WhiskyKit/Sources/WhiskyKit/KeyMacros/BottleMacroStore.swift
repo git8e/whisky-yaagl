@@ -137,19 +137,24 @@ public final class BottleMacroStore: ObservableObject {
         saveSoon()
     }
 
-    /// Replaces the macro's single trigger. Returns the binding id, or nil when
-    /// another macro in this container already owns the trigger.
+    /// Replaces the macro's single trigger and disables any other macro that
+    /// was using the same trigger. The old binding is kept so the user can see
+    /// which macro it belonged to.
     @discardableResult
     public func setBinding(scriptID: UUID, trigger: MacroTrigger, mode: MacroTriggerMode = .holdLoop) -> UUID? {
         guard let scriptIndex = settings.scripts.firstIndex(where: { $0.id == scriptID }) else { return nil }
-        guard !settings.scripts.contains(where: { script in
-            script.id != scriptID && script.binding?.trigger == trigger
-        }) else {
-            return nil
+
+        for index in settings.scripts.indices where index != scriptIndex {
+            guard var other = settings.scripts[index].binding, other.trigger == trigger else {
+                continue
+            }
+            other.enabled = false
+            settings.scripts[index].binding = other
         }
 
         if var binding = settings.scripts[scriptIndex].binding {
             binding.trigger = trigger
+            binding.enabled = true
             settings.scripts[scriptIndex].binding = binding
             saveSoon()
             return binding.id
@@ -159,6 +164,24 @@ public final class BottleMacroStore: ObservableObject {
         settings.scripts[scriptIndex].binding = binding
         saveSoon()
         return binding.id
+    }
+
+    /// The enabled macro that already owns a trigger, excluding `scriptID`.
+    /// Used to ask before taking a trigger over.
+    public func enabledBindingOwner(
+        for trigger: MacroTrigger,
+        excluding scriptID: UUID? = nil
+    ) -> (script: MacroScript, binding: MacroTriggerBinding)? {
+        for script in settings.scripts {
+            guard script.id != scriptID,
+                  let binding = script.binding,
+                  binding.enabled,
+                  binding.trigger == trigger else {
+                continue
+            }
+            return (script, binding)
+        }
+        return nil
     }
 
     public func clearBinding(scriptID: UUID) {
@@ -186,6 +209,18 @@ public final class BottleMacroStore: ObservableObject {
         }
         if let enabled {
             binding.enabled = enabled
+            if enabled {
+                let trigger = binding.trigger
+                for index in settings.scripts.indices where index != scriptIndex {
+                    guard var other = settings.scripts[index].binding,
+                          other.enabled,
+                          other.trigger == trigger else {
+                        continue
+                    }
+                    other.enabled = false
+                    settings.scripts[index].binding = other
+                }
+            }
         }
         settings.scripts[scriptIndex].binding = binding
         saveSoon()
