@@ -186,9 +186,6 @@ struct KeyMacroView: View {
         }
         .padding(14)
         .background(bannerColor.opacity(0.11))
-        .overlay(alignment: .bottom) {
-            Divider()
-        }
     }
 
     private var bannerIcon: String {
