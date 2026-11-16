@@ -143,6 +143,7 @@ struct ContentView: View {
                             }
                         }
                         .id(bottle.url)
+                        .tag(bottle.url)
                     }
                 }
             }
@@ -150,13 +151,32 @@ struct ContentView: View {
             .animation(.default, value: bottleFilter)
             .listStyle(.sidebar)
             .searchable(text: $bottleFilter, placement: .sidebar)
-            .onChange(of: newlyCreatedBottleURL) { _, url in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    selected = url
-                    withAnimation {
-                        proxy.scrollTo(url, anchor: .center)
-                    }
-                }
+            .onChange(of: newlyCreatedBottleURL) { _, _ in
+                selectNewBottle(using: proxy)
+            }
+            .onChange(of: showBottleCreation) { _, _ in
+                selectNewBottle(using: proxy)
+            }
+        }
+    }
+
+    private func selectNewBottle(using proxy: ScrollViewProxy) {
+        guard !showBottleCreation, let url = newlyCreatedBottleURL else { return }
+        newlyCreatedBottleURL = nil
+
+        // Clear the previous selection first. Selecting the new bottle while
+        // the old one is still selected can leave both rows highlighted on
+        // macOS.
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            selected = nil
+        }
+
+        DispatchQueue.main.async {
+            withAnimation {
+                selected = url
+                proxy.scrollTo(url, anchor: .center)
             }
         }
     }
