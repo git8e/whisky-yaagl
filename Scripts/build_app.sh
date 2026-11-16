@@ -98,7 +98,7 @@ COMMON_ARGS=(
     -project "$ROOT/Whisky.xcodeproj"
     -scheme "Whisky"
     -configuration "$CONFIGURATION"
-    -destination "platform=macOS"
+    -destination "generic/platform=macOS"
     -derivedDataPath "$DERIVED_DATA"
 )
 
