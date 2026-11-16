@@ -9,6 +9,7 @@ struct HoYoPlayInstallPinView: View {
 
     @State private var isWorking = false
     @State private var progress: Double?
+    @State private var showInstallNotice = false
 
     init(bottle: Bottle, info: HoYoPlayContent, onInstallFinished: @escaping () -> Void = {}) {
         self.bottle = bottle
@@ -18,7 +19,8 @@ struct HoYoPlayInstallPinView: View {
 
     var body: some View {
         Button {
-            installHoYoPlay()
+            guard !isWorking else { return }
+            showInstallNotice = true
         } label: {
             VStack {
                 Color.clear
@@ -68,12 +70,22 @@ struct HoYoPlayInstallPinView: View {
             }
             .labelStyle(.titleAndIcon)
         }
+        .alert(
+            String(localized: "hoyoplay.install.notice.title"),
+            isPresented: $showInstallNotice
+        ) {
+            Button(String(localized: "button.cancel"), role: .cancel) { }
+            Button(String(localized: "hoyoplay.install.notice.continue")) {
+                installHoYoPlay()
+            }
+        } message: {
+            Text(String(localized: "hoyoplay.install.notice.message"))
+        }
     }
 
     @MainActor
     private func installHoYoPlay() {
         guard !isWorking else { return }
-        guard confirmHoYoPlayInstall() else { return }
 
         Task(priority: .userInitiated) {
             let latestInfo = await LauncherContent.refresh(forceRemote: true) ?? info
@@ -204,17 +216,6 @@ struct HoYoPlayInstallPinView: View {
     }
 
     @MainActor
-    private func confirmHoYoPlayInstall() -> Bool {
-        let alert = NSAlert()
-        alert.messageText = String(localized: "hoyoplay.install.notice.title")
-        alert.informativeText = String(localized: "hoyoplay.install.notice.message")
-        alert.alertStyle = .informational
-        alert.addButton(withTitle: String(localized: "hoyoplay.install.notice.continue"))
-        alert.addButton(withTitle: String(localized: "button.cancel"))
-        return alert.runModal() == .alertFirstButtonReturn
-    }
-
-    @MainActor
     private func showManualInstallAlert(info: HoYoPlayContent, reason: String) {
         let alert = NSAlert()
         alert.messageText = String(localized: "hoyoplay.install.failed.title")
@@ -242,20 +243,50 @@ struct HoYoPlayInstallPinView: View {
 private struct AppleStyleProgressRing: View {
     let progress: Double?
 
+    private var fraction: Double {
+        min(max(progress ?? 0, 0), 1)
+    }
+
     var body: some View {
         ZStack {
             Circle()
-                .stroke(.secondary.opacity(0.25), lineWidth: 3.5)
+                .fill(.white.opacity(0.24))
 
-            Circle()
-                .trim(from: 0, to: min(max(progress ?? 0, 0), 1))
-                .stroke(
-                    Color.accentColor,
-                    style: StrokeStyle(lineWidth: 3.5, lineCap: .round)
-                )
-                .rotationEffect(.degrees(-90))
-                .animation(.easeOut(duration: 0.18), value: progress)
+            ProgressSector(progress: fraction)
+                .fill(.white)
+                .animation(.linear(duration: 0.25), value: fraction)
         }
+        .overlay {
+            Circle()
+                .stroke(.white.opacity(0.35), lineWidth: 0.75)
+        }
+    }
+}
+
+private struct ProgressSector: Shape {
+    var progress: Double
+
+    var animatableData: Double {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+        let sweep = 360 * min(max(progress, 0), 1)
+
+        path.move(to: center)
+        path.addArc(
+            center: center,
+            radius: radius,
+            startAngle: .degrees(-90),
+            endAngle: .degrees(-90 + sweep),
+            clockwise: false
+        )
+        path.closeSubpath()
+        return path
     }
 }
 
