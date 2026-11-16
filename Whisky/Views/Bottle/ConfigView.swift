@@ -113,6 +113,12 @@ struct ConfigView: View {
         WineRuntimes.runtime(id: bottle.settings.wineRuntimeId)?.renderBackend == .dxmt
     }
 
+    private var selectedRuntimeSupportsDXMT: Bool {
+        let runtimeId = bottle.settings.wineRuntimeId
+        return WineRuntimeManager.isInstalled(runtimeId: runtimeId)
+            && WineRuntimeManager.supportsDXMT(runtimeId: runtimeId)
+    }
+
     private var exeHintKey: LocalizedStringKey {
         switch gameRegionSelection.wrappedValue {
         case .hk4eOs:
@@ -184,6 +190,13 @@ struct ConfigView: View {
                 Text("config.wineRuntime.switchWarning")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+
+                if isDXMTRuntime && !selectedRuntimeSupportsDXMT {
+                    Label("config.wineRuntime.dxmtUnsupported", systemImage: "exclamationmark.triangle.fill")
+                        .font(.footnote)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
                 // GStreamer is shared by all runtimes, but each isolated
                 // runtime gets its own symlink/rpath patch (see WineGStreamer).
@@ -495,6 +508,7 @@ struct ConfigView: View {
 
                     if isDXMTRuntime {
                         Toggle("hk4e.dxmtInjection", isOn: $bottle.settings.hk4eDXMTInjectionEnabled)
+                            .disabled(!selectedRuntimeSupportsDXMT)
                             .onChange(of: bottle.settings.hk4eDXMTInjectionEnabled) { _, enabled in
                                 Task(priority: .userInitiated) {
                                     if enabled {

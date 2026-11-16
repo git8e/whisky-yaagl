@@ -15952,6 +15952,40 @@
         }
       }
     },
+    "runtime.error.dxmtUnsupported" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” does not include the Metal exports required by DXMT. Choose Wine 11.4 or 11.8 DXMT (signed), or disable DXMT injection."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」には DXMT に必要な Metal エクスポートが含まれていません。Wine 11.4 または 11.8 の DXMT（署名済み）を選択するか、DXMT 注入を無効にしてください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@”에는 DXMT에 필요한 Metal 내보내기가 없습니다. Wine 11.4 또는 11.8 DXMT(서명됨)를 선택하거나 DXMT 주입을 끄세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@”不包含 DXMT 所需的 Metal 导出。请选择 Wine 11.4 或 11.8 DXMT（签名版），或关闭 DXMT 注入。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」不包含 DXMT 所需的 Metal 匯出。請選擇 Wine 11.4 或 11.8 DXMT（簽名版），或關閉 DXMT 注入。"
+          }
+        }
+      }
+    },
     "runtime.error.integrityFailed" : {
       "localizations" : {
         "en" : {
@@ -25897,6 +25931,40 @@
         }
       }
     },
+    "config.wineRuntime.dxmtUnsupported" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This runtime does not include the Metal exports DXMT needs. DXMT games will fail to launch."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このランタイムには DXMT に必要な Metal エクスポートがありません。DXMT を使用するゲームは起動できません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 런타임에는 DXMT에 필요한 Metal 내보내기가 없습니다. DXMT 게임은 실행되지 않습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个运行时缺少 DXMT 所需的 Metal 导出，使用 DXMT 的游戏将无法启动。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這個執行環境缺少 DXMT 所需的 Metal 匯出，使用 DXMT 的遊戲將無法啟動。"
+          }
+        }
+      }
+    },
     "config.wineRuntime.switchWarning" : {
       "localizations" : {
         "ar" : {
@@ -27685,28 +27753,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "錄製觸發鍵"
-          }
-        }
-      }
-    },
-    "keyMacros.rerecordTrigger" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Record Trigger Again"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重新录制触发键"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重新錄製觸發鍵"
           }
         }
       }

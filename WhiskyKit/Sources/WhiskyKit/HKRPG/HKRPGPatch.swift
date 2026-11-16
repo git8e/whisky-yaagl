@@ -117,6 +117,14 @@ public enum HKRPGPatch {
         let supportsPatching = (runtime != nil) && (runtimeId != WineRuntimes.whiskyDefaultId)
 
         try await WineRuntimeManager.ensureIsolatedRuntime(bottle: bottle, baseRuntimeId: runtimeId)
+
+        if usesDXMT,
+           !WineRuntimeManager.supportsDXMT(
+               runtimeRoot: WineRuntimeManager.effectiveWineRoot(bottle: bottle)
+           ) {
+            throw WineRuntimeManagerError.dxmtUnsupported(runtimeId)
+        }
+
         await revertIfNeeded(bottle: bottle, prefixURL: prefixURL)
 
         if bottle.settings.hkrpgFixWebview {

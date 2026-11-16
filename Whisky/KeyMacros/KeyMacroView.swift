@@ -550,9 +550,7 @@ private struct MacroListView: View {
 
     @ViewBuilder
     private func contextMenu(for script: MacroScript) -> some View {
-        let triggerAction: LocalizedStringKey = script.binding == nil
-            ? "keyMacros.recordTrigger"
-            : "keyMacros.rerecordTrigger"
+        let triggerAction: LocalizedStringKey = "keyMacros.recordTrigger"
 
         Button("keyMacros.rename") {
             renameTarget = script
@@ -882,9 +880,7 @@ private struct MacroEditorView: View {
     }
 
     private func triggerSection(script: MacroScript) -> some View {
-        let triggerTitle: LocalizedStringKey = script.binding == nil
-            ? "keyMacros.recordTrigger"
-            : "keyMacros.rerecordTrigger"
+        let triggerTitle: LocalizedStringKey = "keyMacros.recordTrigger"
 
         return VStack(alignment: .leading, spacing: 10) {
             HStack {

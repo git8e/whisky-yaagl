@@ -61,6 +61,13 @@ public enum NAPPatch {
         let runtime = WineRuntimes.runtime(id: bottle.settings.wineRuntimeId)
         let usesDXMT = (runtime?.renderBackend == .dxmt)
 
+        if usesDXMT,
+           !WineRuntimeManager.supportsDXMT(
+               runtimeRoot: WineRuntimeManager.effectiveWineRoot(bottle: bottle)
+           ) {
+            throw WineRuntimeManagerError.dxmtUnsupported(bottle.settings.wineRuntimeId)
+        }
+
         let removedFiles = NapGame.removedFiles(executableURL: exeURL)
         patchRemovedFiles(gameDir: gameDir, removed: removedFiles)
         defer { revertRemovedFiles(gameDir: gameDir, removed: removedFiles) }

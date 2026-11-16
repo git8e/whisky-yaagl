@@ -102,6 +102,13 @@ public enum HK4ePatch {
         // Ensure this bottle uses an isolated runtime copy.
         try await WineRuntimeManager.ensureIsolatedRuntime(bottle: bottle, baseRuntimeId: runtimeId)
 
+        if usesDXMT,
+           !WineRuntimeManager.supportsDXMT(
+               runtimeRoot: WineRuntimeManager.effectiveWineRoot(bottle: bottle)
+           ) {
+            throw WineRuntimeManagerError.dxmtUnsupported(runtimeId)
+        }
+
         await revertIfNeeded(bottle: bottle, prefixURL: prefixURL)
 
         let state: HK4ePatchState?

@@ -53,6 +53,23 @@ public enum WineRuntimeManager {
         return wineRoot(runtimeId: bottle.settings.wineRuntimeId)
     }
 
+    /// DXMT talks to Wine's Mac driver through the `macdrv_functions` export.
+    /// Some experimental runtimes ship a stock winemac.so without that table,
+    /// so DXMT cannot create a Metal view even though the runtime is labelled
+    /// as a DXMT build.
+    public static func supportsDXMT(runtimeId: String) -> Bool {
+        supportsDXMT(runtimeRoot: wineRoot(runtimeId: runtimeId))
+    }
+
+    public static func supportsDXMT(runtimeRoot: URL) -> Bool {
+        let binary = runtimeRoot.appendingPathComponent(
+            "lib/wine/x86_64-unix/winemac.so",
+            isDirectory: false
+        )
+        guard let data = try? Data(contentsOf: binary) else { return false }
+        return data.range(of: Data("macdrv_functions".utf8)) != nil
+    }
+
     public static func binFolder(bottle: Bottle) -> URL {
         effectiveWineRoot(bottle: bottle).appending(path: "bin", directoryHint: .isDirectory)
     }
@@ -441,6 +458,7 @@ public enum WineRuntimeManagerError: LocalizedError {
     case missingRemoteURL(String)
     case invalidArchive(String)
     case integrityCheckFailed
+    case dxmtUnsupported(String)
 
     public var errorDescription: String? {
         switch self {
@@ -454,6 +472,8 @@ public enum WineRuntimeManagerError: LocalizedError {
             return String(format: String(localized: "runtime.error.invalidArchive"), message)
         case .integrityCheckFailed:
             return String(localized: "runtime.error.integrityFailed")
+        case .dxmtUnsupported(let id):
+            return String(format: String(localized: "runtime.error.dxmtUnsupported"), id)
         }
     }
 }
