@@ -255,16 +255,12 @@ private struct IOSInstallOverlay: View {
         max(targetProgress, startupProgress)
     }
 
-    private var trackInner: Double {
-        0.30 * ringScale
-    }
-
     private var trackOuter: Double {
         0.78 * ringScale
     }
 
-    private var cutoutInner: Double {
-        trackInner * (1 - reveal)
+    private var trackWidth: Double {
+        0.035
     }
 
     private var cutoutOuter: Double {
@@ -277,13 +273,21 @@ private struct IOSInstallOverlay: View {
                 .fill(.black.opacity(0.46))
                 .opacity(1 - reveal)
 
-            RingSector(progress: 1, innerRatio: trackInner, outerRatio: trackOuter)
-                .fill(.white.opacity(0.18), style: FillStyle(eoFill: true))
-                .opacity(1 - reveal)
+            // A thin ring marks the empty part of the progress circle while
+            // the installer is starting. Unlike the old design, the middle is
+            // not filled with a solid circle; the transparent sector reveals
+            // the icon itself, just like the iOS install indicator.
+            RingSector(
+                progress: 1,
+                innerRatio: max(0, trackOuter - trackWidth),
+                outerRatio: trackOuter
+            )
+            .fill(.white.opacity(0.30), style: FillStyle(eoFill: true))
+            .opacity(1 - reveal)
 
             RingSector(
                 progress: displayProgress,
-                innerRatio: cutoutInner,
+                innerRatio: 0,
                 outerRatio: cutoutOuter
             )
             .fill(.white, style: FillStyle(eoFill: true))
