@@ -267,6 +267,10 @@ final class BottleVM: ObservableObject, @unchecked Sendable {
                     case .hkrpg:
                         bottle.settings.hkrpgGameExecutableURL = pinProgramURL
                     }
+                } else {
+                    await MainActor.run {
+                        bottle.refreshProgramsAndPinsFromDisk()
+                    }
                 }
 
                 // Add record

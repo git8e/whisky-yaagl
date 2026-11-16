@@ -36,9 +36,8 @@ struct HoYoPlayInstallPinView: View {
                                 .fill(.black.opacity(0.18))
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(.ultraThinMaterial.opacity(0.78))
-                            ProgressView(value: progress)
-                                .controlSize(.small)
-                                .frame(width: 26)
+                            AppleStyleProgressRing(progress: progress)
+                                .frame(width: 30, height: 30)
                         }
                         .frame(width: 46, height: 46)
                     } else {
@@ -71,8 +70,10 @@ struct HoYoPlayInstallPinView: View {
         }
     }
 
+    @MainActor
     private func installHoYoPlay() {
         guard !isWorking else { return }
+        guard confirmHoYoPlayInstall() else { return }
 
         Task(priority: .userInitiated) {
             let latestInfo = await LauncherContent.refresh(forceRemote: true) ?? info
@@ -121,6 +122,18 @@ struct HoYoPlayInstallPinView: View {
                 await MainActor.run {
                     progress = nil
                 }
+
+                // `wine start` does not necessarily activate the installer's
+                // Qt window. Bring it forward once it appears so the Install
+                // button receives the first click.
+                let windowSnapshot = WineWindowSnapshot.capture()
+                let activationTask = Task {
+                    _ = await HoYoPlayLaunch.activateNewWindow(
+                        since: windowSnapshot,
+                        timeout: 30
+                    )
+                }
+                defer { activationTask.cancel() }
 
                 _ = try await Wine.runWine(
                     ["start", "/wait", "/unix", localInstallerURL.path(percentEncoded: false)],
@@ -191,6 +204,17 @@ struct HoYoPlayInstallPinView: View {
     }
 
     @MainActor
+    private func confirmHoYoPlayInstall() -> Bool {
+        let alert = NSAlert()
+        alert.messageText = String(localized: "hoyoplay.install.notice.title")
+        alert.informativeText = String(localized: "hoyoplay.install.notice.message")
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: String(localized: "hoyoplay.install.notice.continue"))
+        alert.addButton(withTitle: String(localized: "button.cancel"))
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+
+    @MainActor
     private func showManualInstallAlert(info: HoYoPlayContent, reason: String) {
         let alert = NSAlert()
         alert.messageText = String(localized: "hoyoplay.install.failed.title")
@@ -212,6 +236,26 @@ struct HoYoPlayInstallPinView: View {
         let resolvedInfo = info ?? self.info
         guard let url = resolvedInfo.manualDownloadURL else { return }
         NSWorkspace.shared.open(url)
+    }
+}
+
+private struct AppleStyleProgressRing: View {
+    let progress: Double?
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(.secondary.opacity(0.25), lineWidth: 3.5)
+
+            Circle()
+                .trim(from: 0, to: min(max(progress ?? 0, 0), 1))
+                .stroke(
+                    Color.accentColor,
+                    style: StrokeStyle(lineWidth: 3.5, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+                .animation(.easeOut(duration: 0.18), value: progress)
+        }
     }
 }
 

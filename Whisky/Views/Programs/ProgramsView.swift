@@ -193,16 +193,11 @@ struct ProgramItemView: View {
                 .foregroundStyle(.secondary)
                 .help("button.run")
                 .disabled(program.isLaunching)
-                if program.isLaunching {
-                    ZStack {
-                        Circle()
-                            .fill(.black.opacity(0.14))
-                            .frame(width: 24, height: 24)
-                        ProgressView()
-                            .controlSize(.regular)
-                            .scaleEffect(1.05)
-                    }
-                    .padding(.leading, 4)
+                if program.isStarting {
+                    ProgressView()
+                        .controlSize(.small)
+                        .frame(width: 16, height: 16)
+                        .padding(.leading, 4)
                 }
             }
         }

@@ -16,6 +16,7 @@
 //  If not, see https://www.gnu.org/licenses/.
 //
 
+import AppKit
 import SwiftUI
 import WhiskyKit
 import UniformTypeIdentifiers
@@ -82,6 +83,17 @@ struct BottleCreationView: View {
     @State private var nameValid: Bool = false
 
     @Environment(\.dismiss) private var dismiss
+
+    /// Cap the expanded advanced-settings form at 5/6 of the host window.
+    /// The Form itself scrolls, so long runtime/toggle lists never push the
+    /// sheet past the screen edge.
+    private var maximumExpandedHeight: CGFloat {
+        let hostHeight = NSApp.keyWindow?.sheetParent?.frame.height
+            ?? NSApp.mainWindow?.frame.height
+            ?? NSScreen.main?.visibleFrame.height
+            ?? 900
+        return (hostHeight * 5 / 6).rounded()
+    }
 
     private var gameExecutableOptionalKey: LocalizedStringKey {
         if gameRegionPreset.isHK4e { return "hk4e.gameExecutableOptional" }
@@ -222,8 +234,9 @@ struct BottleCreationView: View {
                 dismiss()
             }
         }
-        .fixedSize(horizontal: false, vertical: true)
+        .fixedSize(horizontal: false, vertical: !otherSettingsExpanded)
         .frame(width: ViewWidth.small)
+        .frame(height: otherSettingsExpanded ? maximumExpandedHeight : nil)
         .task {
             availableRuntimes = await WineRuntimes.refreshCatalog(forceRemote: false)
             if !availableRuntimes.contains(where: { $0.id == wineRuntimeId }) {

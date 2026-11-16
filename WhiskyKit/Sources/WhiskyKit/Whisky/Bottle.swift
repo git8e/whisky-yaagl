@@ -37,6 +37,7 @@ public final class Bottle: ObservableObject, Equatable, Hashable, Identifiable, 
                                  id: String)] {
         return settings.pins.compactMap { pin in
             guard let program = programs.first(where: { $0.url == pin.url }) else { return nil }
+            guard !program.isUninstaller else { return nil }
             return (pin, program, "\(pin.name)//\(program.url)")
         }
     }

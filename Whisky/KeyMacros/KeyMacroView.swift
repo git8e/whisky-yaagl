@@ -610,11 +610,6 @@ private struct MacroRow: View {
         macrosEnabled && binding?.enabled == true
     }
 
-    private var stateIcon: String {
-        guard binding != nil else { return "minus.circle" }
-        return effectivelyEnabled ? "power.circle.fill" : "power.circle"
-    }
-
     private var stateColor: Color {
         guard binding != nil else { return .secondary.opacity(0.35) }
         return effectivelyEnabled ? .green : .secondary.opacity(0.55)
@@ -687,10 +682,17 @@ private struct MacroRow: View {
                 .help("keyMacros.delete")
             }
         } else {
-            Image(systemName: stateIcon)
-                .font(.caption)
-                .foregroundStyle(stateColor)
-                .help(stateHelp)
+            Group {
+                if binding == nil {
+                    Circle()
+                        .strokeBorder(stateColor, lineWidth: 1)
+                } else {
+                    Circle()
+                        .fill(stateColor)
+                }
+            }
+            .frame(width: 8, height: 8)
+            .help(stateHelp)
         }
     }
 }
@@ -739,7 +741,6 @@ private struct MacroEditorView: View {
                     .frame(maxHeight: .infinity)
                 Divider()
                 triggerSection(script: script)
-                    .frame(height: 290, alignment: .topLeading)
                     .layoutPriority(1)
             } else {
                 ContentUnavailableView("keyMacros.missing.title", systemImage: "exclamationmark.triangle")
@@ -948,9 +949,10 @@ private struct TriggerBindingRow: View {
                 Spacer(minLength: 8)
 
                 if let binding {
-                    HStack(spacing: 4) {
-                        Image(systemName: binding.enabled ? "power.circle.fill" : "power.circle")
-                            .foregroundStyle(binding.enabled ? .green : .secondary)
+                    HStack(spacing: 5) {
+                        Circle()
+                            .fill(binding.enabled ? .green : .gray)
+                            .frame(width: 8, height: 8)
                         Text(binding.enabled
                             ? LocalizedStringKey("keyMacros.trigger.enabledState")
                             : LocalizedStringKey("keyMacros.trigger.disabledState"))

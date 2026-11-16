@@ -17,6 +17,7 @@
 //
 
 import CoreGraphics
+import Darwin
 import Foundation
 
 /// Small helper around CoreGraphics window discovery.
@@ -58,6 +59,56 @@ public enum WineWindowSnapshot {
         }
 
         return !visibleWindowIDs().subtracting(snapshot.windowIDs).isEmpty
+    }
+
+    /// Wait for a new visible Wine window and return the PID that owns it.
+    /// Used to activate installer windows that `wine start` opens behind the
+    /// current app.
+    public static func waitForNewWindowOwnerPID(
+        since snapshot: Snapshot,
+        timeout: TimeInterval = 25
+    ) async -> pid_t? {
+        guard timeout > 0 else { return newWindowOwnerPID(since: snapshot) }
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while !Task.isCancelled && Date() < deadline {
+            if let pid = newWindowOwnerPID(since: snapshot) {
+                return pid
+            }
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        }
+
+        return newWindowOwnerPID(since: snapshot)
+    }
+
+    private static func newWindowOwnerPID(since snapshot: Snapshot) -> pid_t? {
+        let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
+        guard let windows = CGWindowListCopyWindowInfo(options, kCGNullWindowID) as? [[String: Any]] else {
+            return nil
+        }
+
+        for window in windows {
+            guard let owner = window[kCGWindowOwnerName as String] as? String,
+                  owner.lowercased().contains("wine"),
+                  let number = window[kCGWindowNumber as String] as? NSNumber,
+                  !snapshot.windowIDs.contains(CGWindowID(number.uint32Value)) else {
+                continue
+            }
+
+            let layer = (window[kCGWindowLayer as String] as? NSNumber)?.intValue ?? -1
+            guard layer == 0 else { continue }
+
+            let bounds = window[kCGWindowBounds as String] as? [String: Any] ?? [:]
+            let width = (bounds["Width"] as? NSNumber)?.doubleValue ?? 0
+            let height = (bounds["Height"] as? NSNumber)?.doubleValue ?? 0
+            guard width >= 120, height >= 90 else { continue }
+
+            if let pid = (window[kCGWindowOwnerPID as String] as? NSNumber)?.int32Value {
+                return pid
+            }
+        }
+
+        return nil
     }
 
     private static func visibleWindowIDs() -> Set<CGWindowID> {

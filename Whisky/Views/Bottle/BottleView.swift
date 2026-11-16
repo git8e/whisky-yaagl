@@ -16,6 +16,7 @@
 //  If not, see https://www.gnu.org/licenses/.
 //
 
+import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 import WhiskyKit
@@ -131,6 +132,14 @@ struct BottleView: View {
             .onAppear {
                 bottle.refreshProgramsAndPinsFromDisk()
                 refreshHoYoPlayInstalledState()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                // HoYoPlay can finish installing or launching a game while
+                // Whisky is in the background. Re-scan on return so the game
+                // is adopted and pinned for a direct, patched launch.
+                if hoYoPlayInstalled {
+                    bottle.refreshProgramsAndPinsFromDisk()
+                }
             }
             .task {
                 await LauncherContent.refreshIfNeeded()

@@ -142,31 +142,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please try again. If the error keeps happening, try using a VPN."
+            "value" : "Please try again. If the error keeps happening, try using a professional gaming accelerator (Gaming VPN / Ping Reducer / Lag Reducer)."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "もう一度お試しください。エラーが続く場合は VPN を使用してみてください。"
+            "value" : "もう一度お試しください。エラーが続く場合は、専門のゲーム用アクセラレーター（Gaming VPN / Ping Reducer / Lag Reducer）を試してください。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "다시 시도해 주세요. 오류가 계속되면 VPN을 사용해 보세요."
+            "value" : "다시 시도해 주세요. 오류가 계속되면 전문 게임 가속기(Gaming VPN / Ping Reducer / Lag Reducer)를 사용해 보세요."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请再试一次，如果错误持续出现，请尝试使用 VPN。"
+            "value" : "请再试一次，如果错误持续出现，请尝试使用专业游戏加速器（Gaming VPN / Ping Reducer / Lag Reducer）。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請再試一次，如果錯誤持續出現，請嘗試使用 VPN。"
+            "value" : "請再試一次，如果錯誤持續出現，請嘗試使用專業遊戲加速器（Gaming VPN / Ping Reducer / Lag Reducer）。"
           }
         }
       }
@@ -26811,6 +26811,108 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無法安裝 HoYoPlay"
+          }
+        }
+      }
+    },
+    "hoyoplay.install.notice.continue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロードを続ける"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계속 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续下载"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "繼續下載"
+          }
+        }
+      }
+    },
+    "hoyoplay.install.notice.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay is only used to install and update games. Some games may not launch through HoYoPlay under Wine. If a game does not start, associate its executable manually from Installed Programs.\n\nContinue downloading the installer?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay はゲームのインストールと更新のためのランチャーです。Wine 環境では HoYoPlay からゲームを起動できない場合があります。起動できない場合は、インストール済みプログラムからゲームの実行ファイルを手動で関連付けてください。\n\nインストーラーのダウンロードを続けますか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay는 게임 설치 및 업데이트용 런처입니다. Wine 환경에서는 HoYoPlay로 일부 게임을 실행하지 못할 수 있습니다. 게임이 실행되지 않으면 설치된 프로그램에서 게임 실행 파일을 수동으로 연결해 주세요.\n\n설치 파일 다운로드를 계속할까요?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay 仅用于安装和更新游戏，在 Wine 下可能无法启动部分游戏。如果游戏无法启动，请在“已安装程序”中手动关联游戏的可执行文件。\n\n是否继续下载安装器？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay 僅用於安裝和更新遊戲，在 Wine 下可能無法啟動部分遊戲。如果遊戲無法啟動，請在「已安裝的程式」中手動關聯遊戲的執行檔。\n\n是否繼續下載安裝程式？"
+          }
+        }
+      }
+    },
+    "hoyoplay.install.notice.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About HoYoPlay"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay について"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HoYoPlay 안내"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关于 HoYoPlay"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關於 HoYoPlay"
           }
         }
       }

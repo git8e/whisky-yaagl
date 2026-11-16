@@ -16,6 +16,7 @@
 //  If not, see https://www.gnu.org/licenses/.
 //
 
+import AppKit
 import CoreGraphics
 import Darwin
 import Foundation
@@ -69,6 +70,27 @@ public enum HoYoPlayLaunch {
                 )
             }
         }
+    }
+
+    /// Activate the first new Wine window after `snapshot`. Installers started
+    /// with `wine start` can open behind Whisky, which makes their buttons look
+    /// unresponsive until the window is clicked once.
+    @discardableResult
+    public static func activateNewWindow(
+        since snapshot: WineWindowSnapshot.Snapshot,
+        timeout: TimeInterval = 25
+    ) async -> Bool {
+        guard let pid = await WineWindowSnapshot.waitForNewWindowOwnerPID(
+            since: snapshot,
+            timeout: timeout
+        ) else {
+            return false
+        }
+
+        await MainActor.run {
+            NSRunningApplication(processIdentifier: pid)?.activate(options: [.activateAllWindows])
+        }
+        return true
     }
 
     /// Whether `url` points at the HoYoPlay launcher or its HYP executable.

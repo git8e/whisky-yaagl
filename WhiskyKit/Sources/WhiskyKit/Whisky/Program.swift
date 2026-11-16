@@ -61,6 +61,21 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
         isLaunching && !hasVisibleWindow
     }
 
+    /// Uninstallers are not useful on the bottle home screen; they often have
+    /// a missing or white icon and are better reached from Installed Programs.
+    public var isUninstaller: Bool {
+        Self.isUninstallerExecutable(url)
+    }
+
+    public static func isUninstallerExecutable(_ url: URL) -> Bool {
+        let name = url.deletingPathExtension().lastPathComponent.lowercased()
+        return name == "unins000"
+            || name == "uninst"
+            || name == "uninstall"
+            || name.hasPrefix("uninstall")
+            || name.hasPrefix("unins")
+    }
+
     public let peFile: PEFile?
 
     public init(url: URL, bottle: Bottle) {

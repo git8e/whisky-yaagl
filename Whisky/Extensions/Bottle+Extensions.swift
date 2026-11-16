@@ -216,6 +216,10 @@ extension Bottle {
                 if let program = ShellLinkHeader.getProgram(url: link,
                                                             handle: try FileHandle(forReadingFrom: link),
                                                             bottle: self) {
+                    let shortcutName = link.deletingPathExtension().lastPathComponent
+                    guard !isUninstallerShortcut(name: shortcutName, programURL: program.url) else {
+                        continue
+                    }
                     if !shortcutPrograms.contains(where: { $0.program.url == program.url }) {
                         shortcutPrograms.append(ShortcutProgram(
                             program: program,
@@ -269,6 +273,13 @@ extension Bottle {
     /// processed here so newly installed apps can appear without restarting the app.
     @MainActor
     func refreshProgramsAndPinsFromDisk() {
+        // Uninstallers should stay available from Installed Programs but not
+        // clutter the bottle home screen (their icons are often blank).
+        settings.pins.removeAll { pin in
+            guard let url = pin.url else { return false }
+            return Program.isUninstallerExecutable(url)
+        }
+
         updateInstalledPrograms()
 
         let shortcutPrograms = getStartMenuShortcuts().map { (shortcut: $0, ignoresBlocklist: false) }
@@ -279,6 +290,10 @@ extension Bottle {
         // launcher, so grouping avoids naming the pin after an arbitrary game.
         var groups: [String: (program: Program, names: [String], ignoresBlocklist: Bool)] = [:]
         for entry in shortcutPrograms {
+            guard !isUninstallerShortcut(name: entry.shortcut.name,
+                                         programURL: entry.shortcut.program.url) else {
+                continue
+            }
             let key = entry.shortcut.program.url.path().lowercased()
             if var group = groups[key] {
                 group.names.append(entry.shortcut.name)
@@ -339,6 +354,259 @@ extension Bottle {
 
         // Re-sort after adding Start Menu programs.
         programs = programs.sorted { $0.name.lowercased() < $1.name.lowercased() }
+
+        autoAssociateHoYoPlayGameIfNeeded()
+    }
+
+    /// HoYoPlay records each installed game's path in the prefix registry. If
+    /// the user did not pick a game executable during bottle creation, adopt
+    /// the matching game and pin it so the home screen launches it directly
+    /// (with this bottle's patches) instead of opening the launcher first.
+    @MainActor
+    func autoAssociateHoYoPlayGameIfNeeded() {
+        guard settings.hk4eGameExecutableURL == nil
+            || settings.napGameExecutableURL == nil
+            || settings.hkrpgGameExecutableURL == nil else {
+            return
+        }
+
+        for install in hoyoPlayRegistryGames() {
+            let kind = install.gameKind
+            guard kind.matches(settings.gamePreset) else { continue }
+            guard let executableURL = hoyoPlayExecutable(for: install),
+                  FileManager.default.fileExists(atPath: executableURL.path(percentEncoded: false)) else {
+                continue
+            }
+
+            switch kind {
+            case .hk4e:
+                guard settings.hk4eGameExecutableURL == nil else { continue }
+                settings.hk4eGameExecutableURL = executableURL
+                settings.hk4eRegion = install.isChina ? .cn : .os
+            case .nap:
+                guard settings.napGameExecutableURL == nil else { continue }
+                settings.napGameExecutableURL = executableURL
+                settings.napRegion = install.isChina ? .cn : .os
+            case .hkrpg:
+                guard settings.hkrpgGameExecutableURL == nil else { continue }
+                settings.hkrpgGameExecutableURL = executableURL
+                settings.hkrpgRegion = install.isChina ? .cn : .os
+            }
+
+            pinHoYoPlayGame(executableURL, displayName: install.displayName)
+        }
+    }
+
+    private enum HoYoPlayGameKind {
+        case hk4e
+        case nap
+        case hkrpg
+    }
+
+    private struct HoYoPlayRegistryGame {
+        let business: String
+        let installPath: String
+
+        var gameKind: HoYoPlayGameKind {
+            if business.hasPrefix("hk4e") { return .hk4e }
+            if business.hasPrefix("nap") { return .nap }
+            return .hkrpg
+        }
+
+        var isChina: Bool {
+            business.hasSuffix("_cn")
+        }
+
+        func matches(_ preset: BottleGamePreset) -> Bool {
+            switch (self, preset) {
+            case (.hk4e, .hk4e), (.nap, .nap), (.hkrpg, .hkrpg):
+                return true
+            default:
+                return false
+            }
+        }
+
+        var displayName: String {
+            switch gameKind {
+            case .hk4e:
+                return "Genshin Impact"
+            case .nap:
+                return "Zenless Zone Zero"
+            case .hkrpg:
+                return "Honkai: Star Rail"
+            }
+        }
+
+        var executableNames: [String] {
+            switch gameKind {
+            case .hk4e:
+                return ["genshinimpact.exe", "yuanshen.exe"]
+            case .nap:
+                return ["zenlesszonezero.exe"]
+            case .hkrpg:
+                return ["starrail.exe"]
+            }
+        }
+    }
+
+    private func hoyoPlayRegistryGames() -> [HoYoPlayRegistryGame] {
+        let registryURL = url.appending(path: "user.reg")
+        guard let data = try? Data(contentsOf: registryURL),
+              let text = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .isoLatin1) else {
+            return []
+        }
+
+        let knownBusiness = [
+            "hk4e_global", "hk4e_cn",
+            "nap_global", "nap_cn",
+            "hkrpg_global", "hkrpg_cn"
+        ]
+        var games: [HoYoPlayRegistryGame] = []
+        var section = ""
+        var business: String?
+        var installPath: String?
+
+        func flush() {
+            if let business, let installPath, !installPath.isEmpty {
+                games.append(HoYoPlayRegistryGame(business: business, installPath: installPath))
+            }
+            business = nil
+            installPath = nil
+        }
+
+        for rawLine in text.components(separatedBy: .newlines) {
+            let line = rawLine.trimmingCharacters(in: .whitespaces)
+            if line.hasPrefix("[") && line.hasSuffix("]") {
+                flush()
+                section = unescapeRegistry(String(line.dropFirst().dropLast()))
+                if section.contains("\\Cognosphere\\HYP\\1_0\\"),
+                   let last = section.split(separator: "\\").last.map(String.init),
+                   knownBusiness.contains(last) {
+                    business = last
+                }
+                continue
+            }
+
+            guard business != nil else { continue }
+            if line.hasPrefix("\"GameBiz\"") {
+                if let value = registryValue(from: line), knownBusiness.contains(value) {
+                    business = value
+                }
+            } else if line.hasPrefix("\"GameInstallPath\"") {
+                installPath = registryValue(from: line)
+            }
+        }
+        flush()
+
+        return games
+    }
+
+    private func registryValue(from line: String) -> String? {
+        guard let equals = line.firstIndex(of: "=") else { return nil }
+        var value = String(line[line.index(after: equals)...])
+        value = value.trimmingCharacters(in: .whitespaces)
+        if value.hasPrefix("\""), value.hasSuffix("\""), value.count >= 2 {
+            value = String(value.dropFirst().dropLast())
+        }
+        return unescapeRegistry(value)
+    }
+
+    private func unescapeRegistry(_ value: String) -> String {
+        value.replacingOccurrences(of: "\\\\", with: "\\")
+    }
+
+    private func hoyoPlayExecutable(for install: HoYoPlayRegistryGame) -> URL? {
+        guard let installURL = localURL(forWinePath: install.installPath) else { return nil }
+        let fileManager = FileManager.default
+
+        for name in install.executableNames {
+            let direct = installURL.appendingPathComponent(name)
+            if fileManager.fileExists(atPath: direct.path(percentEncoded: false)) {
+                return direct
+            }
+        }
+
+        // Some games keep the executable in a nested "Game" folder.
+        let enumerator = fileManager.enumerator(
+            at: installURL,
+            includingPropertiesForKeys: [.isRegularFileKey],
+            options: [.skipsHiddenFiles]
+        )
+        while let candidate = enumerator?.nextObject() as? URL {
+            if install.executableNames.contains(candidate.lastPathComponent.lowercased()) {
+                return candidate
+            }
+        }
+
+        return nil
+    }
+
+    private func localURL(forWinePath path: String) -> URL? {
+        let normalized = path.replacingOccurrences(of: "\\", with: "/")
+        guard normalized.count > 2,
+              normalized[normalized.index(normalized.startIndex, offsetBy: 1)] == ":" else {
+            return nil
+        }
+
+        let drive = normalized.prefix(1).lowercased()
+        var remainder = String(normalized.dropFirst(2))
+        while remainder.hasPrefix("/") { remainder.removeFirst() }
+        guard !remainder.isEmpty else { return nil }
+
+        if drive == "z" {
+            return URL(fileURLWithPath: "/" + remainder)
+        }
+        if drive == "c" {
+            return url.appendingPathComponent("drive_c", isDirectory: true)
+                .appendingPathComponent(remainder)
+        }
+
+        let device = url.appendingPathComponent("dosdevices", isDirectory: true)
+            .appendingPathComponent("\(drive):")
+        guard let destination = try? FileManager.default.destinationOfSymbolicLink(
+            atPath: device.path(percentEncoded: false)
+        ) else {
+            return nil
+        }
+        let root: URL
+        if destination.hasPrefix("/") {
+            root = URL(fileURLWithPath: destination)
+        } else {
+            root = device.deletingLastPathComponent().appendingPathComponent(destination).standardizedFileURL
+        }
+        return root.appendingPathComponent(remainder)
+    }
+
+    private func pinHoYoPlayGame(_ executableURL: URL, displayName: String) {
+        if let existing = programs.first(where: {
+            $0.url.path().caseInsensitiveCompare(executableURL.path()) == .orderedSame
+        }) {
+            existing.pinned = true
+            return
+        }
+
+        let alreadyPinned = settings.pins.contains {
+            $0.url?.path().caseInsensitiveCompare(executableURL.path()) == .orderedSame
+        }
+        if !alreadyPinned {
+            settings.pins.append(PinnedProgram(name: displayName, url: executableURL))
+        }
+
+        let program = Program(url: executableURL, bottle: self)
+        programs.append(program)
+        programs = programs.sorted { $0.name.lowercased() < $1.name.lowercased() }
+    }
+
+    private func isUninstallerShortcut(name: String, programURL: URL) -> Bool {
+        if Program.isUninstallerExecutable(programURL) {
+            return true
+        }
+
+        let lowered = name.lowercased()
+        let markers = [
+            "uninstall", "unins", "卸载", "解除安裝", "アンインストール", "제거", "desinstalar"
+        ]
+        return markers.contains { lowered.contains($0) }
     }
 
     /// Picks the most representative shortcut name for a program.
