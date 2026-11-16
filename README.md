@@ -27,6 +27,7 @@ This project is actively maintained and works as of **November 2026**.
 
 ### Recent Activity
 
+- **v0.1.17** released on November 16, 2026 -- adds per-bottle key macros with customizable triggers and an Accessibility-based runner, plus a smoother HoYoPlay install flow, automatic game detection, and a more reliable macro editor.
 - **v0.1.16** released on November 12, 2026 -- fixes HoYoPlay on DXMT runtimes: the launcher renders and installs reliably, pins are named after the launcher, and the duplicate macOS title bar is gone.
 - **v0.1.15** released on November 12, 2026 -- adds per-bottle GStreamer media support for in-game video and audio, including ADTS AAC and MPEG-TS/HLS playback.
 - **v0.1.14** released on October 11, 2026 -- ships as a drag-to-Applications DMG, with GitHub Actions publishing a release (DMG + zip) automatically on every version tag.
