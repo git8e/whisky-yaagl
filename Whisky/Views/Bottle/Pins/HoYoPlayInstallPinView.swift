@@ -273,17 +273,21 @@ private struct AppleStyleProgressRing: View {
                     .animation(.linear(duration: 0.22), value: targetFraction)
 
                 if targetFraction < 0.995 {
-                    Circle()
-                        .fill(.white)
-                        .frame(width: 3.2, height: 3.2)
-                        .offset(y: -(radius - 2.8))
-                        .rotationEffect(.degrees(360 * displayFraction))
-                        .opacity(pulse ? 0.95 : 0.30)
-                        .shadow(color: .black.opacity(0.40), radius: 1)
-                        .animation(
-                            .easeInOut(duration: 0.75).repeatForever(autoreverses: true),
-                            value: pulse
-                        )
+                    ZStack {
+                        Circle()
+                            .fill(.white)
+                            .frame(width: 3.2, height: 3.2)
+                            .offset(y: -(radius - 2.8))
+                    }
+                    .frame(width: size, height: size)
+                    .rotationEffect(.degrees(360 * displayFraction))
+                    .opacity(pulse ? 0.95 : 0.30)
+                    .shadow(color: .black.opacity(0.40), radius: 1)
+                    .animation(.linear(duration: 0.22), value: targetFraction)
+                    .animation(
+                        .easeInOut(duration: 0.75).repeatForever(autoreverses: true),
+                        value: pulse
+                    )
                 }
             }
         }
