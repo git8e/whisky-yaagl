@@ -69,7 +69,7 @@ ensure_identity_material() {
     chmod 600 "$SIGN_DIR/key.pem" "$SIGN_DIR/identity.p12"
 }
 
-if ! security show-keychain-info "$KEYCHAIN" >/dev/null 2>&1; then
+if [ ! -f "$KEYCHAIN" ] && [ ! -f "${KEYCHAIN%.keychain-db}.keychain" ]; then
     echo "==> Creating local signing keychain"
     security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
     security set-keychain-settings -lut 21600 "$KEYCHAIN"
