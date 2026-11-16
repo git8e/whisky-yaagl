@@ -142,31 +142,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please try again. If the error keeps happening, try using a professional gaming accelerator (Gaming VPN / Ping Reducer / Lag Reducer)."
+            "value" : "Please try again. If the error keeps happening, try using a gaming VPN."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "もう一度お試しください。エラーが続く場合は、専門のゲーム用アクセラレーター（Gaming VPN / Ping Reducer / Lag Reducer）を試してください。"
+            "value" : "もう一度お試しください。エラーが続く場合は、ゲーム用 VPN を試してください。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "다시 시도해 주세요. 오류가 계속되면 전문 게임 가속기(Gaming VPN / Ping Reducer / Lag Reducer)를 사용해 보세요."
+            "value" : "다시 시도해 주세요. 오류가 계속되면 게임용 VPN을 사용해 보세요."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请再试一次，如果错误持续出现，请尝试使用专业游戏加速器（Gaming VPN / Ping Reducer / Lag Reducer）。"
+            "value" : "请再试一次，如果错误持续出现，请尝试使用专业游戏加速器。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請再試一次，如果錯誤持續出現，請嘗試使用專業遊戲加速器（Gaming VPN / Ping Reducer / Lag Reducer）。"
+            "value" : "請再試一次，如果錯誤持續出現，請嘗試使用專業遊戲加速器。"
           }
         }
       }

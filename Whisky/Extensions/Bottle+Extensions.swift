@@ -401,6 +401,15 @@ extension Bottle {
         case hk4e
         case nap
         case hkrpg
+
+        func matches(_ preset: BottleGamePreset) -> Bool {
+            switch (self, preset) {
+            case (.hk4e, .hk4e), (.nap, .nap), (.hkrpg, .hkrpg):
+                return true
+            default:
+                return false
+            }
+        }
     }
 
     private struct HoYoPlayRegistryGame {
@@ -415,15 +424,6 @@ extension Bottle {
 
         var isChina: Bool {
             business.hasSuffix("_cn")
-        }
-
-        func matches(_ preset: BottleGamePreset) -> Bool {
-            switch (self, preset) {
-            case (.hk4e, .hk4e), (.nap, .nap), (.hkrpg, .hkrpg):
-                return true
-            default:
-                return false
-            }
         }
 
         var displayName: String {

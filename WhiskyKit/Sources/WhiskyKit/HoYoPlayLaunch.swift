@@ -88,7 +88,7 @@ public enum HoYoPlayLaunch {
         }
 
         await MainActor.run {
-            NSRunningApplication(processIdentifier: pid)?.activate(options: [.activateAllWindows])
+            _ = NSRunningApplication(processIdentifier: pid)?.activate(options: [.activateAllWindows])
         }
         return true
     }
