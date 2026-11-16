@@ -256,7 +256,7 @@ private struct IOSInstallOverlay: View {
     }
 
     private var trackOuter: Double {
-        0.52 * ringScale
+        0.75 * ringScale
     }
 
     private var trackWidth: Double {
@@ -272,7 +272,7 @@ private struct IOSInstallOverlay: View {
     }
 
     private var visibleRingOuter: Double {
-        trackOuter + reveal * 0.45
+        trackOuter + reveal * 0.22
     }
 
     var body: some View {
@@ -296,7 +296,8 @@ private struct IOSInstallOverlay: View {
 
             // The ring itself stays above the cutout so it remains a complete
             // circle over both the dimmed and revealed parts of the icon. It
-            // is deliberately chunky, matching the reference recording.
+            // spans three quarters of the app icon and is deliberately chunky,
+            // matching the reference recording.
             RingSector(
                 progress: 1,
                 innerRatio: max(0, visibleRingOuter - ringWidth),
