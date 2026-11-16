@@ -34,14 +34,15 @@ struct HoYoPlayInstallPinView: View {
 
                     if isWorking {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(.black.opacity(0.18))
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(.ultraThinMaterial.opacity(0.78))
+                            Circle()
+                                .fill(.black.opacity(0.42))
+                            Circle()
+                                .strokeBorder(.white.opacity(0.30), lineWidth: 0.75)
                             AppleStyleProgressRing(progress: progress)
-                                .frame(width: 30, height: 30)
+                                .frame(width: 32, height: 32)
                         }
                         .frame(width: 46, height: 46)
+                        .shadow(color: .black.opacity(0.28), radius: 3, y: 1)
                     } else {
                         Image(systemName: "arrow.down.circle.fill")
                             .resizable()
@@ -243,22 +244,73 @@ struct HoYoPlayInstallPinView: View {
 private struct AppleStyleProgressRing: View {
     let progress: Double?
 
-    private var fraction: Double {
+    @State private var startupFraction: Double = 0
+    @State private var pulse = false
+
+    private var targetFraction: Double {
         min(max(progress ?? 0, 0), 1)
     }
 
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(.white.opacity(0.24))
+    private var displayFraction: Double {
+        max(targetFraction, startupFraction)
+    }
 
-            ProgressSector(progress: fraction)
-                .fill(.white)
-                .animation(.linear(duration: 0.25), value: fraction)
+    var body: some View {
+        GeometryReader { geometry in
+            let size = min(geometry.size.width, geometry.size.height)
+            let radius = size / 2
+
+            ZStack {
+                Circle()
+                    .fill(.white)
+                    .shadow(color: .black.opacity(0.18), radius: 1.5, y: 0.5)
+
+                Circle()
+                    .strokeBorder(.black.opacity(0.12), lineWidth: 0.75)
+
+                ProgressSector(progress: displayFraction)
+                    .fill(Color.blue)
+                    .animation(.linear(duration: 0.22), value: targetFraction)
+
+                if targetFraction < 0.995 {
+                    Circle()
+                        .fill(.white)
+                        .frame(width: 3.2, height: 3.2)
+                        .offset(y: -(radius - 2.8))
+                        .rotationEffect(.degrees(360 * displayFraction))
+                        .opacity(pulse ? 0.95 : 0.30)
+                        .shadow(color: .black.opacity(0.40), radius: 1)
+                        .animation(
+                            .easeInOut(duration: 0.75).repeatForever(autoreverses: true),
+                            value: pulse
+                        )
+                }
+            }
         }
-        .overlay {
-            Circle()
-                .stroke(.white.opacity(0.35), lineWidth: 0.75)
+        .onAppear {
+            startStartupSweep()
+        }
+        .onChange(of: progress) { _, newValue in
+            if newValue == nil || (newValue ?? 0) <= 0.001 {
+                startStartupSweep()
+            }
+        }
+    }
+
+    private func startStartupSweep() {
+        startupFraction = 0
+        pulse = false
+
+        // Give immediate feedback as soon as the install starts. The first
+        // 30° fills quickly, then holds until real download progress arrives.
+        withAnimation(.easeOut(duration: 0.42)) {
+            startupFraction = 30.0 / 360.0
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+            withAnimation(.easeInOut(duration: 0.75).repeatForever(autoreverses: true)) {
+                pulse = true
+            }
         }
     }
 }
