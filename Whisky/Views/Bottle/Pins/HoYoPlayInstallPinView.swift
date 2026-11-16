@@ -256,15 +256,23 @@ private struct IOSInstallOverlay: View {
     }
 
     private var trackOuter: Double {
-        0.78 * ringScale
+        0.52 * ringScale
     }
 
     private var trackWidth: Double {
-        0.035
+        0.11
+    }
+
+    private var ringWidth: Double {
+        trackWidth * ringScale
     }
 
     private var cutoutOuter: Double {
         trackOuter + reveal * 2.0
+    }
+
+    private var visibleRingOuter: Double {
+        trackOuter + reveal * 0.45
     }
 
     var body: some View {
@@ -273,18 +281,10 @@ private struct IOSInstallOverlay: View {
                 .fill(.black.opacity(0.46))
                 .opacity(1 - reveal)
 
-            // A thin ring marks the empty part of the progress circle while
-            // the installer is starting. Unlike the old design, the middle is
-            // not filled with a solid circle; the transparent sector reveals
-            // the icon itself, just like the iOS install indicator.
-            RingSector(
-                progress: 1,
-                innerRatio: max(0, trackOuter - trackWidth),
-                outerRatio: trackOuter
-            )
-            .fill(.white.opacity(0.30), style: FillStyle(eoFill: true))
-            .opacity(1 - reveal)
-
+            // The transparent sector grows through the mask like the iOS
+            // install indicator. The centre is deliberately left open so the
+            // icon shows through; a solid centre only belongs to the paused
+            // state in the original animation.
             RingSector(
                 progress: displayProgress,
                 innerRatio: 0,
@@ -293,8 +293,20 @@ private struct IOSInstallOverlay: View {
             .fill(.white, style: FillStyle(eoFill: true))
             .animation(.linear(duration: 0.22), value: targetProgress)
             .blendMode(.destinationOut)
+
+            // The ring itself stays above the cutout so it remains a complete
+            // circle over both the dimmed and revealed parts of the icon. It
+            // is deliberately chunky, matching the reference recording.
+            RingSector(
+                progress: 1,
+                innerRatio: max(0, visibleRingOuter - ringWidth),
+                outerRatio: visibleRingOuter
+            )
+            .fill(.white.opacity(0.88), style: FillStyle(eoFill: true))
+            .opacity(1 - reveal)
         }
         .compositingGroup()
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .onAppear {
             startInstallAnimation()
         }
