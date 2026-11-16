@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-26
+    runs-on: macos-15-intel
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
