@@ -18,6 +18,19 @@
 
 import Foundation
 
+public struct TarError: LocalizedError {
+    public let output: String
+
+    public init(output: String) {
+        self.output = output
+    }
+
+    public var errorDescription: String? {
+        let trimmed = output.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? String(localized: "tar.error.extractFailed") : trimmed
+    }
+}
+
 public class Tar {
     static let tarBinary: URL = URL(fileURLWithPath: "/usr/bin/tar")
 
@@ -48,7 +61,7 @@ public class Tar {
             process.waitUntilExit()
             let status = process.terminationStatus
             if status != 0 {
-                throw outputString
+                throw TarError(output: outputString)
             }
         }
     }
@@ -69,7 +82,7 @@ public class Tar {
             process.waitUntilExit()
             let status = process.terminationStatus
             if status != 0 {
-                throw outputString
+                throw TarError(output: outputString)
             }
         }
     }
@@ -103,9 +116,7 @@ public class Tar {
         guard process.terminationStatus == 0 else {
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             let output = String(data: data, encoding: .utf8) ?? ""
-            throw output
+            throw TarError(output: output)
         }
     }
 }
-
-extension String: @retroactive Error {}

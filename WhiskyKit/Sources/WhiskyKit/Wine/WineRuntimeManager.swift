@@ -376,7 +376,25 @@ public enum WineRuntimeManager {
         try fm.createDirectory(at: tempDir, withIntermediateDirectories: true)
         defer { try? fm.removeItem(at: tempDir) }
 
-        try Tar.untar(tarBall: archiveURL, toURL: tempDir)
+        do {
+            try Tar.untar(tarBall: archiveURL, toURL: tempDir)
+        } catch let error as TarError {
+            // Some signed Wine archives have a truncated AppleDouble/trailer
+            // member. bsdtar reports an error even though all real entries
+            // were extracted. Since the archive checksum was already verified,
+            // let the explicit wine-root/binary checks below decide whether
+            // the extraction is usable.
+            let output = error.output.lowercased()
+            let hasVerifiedChecksum = !(runtime.sha256 ?? "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .isEmpty
+            guard hasVerifiedChecksum, output.contains("truncated") else {
+                throw error
+            }
+            logger.warning("Ignoring truncated tar trailer for \(runtime.id, privacy: .public)")
+        } catch {
+            throw error
+        }
 
         let wineRootInArchive: URL
         if let path = runtime.archive.winePathInArchive {
