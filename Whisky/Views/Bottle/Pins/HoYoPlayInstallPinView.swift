@@ -9,6 +9,7 @@ struct HoYoPlayInstallPinView: View {
 
     @State private var isWorking = false
     @State private var progress: Double?
+    @State private var isRevealing = false
     @State private var showInstallNotice = false
 
     init(bottle: Bottle, info: HoYoPlayContent, onInstallFinished: @escaping () -> Void = {}) {
@@ -33,16 +34,8 @@ struct HoYoPlayInstallPinView: View {
                         .frame(width: 45, height: 45)
 
                     if isWorking {
-                        ZStack {
-                            Circle()
-                                .fill(.black.opacity(0.42))
-                            Circle()
-                                .strokeBorder(.white.opacity(0.30), lineWidth: 0.75)
-                            AppleStyleProgressRing(progress: progress)
-                                .frame(width: 32, height: 32)
-                        }
-                        .frame(width: 46, height: 46)
-                        .shadow(color: .black.opacity(0.28), radius: 3, y: 1)
+                        IOSInstallOverlay(progress: progress, isRevealing: isRevealing)
+                            .frame(width: 45, height: 45)
                     } else {
                         Image(systemName: "arrow.down.circle.fill")
                             .resizable()
@@ -133,7 +126,7 @@ struct HoYoPlayInstallPinView: View {
                 }
 
                 await MainActor.run {
-                    progress = nil
+                    progress = 1
                 }
 
                 // `wine start` does not necessarily activate the installer's
@@ -168,13 +161,18 @@ struct HoYoPlayInstallPinView: View {
                 }
 
                 await MainActor.run {
-                    onInstallFinished()
-                    isWorking = false
+                    isRevealing = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.58) {
+                        onInstallFinished()
+                        isWorking = false
+                        isRevealing = false
+                    }
                 }
             } catch {
                 await MainActor.run {
                     isWorking = false
                     progress = nil
+                    isRevealing = false
                     showManualInstallAlert(info: latestInfo, reason: error.localizedDescription)
                 }
             }
@@ -241,106 +239,158 @@ struct HoYoPlayInstallPinView: View {
     }
 }
 
-private struct AppleStyleProgressRing: View {
+private struct IOSInstallOverlay: View {
     let progress: Double?
+    let isRevealing: Bool
 
-    @State private var startupFraction: Double = 0
-    @State private var pulse = false
+    @State private var startupProgress: Double = 0
+    @State private var ringScale: Double = 0.16
+    @State private var reveal: Double = 0
 
-    private var targetFraction: Double {
+    private var targetProgress: Double {
         min(max(progress ?? 0, 0), 1)
     }
 
-    private var displayFraction: Double {
-        max(targetFraction, startupFraction)
+    private var displayProgress: Double {
+        max(targetProgress, startupProgress)
+    }
+
+    private var trackInner: Double {
+        0.30 * ringScale
+    }
+
+    private var trackOuter: Double {
+        0.78 * ringScale
+    }
+
+    private var cutoutInner: Double {
+        trackInner * (1 - reveal)
+    }
+
+    private var cutoutOuter: Double {
+        trackOuter + reveal * 2.0
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            let size = min(geometry.size.width, geometry.size.height)
-            let radius = size / 2
+        ZStack {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(.black.opacity(0.46))
+                .opacity(1 - reveal)
 
-            ZStack {
-                Circle()
-                    .fill(.white)
-                    .shadow(color: .black.opacity(0.18), radius: 1.5, y: 0.5)
+            RingSector(progress: 1, innerRatio: trackInner, outerRatio: trackOuter)
+                .fill(.white.opacity(0.18), style: FillStyle(eoFill: true))
+                .opacity(1 - reveal)
 
-                Circle()
-                    .strokeBorder(.black.opacity(0.12), lineWidth: 0.75)
-
-                ProgressSector(progress: displayFraction)
-                    .fill(Color.blue)
-                    .animation(.linear(duration: 0.22), value: targetFraction)
-
-                if targetFraction < 0.995 {
-                    ZStack {
-                        Circle()
-                            .fill(.white)
-                            .frame(width: 3.2, height: 3.2)
-                            .offset(y: -(radius - 2.8))
-                    }
-                    .frame(width: size, height: size)
-                    .rotationEffect(.degrees(360 * displayFraction))
-                    .opacity(pulse ? 0.95 : 0.30)
-                    .shadow(color: .black.opacity(0.40), radius: 1)
-                    .animation(.linear(duration: 0.22), value: targetFraction)
-                    .animation(
-                        .easeInOut(duration: 0.75).repeatForever(autoreverses: true),
-                        value: pulse
-                    )
-                }
-            }
+            RingSector(
+                progress: displayProgress,
+                innerRatio: cutoutInner,
+                outerRatio: cutoutOuter
+            )
+            .fill(.white, style: FillStyle(eoFill: true))
+            .animation(.linear(duration: 0.22), value: targetProgress)
+            .blendMode(.destinationOut)
         }
+        .compositingGroup()
         .onAppear {
-            startStartupSweep()
+            startInstallAnimation()
         }
-        .onChange(of: progress) { _, newValue in
-            if newValue == nil || (newValue ?? 0) <= 0.001 {
-                startStartupSweep()
+        .onChange(of: isRevealing) { _, revealing in
+            guard revealing else { return }
+            withAnimation(.easeInOut(duration: 0.5)) {
+                reveal = 1
             }
         }
     }
 
-    private func startStartupSweep() {
-        startupFraction = 0
-        pulse = false
+    private func startInstallAnimation() {
+        startupProgress = 0
+        ringScale = 0.16
+        reveal = 0
 
-        // Give immediate feedback as soon as the install starts. The first
-        // 30° fills quickly, then holds until real download progress arrives.
-        withAnimation(.easeOut(duration: 0.42)) {
-            startupFraction = 30.0 / 360.0
+        // The ring appears first, growing from the centre like the iOS
+        // install indicator, then the first sector starts sweeping.
+        withAnimation(.easeOut(duration: 0.35)) {
+            ringScale = 1
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-            withAnimation(.easeInOut(duration: 0.75).repeatForever(autoreverses: true)) {
-                pulse = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) {
+            withAnimation(.easeOut(duration: 0.42)) {
+                startupProgress = 30.0 / 360.0
             }
         }
     }
 }
 
-private struct ProgressSector: Shape {
+private struct RingSector: Shape {
     var progress: Double
+    var innerRatio: Double
+    var outerRatio: Double
 
-    var animatableData: Double {
-        get { progress }
-        set { progress = newValue }
+    var animatableData: AnimatablePair<Double, AnimatablePair<Double, Double>> {
+        get {
+            AnimatablePair(progress, AnimatablePair(innerRatio, outerRatio))
+        }
+        set {
+            progress = newValue.first
+            innerRatio = newValue.second.first
+            outerRatio = newValue.second.second
+        }
     }
 
     func path(in rect: CGRect) -> Path {
-        var path = Path()
         let center = CGPoint(x: rect.midX, y: rect.midY)
-        let radius = min(rect.width, rect.height) / 2
+        let halfSize = min(rect.width, rect.height) / 2
+        let inner = max(0, min(innerRatio, outerRatio)) * halfSize
+        let outer = max(0, max(innerRatio, outerRatio)) * halfSize
         let sweep = 360 * min(max(progress, 0), 1)
 
-        path.move(to: center)
+        guard outer > 0.001, sweep > 0.001 else { return Path() }
+
+        var path = Path()
+
+        if sweep >= 359.999 {
+            path.addEllipse(in: CGRect(
+                x: center.x - outer,
+                y: center.y - outer,
+                width: outer * 2,
+                height: outer * 2
+            ))
+
+            if inner > 0.001 {
+                path.addEllipse(in: CGRect(
+                    x: center.x - inner,
+                    y: center.y - inner,
+                    width: inner * 2,
+                    height: inner * 2
+                ))
+            }
+
+            return path
+        }
+
+        let start = Angle.degrees(-90)
+        let end = Angle.degrees(-90 + sweep)
+
         path.addArc(
             center: center,
-            radius: radius,
-            startAngle: .degrees(-90),
-            endAngle: .degrees(-90 + sweep),
+            radius: outer,
+            startAngle: start,
+            endAngle: end,
             clockwise: false
         )
+
+        if inner > 0.001 {
+            path.addArc(
+                center: center,
+                radius: inner,
+                startAngle: end,
+                endAngle: start,
+                clockwise: true
+            )
+        } else {
+            path.addLine(to: center)
+        }
+
         path.closeSubpath()
         return path
     }
