@@ -201,6 +201,34 @@ extension Whisky {
         }
     }
 
+    /// Keeps the Dock tile asking for attention until the launch finishes.
+    ///
+    /// A single `requestUserAttention(.criticalRequest)` is often shortened by
+    /// macOS (and depends on the user's Dock bounce preference). Re-request
+    /// after each short interval so the animation continues for the whole
+    /// startup instead of stopping after the first two bounces.
+    private final class BounceWatcher: NSObject, NSApplicationDelegate {
+        private var timer: Timer?
+        private var attentionRequest: Int?
+
+        func applicationDidFinishLaunching(_ notification: Notification) {
+            requestAttention()
+            let timer = Timer(timeInterval: 0.9, repeats: true) { [weak self] _ in
+                self?.requestAttention()
+            }
+            RunLoop.main.add(timer, forMode: .common)
+            self.timer = timer
+        }
+
+        private func requestAttention() {
+            if let attentionRequest {
+                NSApp.cancelUserAttentionRequest(attentionRequest)
+            }
+            let request = NSApp.requestUserAttention(.criticalRequest)
+            attentionRequest = request == 0 ? nil : request
+        }
+    }
+
     /// Internal helper used by the app's generated launch beacons.
     /// It gives the process a regular Dock tile, asks the Dock to bounce it,
     /// and exits when the first Wine window appears.
@@ -219,7 +247,8 @@ extension Whisky {
             if let iconURL = Bundle.main.url(forResource: "AppIcon", withExtension: "icns") {
                 app.applicationIconImage = NSImage(contentsOf: iconURL)
             }
-            _ = app.requestUserAttention(.criticalRequest)
+            let watcher = BounceWatcher()
+            app.delegate = watcher
 
             let baselineIDs = Set(
                 baseline
