@@ -6,7 +6,8 @@ on:
 
 jobs:
   build:
-    runs-on: macos-26
+    # Temporary fallback while the macos-26 runner queue is backed up.
+    runs-on: macos-15-intel
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
