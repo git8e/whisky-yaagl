@@ -189,23 +189,27 @@ struct ContentView: View {
                     .disabled(bottle.inFlight)
                     .id(bottle.url)
             }
-        } else {
-            if (bottleVM.bottles.isEmpty || bottleVM.countActive() == 0) && bottlesLoaded {
-                VStack {
-                    Text("main.createFirst")
-                    Button {
-                        showBottleCreation.toggle()
-                    } label: {
-                        HStack {
-                            Image(systemName: "plus")
-                            Text("button.createBottle")
-                        }
-                        .padding(6)
+        } else if bottlesLoaded {
+            VStack(spacing: 12) {
+                Text(bottleVM.bottles.isEmpty || bottleVM.countActive() == 0
+                     ? "main.createFirst" : "main.selectBottle")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+                Button {
+                    showBottleCreation.toggle()
+                } label: {
+                    HStack {
+                        Image(systemName: "plus")
+                        Text("button.createBottle")
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.accentColor)
+                    .padding(6)
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(.accentColor)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

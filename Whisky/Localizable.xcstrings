@@ -10307,6 +10307,28 @@
         }
       }
     },
+    "main.selectBottle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a bottle on the left, or create a new one to get started."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请从左侧选择一个容器，或创建一个新容器开始。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請從左側選擇一個容器，或建立一個新容器開始。"
+          }
+        }
+      }
+    },
     "open.bottle" : {
       "localizations" : {
         "ar" : {
