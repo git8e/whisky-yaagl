@@ -24,18 +24,18 @@ struct HoYoPlayInstallPinView: View {
             guard !isWorking else { return }
             showInstallNotice = true
         } label: {
-            VStack(spacing: PinLayout.rowSpacing) {
+            VStack(spacing: PinLayout.iconLabelSpacing) {
                 ZStack(alignment: .topTrailing) {
                     Image("HoYoPlayIcon")
                         .renderingMode(.template)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .foregroundStyle(.primary)
-                        .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
+                        .frame(width: PinLayout.iconContentSize, height: PinLayout.iconContentSize)
 
                     if isWorking {
                         IOSInstallOverlay(progress: progress, isRevealing: isRevealing)
-                            .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
+                            .frame(width: PinLayout.iconContentSize, height: PinLayout.iconContentSize)
                     } else if !didFinishInstall {
                         Image(systemName: "arrow.down.circle.fill")
                             .resizable()

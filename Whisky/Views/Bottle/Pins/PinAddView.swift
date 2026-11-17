@@ -24,7 +24,7 @@ struct PinAddView: View {
     @State private var showingSheet = false
 
     var body: some View {
-        VStack(spacing: PinLayout.rowSpacing) {
+        VStack(spacing: PinLayout.iconLabelSpacing) {
             Button {
                 showingSheet = true
             } label: {
@@ -32,6 +32,10 @@ struct PinAddView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .foregroundStyle(.secondary)
+                    .frame(
+                        width: PinLayout.iconContentSize,
+                        height: PinLayout.iconContentSize
+                    )
             }
             .buttonStyle(.plain)
             .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)

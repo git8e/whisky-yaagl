@@ -20,12 +20,19 @@ import SwiftUI
 import WhiskyKit
 
 /// Finder icon-view metrics used by the pinned-program grid.
+///
+/// Finder's defaults for an icon view are a 64 pt icon slot, 54 pt of space
+/// between slots, and a 12 pt label. The visible application artwork occupies
+/// about 54 pt of the 64 pt slot; using the full slot makes game icons look much
+/// larger than Finder's.
 enum PinLayout {
     static let iconSize: CGFloat = 64
-    static let cellWidth: CGFloat = 113
+    static let iconContentSize: CGFloat = 54
+    static let cellWidth: CGFloat = 118
     static let cellHeight: CGFloat = 112
-    static let labelWidth: CGFloat = 109
+    static let labelWidth: CGFloat = 110
     static let rowSpacing: CGFloat = 8
+    static let iconLabelSpacing: CGFloat = 10
     static let labelFont: Font = .system(size: 12)
 }
 
@@ -45,7 +52,7 @@ struct PinView: View {
     }
 
     var body: some View {
-        VStack(spacing: PinLayout.rowSpacing) {
+        VStack(spacing: PinLayout.iconLabelSpacing) {
             ZStack(alignment: .topTrailing) {
                 Group {
                     if let image = image {
@@ -57,21 +64,21 @@ struct PinView: View {
                     }
                 }
                 .aspectRatio(contentMode: .fit)
-                .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
+                .frame(width: PinLayout.iconContentSize, height: PinLayout.iconContentSize)
                 .scaleEffect(opening ? 1.8 : 1)
                 .opacity(opening ? 0 : 1)
 
                 if isStarting {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 14)
+                        RoundedRectangle(cornerRadius: 13)
                             .fill(.black.opacity(0.18))
-                        RoundedRectangle(cornerRadius: 14)
+                        RoundedRectangle(cornerRadius: 13)
                             .fill(.ultraThinMaterial.opacity(0.78))
                         ProgressView()
                             .controlSize(.large)
-                            .scaleEffect(1.24)
+                            .scaleEffect(1.2)
                     }
-                    .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
+                    .frame(width: PinLayout.iconContentSize, height: PinLayout.iconContentSize)
                 } else {
                     Image(systemName: "play.fill")
                         .resizable()
