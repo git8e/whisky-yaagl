@@ -476,9 +476,12 @@ extension Bottle {
 
         for rawLine in text.components(separatedBy: .newlines) {
             let line = rawLine.trimmingCharacters(in: .whitespaces)
-            if line.hasPrefix("[") && line.hasSuffix("]") {
+            // Wine writes a timestamp after the closing bracket, for example:
+            // `[Software\\Cognosphere\\HYP\\1_0\\hk4e_global] 1794926166`.
+            if line.hasPrefix("["), let closing = line.firstIndex(of: "]") {
                 flush()
-                section = unescapeRegistry(String(line.dropFirst().dropLast()))
+                let key = line[line.index(after: line.startIndex)..<closing]
+                section = unescapeRegistry(String(key))
                 if section.contains("\\Cognosphere\\HYP\\1_0\\"),
                    let last = section.split(separator: "\\").last.map(String.init),
                    knownBusiness.contains(last) {

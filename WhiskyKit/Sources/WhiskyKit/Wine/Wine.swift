@@ -144,6 +144,12 @@ public class Wine {
         // launcher itself. A stale instance was terminated above already.
         HoYoPlayLaunch.hideNativeTitleBarIfNeeded(for: url, bottle: bottle)
 
+        if isLauncher {
+            // Catch games HoYoPlay starts itself and relaunch them through
+            // Whisky's patch pipeline instead.
+            HoYoPlayLaunch.startGameLaunchInterceptor(bottle: bottle)
+        }
+
         for await _ in try Self.runWineProcess(
             name: url.lastPathComponent,
             args: ["start", "/unix", url.path(percentEncoded: false)] + arguments,

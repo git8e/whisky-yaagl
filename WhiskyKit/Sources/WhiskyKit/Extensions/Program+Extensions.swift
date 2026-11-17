@@ -53,7 +53,12 @@ extension Program {
         let usesGamePatch = hk4eExe == url || napExe == url || hkrpgExe == url
         let windowSnapshot = usesGamePatch ? WineWindowSnapshot.capture() : nil
 
+        // The HoYoPlay interceptor must ignore a game that Whisky itself is
+        // starting; it is already using the patched launch path.
+        HoYoPlayLaunch.markGameLaunchOwned(self.url, owned: true)
+
         Task.detached(priority: .userInitiated) {
+            defer { HoYoPlayLaunch.markGameLaunchOwned(self.url, owned: false) }
             await MainActor.run {
                 self.isLaunching = true
                 self.hasVisibleWindow = false
