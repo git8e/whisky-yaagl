@@ -21,18 +21,17 @@ import WhiskyKit
 
 /// Finder icon-view metrics used by the pinned-program grid.
 ///
-/// Finder's defaults for an icon view are a 64 pt icon slot, 54 pt of space
-/// between slots, and a 12 pt label. The visible application artwork occupies
-/// about 54 pt of the 64 pt slot; using the full slot makes game icons look much
-/// larger than Finder's.
+/// Measured from Finder's Applications icon view at the same scale as the app:
+/// 52 pt of visible artwork inside a 64 pt slot, a 113 pt cell pitch, a 116 pt
+/// row pitch, and a 12 pt label with a 15 pt visible icon-to-label gap.
 enum PinLayout {
     static let iconSize: CGFloat = 64
-    static let iconContentSize: CGFloat = 54
-    static let cellWidth: CGFloat = 118
-    static let cellHeight: CGFloat = 112
-    static let labelWidth: CGFloat = 110
+    static let iconContentSize: CGFloat = 52
+    static let cellWidth: CGFloat = 113
+    static let cellHeight: CGFloat = 108
+    static let labelWidth: CGFloat = 109
     static let rowSpacing: CGFloat = 8
-    static let iconLabelSpacing: CGFloat = 10
+    static let iconLabelSpacing: CGFloat = 7
     static let labelFont: Font = .system(size: 12)
 }
 

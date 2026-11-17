@@ -65,6 +65,10 @@ struct BottleView: View {
                     PinAddView(bottle: bottle)
                 }
                 .padding()
+                // Finder leaves 29 pt between the top of the icon view and the
+                // visible artwork; the extra 7 pt complements the icon slot's
+                // 6 pt internal inset.
+                .padding(.top, 7)
                 Form {
                     sidebarLink("tab.programs", systemImage: "list.bullet", stage: .programs)
                     sidebarLink("tab.config", systemImage: "gearshape", stage: .config)
