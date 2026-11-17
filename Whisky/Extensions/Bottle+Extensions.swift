@@ -475,7 +475,7 @@ extension Bottle {
         }
 
         for rawLine in text.components(separatedBy: .newlines) {
-            let line = rawLine.trimmingCharacters(in: .whitespaces)
+            let line = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
             // Wine writes a timestamp after the closing bracket, for example:
             // `[Software\\Cognosphere\\HYP\\1_0\\hk4e_global] 1794926166`.
             if line.hasPrefix("["), let closing = line.firstIndex(of: "]") {
@@ -507,7 +507,7 @@ extension Bottle {
     private func registryValue(from line: String) -> String? {
         guard let equals = line.firstIndex(of: "=") else { return nil }
         var value = String(line[line.index(after: equals)...])
-        value = value.trimmingCharacters(in: .whitespaces)
+        value = value.trimmingCharacters(in: .whitespacesAndNewlines)
         if value.hasPrefix("\""), value.hasSuffix("\""), value.count >= 2 {
             value = String(value.dropFirst().dropLast())
         }
