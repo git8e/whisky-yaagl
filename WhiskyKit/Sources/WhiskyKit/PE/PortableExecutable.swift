@@ -143,8 +143,20 @@ public struct PEFile: Hashable, Equatable, Sendable {
         return rsrc(handle: handle)
     }
 
+    private struct IconResource {
+        let data: Data
+        let width: Int
+        let height: Int
+        let bitCount: UInt16
+    }
+
     /// The best icon for this executable
     /// - Returns: An `NSImage` if there is a renderable icon in the resource directory table
+    ///
+    /// Windows executable icons are `RT_ICON` resources. Rather than rendering
+    /// the different DIB layouts ourselves, assemble the resources into an ICO
+    /// file and let ImageIO decode it. This also handles indexed, 16-bit, PNG
+    /// and 32-bit icons, which all appear in real Windows programs.
     public func bestIcon() -> NSImage? {
         guard let handle = try? FileHandle(forReadingFrom: url) else {
             return nil
@@ -154,35 +166,121 @@ public struct PEFile: Hashable, Equatable, Sendable {
         }
 
         guard let rsrc = rsrc(handle: handle, types: [.icon]) else { return nil }
-        let icons = rsrc.allEntries
-            .compactMap { entry -> NSImage? in
-                guard let offset = entry.resolveRVA(sections: sections) else { return nil }
-                let bitmapInfo = BitmapInfoHeader(handle: handle, offset: UInt64(offset))
-                if bitmapInfo.size != 40 {
-                    do {
-                        try handle.seek(toOffset: UInt64(offset))
-                        if let iconData = try handle.read(upToCount: Int(entry.size)) {
-                            if let rep = NSBitmapImageRep(data: iconData) {
-                                let image = NSImage(size: rep.size)
-                                image.addRepresentation(rep)
-                                return image
-                            }
-                        }
-                    } catch {
-                        print("Failed to get icon")
-                    }
-                } else if bitmapInfo.colorFormat != .unknown {
-                    return bitmapInfo.renderBitmap(handle: handle, offset: UInt64(offset + bitmapInfo.size))
-                }
-
+        let icons = rsrc.allEntries.compactMap { entry -> IconResource? in
+            guard let offset = entry.resolveRVA(sections: sections),
+                  entry.size > 0,
+                  entry.size < 16 * 1024 * 1024 else {
                 return nil
             }
-            .filter { $0.isValid }
-
-        if !icons.isEmpty {
-            return icons.max(by: { $0.size.height < $1.size.height })
-        } else {
-            return NSImage()
+            guard (try? handle.seek(toOffset: UInt64(offset))) != nil,
+                  let data = try? handle.read(upToCount: Int(entry.size)),
+                  let icon = iconResource(from: data) else {
+                return nil
+            }
+            return icon
         }
+        guard !icons.isEmpty else { return nil }
+
+        if let image = icoImage(from: icons) {
+            return image
+        }
+
+        // A malformed member should not hide the other sizes.
+        for icon in icons {
+            if let image = icoImage(from: [icon]) {
+                return image
+            }
+        }
+        return nil
+    }
+
+    private func iconResource(from data: Data) -> IconResource? {
+        guard data.count >= 24 else { return nil }
+
+        // Vista and later store large icons as a PNG stream inside RT_ICON.
+        if data[0] == 0x89, data[1] == 0x50, data[2] == 0x4E, data[3] == 0x47,
+           data[12] == 0x49, data[13] == 0x48, data[14] == 0x44, data[15] == 0x52 {
+            let width = Int(readUInt32BE(data, offset: 16))
+            let height = Int(readUInt32BE(data, offset: 20))
+            guard width > 0, height > 0 else { return nil }
+            return IconResource(data: data, width: width, height: height, bitCount: 32)
+        }
+
+        guard data.count >= 40 else { return nil }
+        let headerSize = readUInt32LE(data, offset: 0)
+        guard headerSize >= 40, Int(headerSize) <= data.count else { return nil }
+
+        let width = Int(abs(Int32(bitPattern: readUInt32LE(data, offset: 4))))
+        let doubledHeight = Int(abs(Int32(bitPattern: readUInt32LE(data, offset: 8))))
+        let bitCount = readUInt16LE(data, offset: 14)
+        let height = doubledHeight / 2
+        guard width > 0, height > 0, width <= 4096, height <= 4096 else { return nil }
+        return IconResource(data: data, width: width, height: height, bitCount: bitCount)
+    }
+
+    private func icoImage(from icons: [IconResource]) -> NSImage? {
+        guard !icons.isEmpty, icons.count <= Int(UInt16.max) else { return nil }
+        let sorted = icons.sorted {
+            if $0.width * $0.height != $1.width * $1.height {
+                return $0.width * $0.height > $1.width * $1.height
+            }
+            return $0.bitCount > $1.bitCount
+        }
+
+        var ico = Data([0x00, 0x00, 0x01, 0x00])
+        appendUInt16LE(UInt16(sorted.count), to: &ico)
+        var imageOffset = 6 + 16 * sorted.count
+        for icon in sorted {
+            ico.append(UInt8(icon.width >= 256 ? 0 : icon.width))
+            ico.append(UInt8(icon.height >= 256 ? 0 : icon.height))
+            ico.append(0) // color count (0 = 256 or more)
+            ico.append(0) // reserved
+            appendUInt16LE(1, to: &ico) // color planes
+            appendUInt16LE(icon.bitCount, to: &ico)
+            appendUInt32LE(UInt32(icon.data.count), to: &ico)
+            appendUInt32LE(UInt32(imageOffset), to: &ico)
+            imageOffset += icon.data.count
+        }
+        for icon in sorted {
+            ico.append(icon.data)
+        }
+
+        guard ico.count <= 64 * 1024 * 1024,
+              let image = NSImage(data: ico),
+              image.isValid,
+              !image.representations.isEmpty else {
+            return nil
+        }
+        return image
+    }
+
+    private func readUInt16LE(_ data: Data, offset: Int) -> UInt16 {
+        UInt16(data[offset]) | (UInt16(data[offset + 1]) << 8)
+    }
+
+    private func readUInt32LE(_ data: Data, offset: Int) -> UInt32 {
+        UInt32(data[offset])
+            | (UInt32(data[offset + 1]) << 8)
+            | (UInt32(data[offset + 2]) << 16)
+            | (UInt32(data[offset + 3]) << 24)
+    }
+
+    private func readUInt32BE(_ data: Data, offset: Int) -> UInt32 {
+        (UInt32(data[offset]) << 24)
+            | (UInt32(data[offset + 1]) << 16)
+            | (UInt32(data[offset + 2]) << 8)
+            | UInt32(data[offset + 3])
+    }
+
+    private func appendUInt16LE(_ value: UInt16, to data: inout Data) {
+        data.append(UInt8(value & 0xFF))
+        data.append(UInt8((value >> 8) & 0xFF))
+    }
+
+    private func appendUInt32LE(_ value: UInt32, to data: inout Data) {
+        data.append(UInt8(value & 0xFF))
+        data.append(UInt8((value >> 8) & 0xFF))
+        data.append(UInt8((value >> 16) & 0xFF))
+        data.append(UInt8((value >> 24) & 0xFF))
     }
 }
