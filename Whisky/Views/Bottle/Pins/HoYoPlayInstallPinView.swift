@@ -58,7 +58,7 @@ struct HoYoPlayInstallPinView: View {
             .padding(10)
         }
         .buttonStyle(.plain)
-        .disabled(isWorking)
+        .allowsHitTesting(!isWorking)
         .contextMenu {
             Button("hoyoplay.openWebsite", systemImage: "safari") {
                 openManualDownloadPage()
