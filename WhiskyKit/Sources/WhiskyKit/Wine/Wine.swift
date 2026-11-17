@@ -150,12 +150,13 @@ public class Wine {
             HoYoPlayLaunch.startGameLaunchInterceptor(bottle: bottle)
         }
 
-        let programDisplayName = bottle.programs
-            .first(where: { $0.url.isSameFile(as: url) })?
-            .launchDisplayName
+        let launchedProgram = bottle.programs
+            .first(where: { $0.url.isSameFile(as: url) })
         WineLaunchBundle.launch(
             for: url,
-            displayName: isLauncher ? "HoYoPlay" : programDisplayName
+            displayName: launchedProgram?.launchDisplayName
+                ?? (isLauncher ? "HoYoPlay" : nil),
+            icon: launchedProgram?.launchIcon
         )
 
         for await _ in try Self.runWineProcess(

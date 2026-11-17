@@ -16,8 +16,11 @@
 //  If not, see https://www.gnu.org/licenses/.
 //
 
+import AppKit
+import CoreGraphics
 import Darwin
 import Foundation
+import ImageIO
 import os.log
 
 /// A small, generated app bundle that acts as a launch beacon.
@@ -43,8 +46,16 @@ public struct WineLaunchBundle {
     /// Returns without waiting for the beacon to finish starting. Launching the
     /// Windows program should happen immediately afterwards so the beacon is
     /// already waiting for the first window.
-    public static func launch(for programURL: URL, displayName: String? = nil) {
-        guard let bundle = prepare(for: programURL, displayName: displayName) else { return }
+    public static func launch(
+        for programURL: URL,
+        displayName: String? = nil,
+        icon: NSImage? = nil
+    ) {
+        guard let bundle = prepare(
+            for: programURL,
+            displayName: displayName,
+            icon: icon
+        ) else { return }
 
         // Capture the windows that exist before the game starts. The beacon
         // uses this to distinguish the game window from windows that were
@@ -79,7 +90,11 @@ public struct WineLaunchBundle {
     /// Returns `nil` when the helper binary is not present (for example when
     /// running a development build directly from Xcode). Callers should then
     /// fall back to launching Wine without a beacon.
-    public static func prepare(for programURL: URL, displayName: String? = nil) -> WineLaunchBundle? {
+    public static func prepare(
+        for programURL: URL,
+        displayName: String? = nil,
+        icon: NSImage? = nil
+    ) -> WineLaunchBundle? {
         let fileManager = FileManager.default
         guard let helperURL = helperBinaryURL(),
               fileManager.isExecutableFile(atPath: helperURL.path(percentEncoded: false)) else {
@@ -89,10 +104,11 @@ public struct WineLaunchBundle {
         let name = sanitizedDisplayName(
             displayName ?? programURL.deletingPathExtension().lastPathComponent
         )
-        let key = stableKey(for: programURL)
+        let key = stableKey(for: programURL, name: name, icon: icon)
         let version = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
-        // Include the app build in the bundle path so LaunchServices does not
-        // keep a cached name or a missing icon from an older build.
+        // Include the app build and the icon/name hash in the bundle path so
+        // LaunchServices never keeps a cached icon or name from an older
+        // launch or an older app build.
         let bundleURL = WhiskyPaths.applicationSupportRoot
             .appending(path: "LaunchServices", directoryHint: .isDirectory)
             .appending(path: "\(key)-\(version).app", directoryHint: .isDirectory)
@@ -119,7 +135,11 @@ public struct WineLaunchBundle {
                 _ = removexattr(path, "com.apple.quarantine", 0)
             }
 
-            let iconName = copyApplicationIcon(to: resourcesURL, fileManager: fileManager)
+            let iconName = writeIcon(
+                icon,
+                to: resourcesURL,
+                fileManager: fileManager
+            )
             var info: [String: Any] = [
                 "CFBundleDevelopmentRegion": "en",
                 "CFBundleDisplayName": name,
@@ -162,6 +182,133 @@ public struct WineLaunchBundle {
         }
     }
 
+    private enum IconError: Error {
+        case bitmapContext
+        case imageDestination
+    }
+
+    private static func writeIcon(
+        _ icon: NSImage?,
+        to resourcesURL: URL,
+        fileManager: FileManager
+    ) -> String? {
+        guard let icon,
+              let source = cgImage(from: icon) else {
+            return copyApplicationIcon(to: resourcesURL, fileManager: fileManager)
+        }
+
+        let iconsetURL = resourcesURL.appending(
+            path: "AppIcon.iconset",
+            directoryHint: .isDirectory
+        )
+        let destination = resourcesURL.appending(path: "AppIcon.icns")
+
+        // The bundle path includes a hash of the icon, so a cached icon here
+        // is already the correct one. Re-rendering it on every launch would
+        // add avoidable work to the game startup path.
+        if fileManager.fileExists(atPath: destination.path(percentEncoded: false)) {
+            return "AppIcon"
+        }
+
+        do {
+            if fileManager.fileExists(atPath: iconsetURL.path(percentEncoded: false)) {
+                try fileManager.removeItem(at: iconsetURL)
+            }
+            try fileManager.createDirectory(at: iconsetURL, withIntermediateDirectories: true)
+
+            let variants: [(name: String, pixels: Int)] = [
+                ("icon_16x16.png", 16),
+                ("icon_16x16@2x.png", 32),
+                ("icon_32x32.png", 32),
+                ("icon_32x32@2x.png", 64),
+                ("icon_128x128.png", 128),
+                ("icon_128x128@2x.png", 256),
+                ("icon_256x256.png", 256),
+                ("icon_256x256@2x.png", 512),
+                ("icon_512x512.png", 512),
+                ("icon_512x512@2x.png", 1024)
+            ]
+            for variant in variants {
+                try writePNG(
+                    source,
+                    pixels: variant.pixels,
+                    to: iconsetURL.appending(path: variant.name)
+                )
+            }
+
+            if fileManager.fileExists(atPath: destination.path(percentEncoded: false)) {
+                try fileManager.removeItem(at: destination)
+            }
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/iconutil")
+            process.arguments = [
+                "-c", "icns",
+                iconsetURL.path(percentEncoded: false),
+                "-o", destination.path(percentEncoded: false)
+            ]
+            try process.run()
+            process.waitUntilExit()
+            try? fileManager.removeItem(at: iconsetURL)
+
+            guard process.terminationStatus == 0,
+                  fileManager.fileExists(atPath: destination.path(percentEncoded: false)) else {
+                logger.debug("iconutil could not create the launch beacon icon")
+                return copyApplicationIcon(to: resourcesURL, fileManager: fileManager)
+            }
+            return "AppIcon"
+        } catch {
+            try? fileManager.removeItem(at: iconsetURL)
+            logger.debug("Could not render launch beacon icon: \(error)")
+            return copyApplicationIcon(to: resourcesURL, fileManager: fileManager)
+        }
+    }
+
+    private static func cgImage(from image: NSImage) -> CGImage? {
+        var rect = CGRect(origin: .zero, size: image.size)
+        return image.cgImage(forProposedRect: &rect, context: nil, hints: nil)
+    }
+
+    private static func writePNG(
+        _ image: CGImage,
+        pixels: Int,
+        to url: URL
+    ) throws {
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        guard let context = CGContext(
+            data: nil,
+            width: pixels,
+            height: pixels,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else {
+            throw IconError.bitmapContext
+        }
+        context.interpolationQuality = .high
+        context.clear(CGRect(x: 0, y: 0, width: pixels, height: pixels))
+        context.draw(
+            image,
+            in: CGRect(x: 0, y: 0, width: pixels, height: pixels)
+        )
+        guard let output = context.makeImage(),
+              let destination = CGImageDestinationCreateWithURL(
+                url as CFURL,
+                "public.png" as CFString,
+                1,
+                nil
+              ) else {
+            throw IconError.imageDestination
+        }
+        CGImageDestinationAddImage(destination, output, nil)
+        guard CGImageDestinationFinalize(destination) else {
+            throw IconError.imageDestination
+        }
+    }
+
+    /// Fallback for programs whose executable has no usable icon. The main
+    /// window shows no icon in that case, but leaving the beacon without any
+    /// icon would make it look broken in the Dock.
     private static func copyApplicationIcon(to resourcesURL: URL, fileManager: FileManager) -> String? {
         let candidates = [
             Bundle.main.bundleURL.appending(path: "Contents/Resources/AppIcon.icns"),
@@ -195,11 +342,24 @@ public struct WineLaunchBundle {
         return name.replacingOccurrences(of: "\n", with: " ")
     }
 
-    private static func stableKey(for url: URL) -> String {
+    private static func stableKey(for url: URL, name: String, icon: NSImage?) -> String {
         var hash: UInt64 = 14_695_981_039_346_656_037
-        for byte in url.standardizedFileURL.path(percentEncoded: false).utf8 {
+        func mix(_ byte: UInt8) {
             hash ^= UInt64(byte)
             hash &*= 1_099_511_628_211
+        }
+
+        for byte in url.standardizedFileURL.path(percentEncoded: false).utf8 {
+            mix(byte)
+        }
+        mix(0)
+        for byte in name.utf8 {
+            mix(byte)
+        }
+        if let iconData = icon?.tiffRepresentation {
+            for byte in iconData {
+                mix(byte)
+            }
         }
         return String(hash, radix: 16)
     }

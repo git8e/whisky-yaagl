@@ -16,6 +16,7 @@
 //  If not, see https://www.gnu.org/licenses/.
 //
 
+import AppKit
 import Foundation
 import SwiftUI
 import os.log
@@ -40,8 +41,18 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
         })?.name ?? url.deletingPathExtension().lastPathComponent
     }
 
-    /// Human-readable name for the transient Dock icon shown while starting.
+    /// Name shown for the transient Dock icon while starting.
+    ///
+    /// A pin's custom name comes from the main window, so prefer it over both
+    /// the executable name and the preset game names. The preset names are
+    /// only a fallback for programs that have not been pinned.
     public var launchDisplayName: String {
+        if let pinnedName = bottle.settings.pins.first(where: { pin in
+            guard let pinURL = pin.url else { return false }
+            return pinURL.isSameFile(as: url)
+        })?.name.trimmingCharacters(in: .whitespacesAndNewlines), !pinnedName.isEmpty {
+            return pinnedName
+        }
         if bottle.settings.hk4eGameExecutableURL?.isSameFile(as: url) == true {
             return "Genshin Impact"
         }
@@ -51,7 +62,18 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
         if bottle.settings.hkrpgGameExecutableURL?.isSameFile(as: url) == true {
             return "Honkai: Star Rail"
         }
-        return displayName
+        return url.deletingPathExtension().lastPathComponent
+    }
+
+    /// Icon shown in the main window for this program. This is the same image
+    /// the pins and Installed Programs views use.
+    public var launchIcon: NSImage? {
+        guard let icon = peFile?.bestIcon(),
+              icon.size.width > 0,
+              icon.size.height > 0 else {
+            return nil
+        }
+        return icon
     }
 
     @Published public var settings: ProgramSettings {

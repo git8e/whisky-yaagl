@@ -209,7 +209,8 @@ public enum HKRPGPatch {
 
             WineLaunchBundle.launch(
                 for: program.url,
-                displayName: program.launchDisplayName
+                displayName: program.launchDisplayName,
+                icon: program.launchIcon
             )
             for await output in try Wine.runWineProcess(
                 name: exeURL.lastPathComponent,
