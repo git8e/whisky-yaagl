@@ -53,6 +53,17 @@ extension URL {
         return prettyPath
     }
 
+    /// Compare two file URLs by their decoded, standardized path.
+    ///
+    /// `URL.path()` is percent-encoded by default while `path(percentEncoded: false)`
+    /// is not. Mixing those two forms made pin lookups miss and created duplicate
+    /// pins for games installed under folders with spaces.
+    public func isSameFile(as other: URL) -> Bool {
+        let lhs = standardizedFileURL.path(percentEncoded: false)
+        let rhs = other.standardizedFileURL.path(percentEncoded: false)
+        return lhs.caseInsensitiveCompare(rhs) == .orderedSame
+    }
+
     // There is probably a better way to do this
     public func updateParentBottle(old: URL, new: URL) -> URL {
         let originalPath = path(percentEncoded: false)

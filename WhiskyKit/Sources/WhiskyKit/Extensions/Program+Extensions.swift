@@ -50,7 +50,9 @@ extension Program {
         let hk4eExe = bottle.settings.hk4eGameExecutableURL
         let napExe = bottle.settings.napGameExecutableURL
         let hkrpgExe = bottle.settings.hkrpgGameExecutableURL
-        let usesGamePatch = hk4eExe == url || napExe == url || hkrpgExe == url
+        let usesGamePatch = hk4eExe?.isSameFile(as: url) == true
+            || napExe?.isSameFile(as: url) == true
+            || hkrpgExe?.isSameFile(as: url) == true
         let windowSnapshot = usesGamePatch ? WineWindowSnapshot.capture() : nil
 
         // The HoYoPlay interceptor must ignore a game that Whisky itself is
@@ -86,11 +88,11 @@ extension Program {
 
             do {
                 try await Wine.withLogSession(for: self.bottle) {
-                    if hk4eExe == self.url {
+                    if hk4eExe?.isSameFile(as: self.url) == true {
                         try await HK4ePatch.applyAndRun(program: self, args: arguments, environment: environment)
-                    } else if napExe == self.url {
+                    } else if napExe?.isSameFile(as: self.url) == true {
                         try await NAPPatch.applyAndRun(program: self, args: arguments, environment: environment)
-                    } else if hkrpgExe == self.url {
+                    } else if hkrpgExe?.isSameFile(as: self.url) == true {
                         try await HKRPGPatch.applyAndRun(program: self, args: arguments, environment: environment)
                     } else {
                         try await Wine.runProgram(

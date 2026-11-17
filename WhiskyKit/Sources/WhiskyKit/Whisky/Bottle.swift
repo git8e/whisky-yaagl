@@ -36,7 +36,10 @@ public final class Bottle: ObservableObject, Equatable, Hashable, Identifiable, 
     public var pinnedPrograms: [(pin: PinnedProgram, program: Program, // swiftlint:disable:this large_tuple
                                  id: String)] {
         return settings.pins.compactMap { pin in
-            guard let program = programs.first(where: { $0.url == pin.url }) else { return nil }
+            guard let pinURL = pin.url,
+                  let program = programs.first(where: { $0.url.isSameFile(as: pinURL) }) else {
+                return nil
+            }
             guard !program.isUninstaller else { return nil }
             return (pin, program, "\(pin.name)//\(program.url)")
         }
@@ -59,12 +62,13 @@ public final class Bottle: ObservableObject, Equatable, Hashable, Identifiable, 
         }
 
         // Get rid of duplicates and pins that reference removed files
-        var found: Set<URL> = []
+        let originalPinCount = self.settings.pins.count
+        var foundPaths: Set<String> = []
         self.settings.pins = self.settings.pins.filter { pin in
             guard let url = pin.url else { return false }
-            guard !found.contains(url) else { return false }
-            found.insert(url)
-            let urlPath = url.path(percentEncoded: false)
+            let urlPath = url.standardizedFileURL.path(percentEncoded: false)
+            let key = urlPath.lowercased()
+            guard foundPaths.insert(key).inserted else { return false }
             let volume: URL?
             do {
                 volume = try url.resourceValues(forKeys: [.volumeURLKey]).volume ?? nil
@@ -73,6 +77,9 @@ public final class Bottle: ObservableObject, Equatable, Hashable, Identifiable, 
             }
             let legallyRemoved = pin.removable && volume == nil
             return FileManager.default.fileExists(atPath: urlPath) || legallyRemoved
+        }
+        if self.settings.pins.count != originalPinCount {
+            saveSettings()
         }
     }
 

@@ -273,6 +273,8 @@ extension Bottle {
     /// processed here so newly installed apps can appear without restarting the app.
     @MainActor
     func refreshProgramsAndPinsFromDisk() {
+        deduplicatePins()
+
         // Uninstallers should stay available from Installed Programs but not
         // clutter the bottle home screen (their icons are often blank).
         settings.pins.removeAll { pin in
@@ -309,7 +311,7 @@ extension Bottle {
         for group in groups.values.sorted(by: { $0.program.url.path() < $1.program.url.path() }) {
             // Match by case-insensitive path because URL equality is case-sensitive.
             let existing = programs.first(where: {
-                $0.url.path().caseInsensitiveCompare(group.program.url.path()) == .orderedSame
+                $0.url.isSameFile(as: group.program.url)
             })
 
             let program: Program
@@ -333,7 +335,7 @@ extension Bottle {
             // Ensure a pin exists even if path casing differs.
             if let pinIndex = settings.pins.firstIndex(where: { pin in
                 guard let pinURL = pin.url else { return false }
-                return pinURL.path().caseInsensitiveCompare(program.url.path()) == .orderedSame
+                return pinURL.isSameFile(as: program.url)
             }) {
                 // Only update names that look auto-generated; keep user renames.
                 if automaticNames.contains(settings.pins[pinIndex].name),
@@ -580,16 +582,26 @@ extension Bottle {
         return root.appendingPathComponent(remainder)
     }
 
+    private func deduplicatePins() {
+        var seen: Set<String> = []
+        settings.pins = settings.pins.filter { pin in
+            guard let url = pin.url else { return false }
+            let key = url.standardizedFileURL.path(percentEncoded: false).lowercased()
+            return seen.insert(key).inserted
+        }
+    }
+
     private func pinHoYoPlayGame(_ executableURL: URL, displayName: String) {
         if let existing = programs.first(where: {
-            $0.url.path().caseInsensitiveCompare(executableURL.path()) == .orderedSame
+            $0.url.isSameFile(as: executableURL)
         }) {
             existing.pinned = true
             return
         }
 
         let alreadyPinned = settings.pins.contains {
-            $0.url?.path().caseInsensitiveCompare(executableURL.path()) == .orderedSame
+            guard let pinURL = $0.url else { return false }
+            return pinURL.isSameFile(as: executableURL)
         }
         if !alreadyPinned {
             settings.pins.append(PinnedProgram(name: displayName, url: executableURL))

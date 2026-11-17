@@ -39,13 +39,19 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
         didSet {
             guard pinned != oldValue else { return }
             if pinned {
-                guard !bottle.settings.pins.contains(where: { $0.url == url }) else { return }
+                guard !bottle.settings.pins.contains(where: { pin in
+                    guard let pinURL = pin.url else { return false }
+                    return pinURL.isSameFile(as: url)
+                }) else { return }
                 bottle.settings.pins.append(PinnedProgram(
                     name: name.replacingOccurrences(of: ".exe", with: ""),
                     url: url
                 ))
             } else {
-                bottle.settings.pins.removeAll(where: { $0.url == url })
+                bottle.settings.pins.removeAll(where: { pin in
+                    guard let pinURL = pin.url else { return false }
+                    return pinURL.isSameFile(as: url)
+                })
             }
         }
     }
@@ -82,7 +88,10 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
         let name = url.lastPathComponent
         self.bottle = bottle
         self.url = url
-        self.pinned = bottle.settings.pins.contains(where: { $0.url == url })
+        self.pinned = bottle.settings.pins.contains(where: { pin in
+            guard let pinURL = pin.url else { return false }
+            return pinURL.isSameFile(as: url)
+        })
 
         // Warning: This will break if two programs share the same name such as "Launch.exe"
         // Best to add some sort of UUID in the path or file

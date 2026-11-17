@@ -277,7 +277,10 @@ public enum HoYoPlayLaunch {
             var missingLauncherSince: Date?
 
             while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: 800_000_000)
+                // Poll quickly: HoYoPlay's native game can initialize its
+                // anti-cheat driver within the first second. Killing it later
+                // leaves the driver in a failed state for our relaunch.
+                try? await Task.sleep(nanoseconds: 250_000_000)
                 if Task.isCancelled { break }
 
                 if HoYoPlayLaunch.hasLauncherProcesses() {
@@ -309,15 +312,35 @@ public enum HoYoPlayLaunch {
 
                 // Block HoYoPlay's native launch. The launcher already started
                 // the game, so terminate it before it can reach a login screen.
+                if let command = candidates.first?.command {
+                    Logger.wineKit.info("Intercepting native HoYoPlay launch: \(command, privacy: .public)")
+                }
                 for process in candidates {
                     _ = HoYoPlayLaunch.terminate(pid: process.pid)
                 }
-                for _ in 0..<10 {
+                var emptySince: Date?
+                for _ in 0..<25 {
                     let remaining = HoYoPlayLaunch.gameProcesses(for: target.executableURL)
                         .filter { !initialPIDs.contains($0.pid) }
-                    if remaining.isEmpty { break }
+                    if remaining.isEmpty {
+                        if emptySince == nil {
+                            emptySince = Date()
+                        }
+                        if let emptySince,
+                           Date().timeIntervalSince(emptySince) >= 1.5 {
+                            break
+                        }
+                    } else {
+                        emptySince = nil
+                    }
                     try? await Task.sleep(nanoseconds: 200_000_000)
                 }
+
+                // Restart the bottle before relaunching. The native game may
+                // have already initialized HoYoKProtect; leaving its Wine
+                // services alive makes the patched launch fail with
+                // `initDriver`. wineserver -k also closes the launcher.
+                await Wine.killBottleAndWait(bottle: bottle, timeout: 3)
 
                 // Mark ownership before starting our own process, then let
                 // `runInWine()` hold the mark until the game exits.
@@ -590,10 +613,9 @@ public enum HoYoPlayLaunch {
             bottle.settings.hkrpgRegion = target.isChina ? .cn : .os
         }
 
-        let path = target.executableURL.path(percentEncoded: false)
         let program: Program
         if let existing = bottle.programs.first(where: {
-            $0.url.path().caseInsensitiveCompare(path) == .orderedSame
+            $0.url.isSameFile(as: target.executableURL)
         }) {
             program = existing
         } else {
@@ -602,7 +624,8 @@ public enum HoYoPlayLaunch {
         }
 
         if !bottle.settings.pins.contains(where: {
-            $0.url?.path().caseInsensitiveCompare(path) == .orderedSame
+            guard let pinURL = $0.url else { return false }
+            return pinURL.isSameFile(as: target.executableURL)
         }) {
             bottle.settings.pins.append(PinnedProgram(
                 name: target.displayName,

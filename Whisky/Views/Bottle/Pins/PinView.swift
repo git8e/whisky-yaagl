@@ -121,7 +121,8 @@ struct PinView: View {
         }
         .onChange(of: name) {
             if let index = bottle.settings.pins.firstIndex(where: {
-                return $0.url == pin.url
+                guard let pinURL = $0.url else { return false }
+                return pinURL.isSameFile(as: pin.url)
             }) {
                 bottle.settings.pins[index].name = name
             }
