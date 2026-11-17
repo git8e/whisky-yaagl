@@ -46,22 +46,27 @@ public struct WineLaunchBundle {
     /// Returns without waiting for the beacon to finish starting. Launching the
     /// Windows program should happen immediately afterwards so the beacon is
     /// already waiting for the first window.
+    @discardableResult
     public static func launch(
         for programURL: URL,
         displayName: String? = nil,
         icon: NSImage? = nil
-    ) {
+    ) -> WineLaunchBundle? {
         guard let bundle = prepare(
             for: programURL,
             displayName: displayName,
             icon: icon
-        ) else { return }
+        ) else { return nil }
+        bundle.clearControlFiles()
 
         // Capture the windows that exist before the game starts. The beacon
         // uses this to distinguish the game window from windows that were
         // already on screen.
         let baseline = WineWindowSnapshot.capture(includeNonWine: true)
-        let baselineArgument = baseline.windowIDs.map(String.init).joined(separator: ",")
+        let ids = baseline.windowIDs.map(String.init).joined(separator: ",")
+        // Do not pass an empty positional argument through `open`; use a
+        // sentinel that the helper converts back to an empty baseline.
+        let baselineArgument = ids.isEmpty ? "-" : ids
 
         // Do this in a separate process rather than through AppKit so the
         // actual game launch path is never blocked by the UI process. `-g`
@@ -83,6 +88,45 @@ public struct WineLaunchBundle {
         } catch {
             logger.error("Failed to open launch beacon: \(error)")
         }
+        return bundle
+    }
+
+    /// Tell the beacon that the direct Wine process has exited. The beacon
+    /// also polls this file so an immediate launch failure cannot leave the
+    /// Dock tile bouncing until the full timeout.
+    public func setProcessID(_ pid: pid_t) {
+        do {
+            try String(pid).write(to: processIDURL, atomically: true, encoding: .utf8)
+        } catch {
+            Self.logger.debug("Could not write launch beacon process ID: \(error)")
+        }
+    }
+
+    /// Stop the beacon without waiting for a window or the timeout.
+    public func stop() {
+        do {
+            try Data().write(to: stopURL, options: .atomic)
+        } catch {
+            Self.logger.debug("Could not stop launch beacon: \(error)")
+        }
+    }
+
+    private var controlDirectory: URL {
+        bundleURL.appending(path: "Contents/Resources", directoryHint: .isDirectory)
+    }
+
+    private var processIDURL: URL {
+        controlDirectory.appending(path: "launch.pid", directoryHint: .notDirectory)
+    }
+
+    private var stopURL: URL {
+        controlDirectory.appending(path: "launch.stop", directoryHint: .notDirectory)
+    }
+
+    private func clearControlFiles() {
+        let fileManager = FileManager.default
+        try? fileManager.removeItem(at: processIDURL)
+        try? fileManager.removeItem(at: stopURL)
     }
 
     /// Build (or refresh) the beacon app bundle for `programURL`.

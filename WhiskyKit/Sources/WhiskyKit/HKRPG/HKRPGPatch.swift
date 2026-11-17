@@ -186,6 +186,7 @@ public enum HKRPGPatch {
         let batWine = toWinePath(batURL.path(percentEncoded: false))
 
         var exitCode: Int32 = 0
+        var beacon: WineLaunchBundle?
         do {
             if bottle.settings.hkrpgLaunchFixBlockNetwork {
                 let host = bottle.settings.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -207,7 +208,7 @@ public enum HKRPGPatch {
                 }
             }
 
-            WineLaunchBundle.launch(
+            beacon = WineLaunchBundle.launch(
                 for: program.url,
                 displayName: program.launchDisplayName,
                 icon: program.launchIcon
@@ -219,11 +220,20 @@ public enum HKRPGPatch {
                 environment: mergedEnv,
                 directory: work
             ) {
-                if case .terminated(let p) = output {
+                switch output {
+                case .started(let process):
+                    beacon?.setProcessID(process.processIdentifier)
+                case .terminated(let p):
                     exitCode = p.terminationStatus
+                    if exitCode != 0 {
+                        beacon?.stop()
+                    }
+                default:
+                    break
                 }
             }
         } catch {
+            beacon?.stop()
             if let state {
                 await postRevert(bottle: bottle, gameDir: gameDir, prefixURL: prefixURL, state: state)
             }
@@ -236,6 +246,7 @@ public enum HKRPGPatch {
         try? fm.removeItem(at: batURL)
 
         if exitCode != 0 {
+            beacon?.stop()
             throw HKRPGPatchError.gameExited(code: Int(exitCode))
         }
     }

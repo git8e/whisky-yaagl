@@ -152,25 +152,45 @@ public class Wine {
 
         let launchedProgram = bottle.programs
             .first(where: { $0.url.isSameFile(as: url) })
-        WineLaunchBundle.launch(
+        let beacon = WineLaunchBundle.launch(
             for: url,
             displayName: launchedProgram?.launchDisplayName
                 ?? (isLauncher ? "HoYoPlay" : nil),
             icon: launchedProgram?.launchIcon
         )
 
-        for await _ in try Self.runWineProcess(
-            name: url.lastPathComponent,
-            args: ["start", "/unix", url.path(percentEncoded: false)] + arguments,
-            bottle: bottle, environment: environment
-        ) { }
+        var startStatus: Int32 = 0
+        do {
+            for await output in try Self.runWineProcess(
+                name: url.lastPathComponent,
+                args: ["start", "/unix", url.path(percentEncoded: false)] + arguments,
+                bottle: bottle, environment: environment
+            ) {
+                if case .terminated(let process) = output {
+                    startStatus = process.terminationStatus
+                }
+            }
+        } catch {
+            beacon?.stop()
+            throw error
+        }
+
+        if startStatus != 0 {
+            beacon?.stop()
+        }
 
         // `wine start` exits before HoYoPlay's CEF window is visible. Keep the
         // launch spinner alive until the launcher actually appears, otherwise
         // the UI looks finished while the window is still missing and the user
         // clicks the pin again.
         if let windowSnapshot, !windowSnapshot.hasVisibleWindow {
-            _ = await WineWindowSnapshot.waitForNewWindow(since: windowSnapshot, timeout: 25)
+            let appeared = await WineWindowSnapshot.waitForNewWindow(
+                since: windowSnapshot,
+                timeout: 25
+            )
+            if !appeared {
+                beacon?.stop()
+            }
         }
 
         if isLauncher {

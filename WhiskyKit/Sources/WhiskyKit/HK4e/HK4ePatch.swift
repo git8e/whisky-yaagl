@@ -176,6 +176,7 @@ public enum HK4ePatch {
         let batWine = toWinePath(batURL.path(percentEncoded: false))
 
         var exitCode: Int32 = 0
+        var beacon: WineLaunchBundle?
         do {
             let launchArgs: [String]
             if bottle.settings.hk4eSteamPatch {
@@ -206,7 +207,7 @@ public enum HK4ePatch {
                 }
             }
 
-            WineLaunchBundle.launch(
+            beacon = WineLaunchBundle.launch(
                 for: program.url,
                 displayName: program.launchDisplayName,
                 icon: program.launchIcon
@@ -218,11 +219,20 @@ public enum HK4ePatch {
                 environment: mergedEnv,
                 directory: work
             ) {
-                if case .terminated(let p) = output {
+                switch output {
+                case .started(let process):
+                    beacon?.setProcessID(process.processIdentifier)
+                case .terminated(let p):
                     exitCode = p.terminationStatus
+                    if exitCode != 0 {
+                        beacon?.stop()
+                    }
+                default:
+                    break
                 }
             }
         } catch {
+            beacon?.stop()
             if let state {
                 await postRevert(bottle: bottle, info: info, gameDir: gameDir, prefixURL: prefixURL, state: state)
             }
@@ -235,6 +245,7 @@ public enum HK4ePatch {
         try? fm.removeItem(at: batURL)
 
         if exitCode != 0 {
+            beacon?.stop()
             throw HK4ePatchError.gameExited(code: Int(exitCode))
         }
     }

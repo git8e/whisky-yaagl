@@ -19,6 +19,7 @@
 import Foundation
 import AppKit
 import CoreGraphics
+import Darwin
 import WhiskyKit
 import SwiftyTextTable
 import Progress
@@ -231,7 +232,8 @@ extension Whisky {
 
     /// Internal helper used by the app's generated launch beacons.
     /// It gives the process a regular Dock tile, asks the Dock to bounce it,
-    /// and exits when the first Wine window appears.
+    /// and exits when the first Wine window appears, the launcher asks it to
+    /// stop, or the launched Wine process exits without a window.
     struct BounceWatch: ParsableCommand {
         static let configuration = CommandConfiguration(
             commandName: "bounce-watch",
@@ -251,19 +253,46 @@ extension Whisky {
             app.delegate = watcher
 
             let baselineIDs = Set(
-                baseline
+                (baseline == "-" ? "" : baseline)
                     .split(separator: ",")
                     .compactMap { CGWindowID(String($0)) }
             )
             let snapshot = WineWindowSnapshot.Snapshot(windowIDs: baselineIDs)
             let watchTimeout = timeout
+            let resources = Bundle.main.bundleURL.appending(
+                path: "Contents/Resources",
+                directoryHint: .isDirectory
+            )
+            let processIDURL = resources.appending(path: "launch.pid")
+            let stopURL = resources.appending(path: "launch.stop")
 
             Task {
+                var processExitDate: Date?
                 _ = await WineWindowSnapshot.waitForNewWindow(
                     since: snapshot,
                     timeout: watchTimeout,
                     includeNonWine: true
-                )
+                ) {
+                    if FileManager.default.fileExists(atPath: stopURL.path(percentEncoded: false)) {
+                        return true
+                    }
+                    guard let contents = try? String(contentsOf: processIDURL, encoding: .utf8),
+                          let pid = pid_t(contents.trimmingCharacters(in: .whitespacesAndNewlines)) else {
+                        return false
+                    }
+                    if kill(pid, 0) == 0 || errno == EPERM {
+                        processExitDate = nil
+                        return false
+                    }
+                    guard let exitDate = processExitDate else {
+                        processExitDate = Date()
+                        return false
+                    }
+                    // A Wine launcher can exit a moment before its window is
+                    // ready. Wait a short grace period for that window; an
+                    // actual early failure stops the bounce almost at once.
+                    return Date().timeIntervalSince(exitDate) >= 2
+                }
                 await MainActor.run {
                     NSApp.terminate(nil)
                 }

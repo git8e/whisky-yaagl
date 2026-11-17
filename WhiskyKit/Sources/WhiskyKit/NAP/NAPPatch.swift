@@ -122,6 +122,7 @@ public enum NAPPatch {
         let batWine = toWinePath(batURL.path(percentEncoded: false))
 
         var exitCode: Int32 = 0
+        var beacon: WineLaunchBundle?
         do {
             if bottle.settings.napLaunchFixBlockNetwork {
                 let host = bottle.settings.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -143,7 +144,7 @@ public enum NAPPatch {
                 }
             }
 
-            WineLaunchBundle.launch(
+            beacon = WineLaunchBundle.launch(
                 for: program.url,
                 displayName: program.launchDisplayName,
                 icon: program.launchIcon
@@ -155,11 +156,20 @@ public enum NAPPatch {
                 environment: mergedEnv,
                 directory: work
             ) {
-                if case .terminated(let p) = output {
+                switch output {
+                case .started(let process):
+                    beacon?.setProcessID(process.processIdentifier)
+                case .terminated(let p):
                     exitCode = p.terminationStatus
+                    if exitCode != 0 {
+                        beacon?.stop()
+                    }
+                default:
+                    break
                 }
             }
         } catch {
+            beacon?.stop()
             if bottle.settings.napCustomResolutionEnabled {
                 await NapResolution.revertIfNeeded(bottle: bottle, region: region)
             }
@@ -171,6 +181,7 @@ public enum NAPPatch {
         }
 
         if exitCode != 0 {
+            beacon?.stop()
             throw NAPPatchError.gameExited(code: Int(exitCode))
         }
     }

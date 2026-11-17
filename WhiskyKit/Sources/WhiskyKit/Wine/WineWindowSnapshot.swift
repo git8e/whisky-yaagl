@@ -51,16 +51,22 @@ public enum WineWindowSnapshot {
     /// pass `includeNonWine: true`.
     ///
     /// Returns `true` when a new window appeared. The caller decides what a
-    /// timeout means; this function only waits.
+    /// timeout means; this function only waits. `shouldStop` is polled at the
+    /// same interval so a caller can end the wait when its launch target has
+    /// already exited.
     public static func waitForNewWindow(
         since snapshot: Snapshot,
         timeout: TimeInterval = 25,
-        includeNonWine: Bool = false
+        includeNonWine: Bool = false,
+        shouldStop: () -> Bool = { false }
     ) async -> Bool {
         guard timeout > 0 else { return false }
         let deadline = Date().addingTimeInterval(timeout)
 
         while !Task.isCancelled && Date() < deadline {
+            if shouldStop() {
+                return false
+            }
             if !visibleWindowIDs(includeNonWine: includeNonWine)
                 .subtracting(snapshot.windowIDs).isEmpty {
                 return true
@@ -68,6 +74,9 @@ public enum WineWindowSnapshot {
             try? await Task.sleep(nanoseconds: 250_000_000)
         }
 
+        if shouldStop() {
+            return false
+        }
         return !visibleWindowIDs(includeNonWine: includeNonWine)
             .subtracting(snapshot.windowIDs).isEmpty
     }
