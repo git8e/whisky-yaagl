@@ -926,55 +926,60 @@ private struct TriggerBindingRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 10) {
-                Group {
+            Grid(alignment: .leadingFirstTextBaseline, horizontalSpacing: 10, verticalSpacing: 10) {
+                GridRow {
+                    Text("keyMacros.trigger.key")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .gridColumnAlignment(.leading)
+
+                    Group {
+                        if let binding {
+                            Text(binding.trigger.localizedDisplayName)
+                        } else {
+                            Text("keyMacros.trigger.unset")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .font(.system(.body, design: .monospaced))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
+
                     if let binding {
-                        Text(binding.trigger.localizedDisplayName)
-                    } else {
-                        Text("keyMacros.trigger.unset")
-                            .foregroundStyle(.secondary)
+                        HStack(spacing: 5) {
+                            Circle()
+                                .fill(binding.enabled ? .green : .gray)
+                                .frame(width: 8, height: 8)
+                            Text(binding.enabled
+                                ? LocalizedStringKey("keyMacros.trigger.enabledState")
+                                : LocalizedStringKey("keyMacros.trigger.disabledState"))
+                        }
+                        .font(.caption)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
                     }
                 }
-                .font(.system(.body, design: .monospaced))
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
 
-                Spacer(minLength: 8)
+                GridRow {
+                    Text("keyMacros.mode")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
 
-                if let binding {
-                    HStack(spacing: 5) {
-                        Circle()
-                            .fill(binding.enabled ? .green : .gray)
-                            .frame(width: 8, height: 8)
-                        Text(binding.enabled
-                            ? LocalizedStringKey("keyMacros.trigger.enabledState")
-                            : LocalizedStringKey("keyMacros.trigger.disabledState"))
+                    Picker("keyMacros.mode", selection: Binding(
+                        get: { mode },
+                        set: { store.updateBinding(scriptID: scriptID, mode: $0) }
+                    )) {
+                        ForEach(MacroTriggerMode.allCases) { mode in
+                            Text(mode.localizedTitle).tag(mode)
+                        }
                     }
-                    .font(.caption)
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: 220, alignment: .leading)
+                    .disabled(binding == nil)
                 }
-            }
-
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text("keyMacros.mode")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                Picker("keyMacros.mode", selection: Binding(
-                    get: { mode },
-                    set: { store.updateBinding(scriptID: scriptID, mode: $0) }
-                )) {
-                    ForEach(MacroTriggerMode.allCases) { mode in
-                        Text(mode.localizedTitle).tag(mode)
-                    }
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-                .frame(maxWidth: 220, alignment: .leading)
-                .disabled(binding == nil)
-                Spacer(minLength: 0)
             }
 
             Text(modeDetail)

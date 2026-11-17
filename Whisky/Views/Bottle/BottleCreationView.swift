@@ -124,6 +124,23 @@ struct BottleCreationView: View {
         }
     }
 
+    private var exeHintMessage: String {
+        switch gameRegionPreset {
+        case .hk4eOs:
+            return String(localized: "hk4e.exeHint.os")
+        case .hk4eCn:
+            return String(localized: "hk4e.exeHint.cn")
+        case .napOs:
+            return String(localized: "nap.exeHint.os")
+        case .napCn:
+            return String(localized: "nap.exeHint.cn")
+        case .hkrpgOs:
+            return String(localized: "hkrpg.exeHint.os")
+        case .hkrpgCn:
+            return String(localized: "hkrpg.exeHint.cn")
+        }
+    }
+
     private func normalizeProxyFields() {
         // If user pastes "host:port" into host field, split it.
         let host = initialProxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -389,7 +406,8 @@ struct BottleCreationView: View {
                 panel.canChooseDirectories = false
                 panel.allowsMultipleSelection = false
                 panel.allowedContentTypes = [UTType.exe]
-                panel.message = String(localized: "exePicker.panelMessage")
+                panel.message = exeHintMessage
+                panel.prompt = String(localized: "create.browse")
                 panel.begin { result in
                     if result == .OK, let url = panel.urls.first {
                         pinProgramURL = url

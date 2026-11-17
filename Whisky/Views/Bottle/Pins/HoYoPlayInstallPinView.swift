@@ -10,6 +10,7 @@ struct HoYoPlayInstallPinView: View {
     @State private var isWorking = false
     @State private var progress: Double?
     @State private var isRevealing = false
+    @State private var didFinishInstall = false
     @State private var showInstallNotice = false
 
     init(bottle: Bottle, info: HoYoPlayContent, onInstallFinished: @escaping () -> Void = {}) {
@@ -36,7 +37,7 @@ struct HoYoPlayInstallPinView: View {
                     if isWorking {
                         IOSInstallOverlay(progress: progress, isRevealing: isRevealing)
                             .frame(width: 45, height: 45)
-                    } else {
+                    } else if !didFinishInstall {
                         Image(systemName: "arrow.down.circle.fill")
                             .resizable()
                             .foregroundColor(.accentColor)
@@ -87,6 +88,8 @@ struct HoYoPlayInstallPinView: View {
             await MainActor.run {
                 isWorking = true
                 progress = 0
+                isRevealing = false
+                didFinishInstall = false
             }
 
             do {
@@ -130,22 +133,34 @@ struct HoYoPlayInstallPinView: View {
                 }
 
                 // `wine start` does not necessarily activate the installer's
-                // Qt window. Bring it forward once it appears so the Install
-                // button receives the first click.
+                // Qt window. Run the installer in the background while we wait
+                // for its window, then bring it forward so the Install button
+                // receives the first click.
                 let windowSnapshot = WineWindowSnapshot.capture()
-                let activationTask = Task {
-                    _ = await HoYoPlayLaunch.activateNewWindow(
-                        since: windowSnapshot,
-                        timeout: 30
+                let installTask = Task {
+                    try await Wine.runWine(
+                        ["start", "/wait", "/unix", localInstallerURL.path(percentEncoded: false)],
+                        bottle: bottle,
+                        environment: HoYoPlayLaunch.installerEnvironment
                     )
                 }
-                defer { activationTask.cancel() }
 
-                _ = try await Wine.runWine(
-                    ["start", "/wait", "/unix", localInstallerURL.path(percentEncoded: false)],
-                    bottle: bottle,
-                    environment: HoYoPlayLaunch.installerEnvironment
+                let installerWindowAppeared = await HoYoPlayLaunch.activateNewWindow(
+                    since: windowSnapshot,
+                    timeout: 30
                 )
+
+                // The original iOS-style reveal starts as soon as the app's
+                // window appears, not when the installation finishes. The
+                // installer can stay open while the pin has already revealed
+                // the normal HoYoPlay icon.
+                if installerWindowAppeared {
+                    await MainActor.run {
+                        isRevealing = true
+                    }
+                }
+
+                _ = try await installTask.value
 
                 // Under DXMT the installer finishes by starting a headless
                 // `HYP.exe --jump=installer` that holds the launcher singleton
@@ -161,11 +176,20 @@ struct HoYoPlayInstallPinView: View {
                 }
 
                 await MainActor.run {
-                    isRevealing = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.58) {
+                    didFinishInstall = true
+                    if installerWindowAppeared {
                         onInstallFinished()
                         isWorking = false
                         isRevealing = false
+                    } else {
+                        // Fallback for an installer whose window could not be
+                        // detected: still play the completion reveal once.
+                        isRevealing = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.58) {
+                            onInstallFinished()
+                            isWorking = false
+                            isRevealing = false
+                        }
                     }
                 }
             } catch {
@@ -271,15 +295,10 @@ private struct IOSInstallOverlay: View {
         trackOuter + reveal * 2.0
     }
 
-    private var visibleRingOuter: Double {
-        trackOuter + reveal * 0.22
-    }
-
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(.black.opacity(0.46))
-                .opacity(1 - reveal)
 
             // The transparent sector grows through the mask like the iOS
             // install indicator. The centre is deliberately left open so the
@@ -294,17 +313,16 @@ private struct IOSInstallOverlay: View {
             .animation(.linear(duration: 0.22), value: targetProgress)
             .blendMode(.destinationOut)
 
-            // The ring itself stays above the cutout so it remains a complete
-            // circle over both the dimmed and revealed parts of the icon. It
-            // spans three quarters of the app icon and is deliberately chunky,
-            // matching the reference recording.
+            // The ring is a transparent cutout in the mask, not a painted
+            // stroke. It reveals the icon's own appearance and spans three
+            // quarters of the app icon.
             RingSector(
                 progress: 1,
-                innerRatio: max(0, visibleRingOuter - ringWidth),
-                outerRatio: visibleRingOuter
+                innerRatio: max(0, trackOuter - ringWidth),
+                outerRatio: trackOuter
             )
-            .fill(.white.opacity(0.88), style: FillStyle(eoFill: true))
-            .opacity(1 - reveal)
+            .fill(.white, style: FillStyle(eoFill: true))
+            .blendMode(.destinationOut)
         }
         .compositingGroup()
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))

@@ -182,6 +182,13 @@ public enum HoYoPlayLaunch {
         return terminated
     }
 
+    /// Posted when the last HoYoPlay launcher/helper process has exited.
+    /// The main UI uses this to rescan the prefix registry after the user
+    /// associates a game inside HoYoPlay.
+    public static let launcherDidCloseNotification = Notification.Name(
+        "Whisky.HoYoPlayLaunch.launcherDidClose"
+    )
+
     /// Start a lightweight watcher that removes HYP/CEF after the launcher
     /// window is closed but its process stays alive. Only one watcher runs at a
     /// time and it exits automatically when no HoYoPlay process remains.
@@ -216,6 +223,12 @@ public enum HoYoPlayLaunch {
                     if !HoYoPlayLaunch.hasLauncherProcesses() { break }
                 }
                 await self.finished()
+                await MainActor.run {
+                    NotificationCenter.default.post(
+                        name: HoYoPlayLaunch.launcherDidCloseNotification,
+                        object: nil
+                    )
+                }
             }
         }
 

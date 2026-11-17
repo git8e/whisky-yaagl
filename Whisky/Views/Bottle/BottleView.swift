@@ -141,6 +141,14 @@ struct BottleView: View {
                     bottle.refreshProgramsAndPinsFromDisk()
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: HoYoPlayLaunch.launcherDidCloseNotification)) { _ in
+                // The user may have associated a game inside HoYoPlay. Once
+                // the launcher has fully closed, adopt that registry entry if
+                // this bottle still has no game association.
+                guard !hasGameAssociation else { return }
+                bottle.refreshProgramsAndPinsFromDisk()
+                refreshHoYoPlayInstalledState()
+            }
             .task {
                 await LauncherContent.refreshIfNeeded()
                 hoYoPlayInfo = LauncherContent.hoyoPlay
@@ -197,5 +205,16 @@ struct BottleView: View {
 
     private func refreshHoYoPlayInstalledState() {
         hoYoPlayInstalled = hoYoPlayInfo?.isInstalled(in: bottle) ?? false
+    }
+
+    private var hasGameAssociation: Bool {
+        switch bottle.settings.gamePreset {
+        case .hk4e:
+            return bottle.settings.hk4eGameExecutableURL != nil
+        case .nap:
+            return bottle.settings.napGameExecutableURL != nil
+        case .hkrpg:
+            return bottle.settings.hkrpgGameExecutableURL != nil
+        }
     }
 }
