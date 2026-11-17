@@ -24,38 +24,37 @@ struct HoYoPlayInstallPinView: View {
             guard !isWorking else { return }
             showInstallNotice = true
         } label: {
-            VStack {
-                Color.clear
-                    .frame(height: 8)
+            VStack(spacing: PinLayout.rowSpacing) {
                 ZStack(alignment: .topTrailing) {
                     Image("HoYoPlayIcon")
                         .renderingMode(.template)
                         .resizable()
+                        .aspectRatio(contentMode: .fit)
                         .foregroundStyle(.primary)
-                        .frame(width: 45, height: 45)
+                        .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
 
                     if isWorking {
                         IOSInstallOverlay(progress: progress, isRevealing: isRevealing)
-                            .frame(width: 45, height: 45)
+                            .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
                     } else if !didFinishInstall {
                         Image(systemName: "arrow.down.circle.fill")
                             .resizable()
                             .foregroundColor(.accentColor)
-                            .frame(width: 16, height: 16)
+                            .frame(width: 20, height: 20)
                             .padding(.top, 2)
                             .padding(.trailing, 2)
                     }
                 }
-                .frame(width: 45, height: 45)
-                Spacer()
+                .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
                 Text(info.displayName)
+                    .font(PinLayout.labelFont)
                     .multilineTextAlignment(.center)
-                    .lineLimit(2)
+                    .lineLimit(1)
                     .truncationMode(.tail)
+                    .frame(width: PinLayout.labelWidth)
                     .help(info.displayName)
             }
-            .frame(width: 90, height: 90)
-            .padding(10)
+            .frame(width: PinLayout.cellWidth, height: PinLayout.cellHeight, alignment: .top)
         }
         .buttonStyle(.plain)
         .allowsHitTesting(!isWorking)

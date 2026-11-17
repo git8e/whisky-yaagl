@@ -24,26 +24,25 @@ struct PinAddView: View {
     @State private var showingSheet = false
 
     var body: some View {
-        VStack {
-            Color.clear
-                .frame(height: 8)
+        VStack(spacing: PinLayout.rowSpacing) {
             Button {
                 showingSheet = true
             } label: {
                 Image(systemName: "plus.circle")
                     .resizable()
+                    .aspectRatio(contentMode: .fit)
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
-            .frame(width: 45, height: 45)
-            Spacer()
+            .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
             Text("pin.help")
+                .font(PinLayout.labelFont)
                 .multilineTextAlignment(.center)
                 .lineLimit(1)
                 .truncationMode(.tail)
+                .frame(width: PinLayout.labelWidth)
         }
-        .frame(width: 90, height: 90)
-        .padding(10)
+        .frame(width: PinLayout.cellWidth, height: PinLayout.cellHeight, alignment: .top)
         .sheet(isPresented: $showingSheet) {
             PinCreationView(bottle: bottle)
         }

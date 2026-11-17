@@ -19,6 +19,16 @@
 import SwiftUI
 import WhiskyKit
 
+/// Finder icon-view metrics used by the pinned-program grid.
+enum PinLayout {
+    static let iconSize: CGFloat = 64
+    static let cellWidth: CGFloat = 113
+    static let cellHeight: CGFloat = 112
+    static let labelWidth: CGFloat = 109
+    static let rowSpacing: CGFloat = 8
+    static let labelFont: Font = .system(size: 12)
+}
+
 struct PinView: View {
     @ObservedObject var bottle: Bottle
     @ObservedObject var program: Program
@@ -35,9 +45,7 @@ struct PinView: View {
     }
 
     var body: some View {
-        VStack {
-            Color.clear
-                .frame(height: 8)
+        VStack(spacing: PinLayout.rowSpacing) {
             ZStack(alignment: .topTrailing) {
                 Group {
                     if let image = image {
@@ -48,40 +56,41 @@ struct PinView: View {
                             .resizable()
                     }
                 }
-                .frame(width: 45, height: 45)
-                .scaleEffect(opening ? 2 : 1)
+                .aspectRatio(contentMode: .fit)
+                .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
+                .scaleEffect(opening ? 1.8 : 1)
                 .opacity(opening ? 0 : 1)
 
                 if isStarting {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: 14)
                             .fill(.black.opacity(0.18))
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: 14)
                             .fill(.ultraThinMaterial.opacity(0.78))
                         ProgressView()
                             .controlSize(.large)
-                            .scaleEffect(1.18)
+                            .scaleEffect(1.24)
                     }
-                    .frame(width: 46, height: 46)
+                    .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
                 } else {
                     Image(systemName: "play.fill")
                         .resizable()
                         .foregroundColor(.green)
-                        .frame(width: 16, height: 16)
+                        .frame(width: 20, height: 20)
                         .padding(.top, 2)
                         .padding(.trailing, 2)
                 }
             }
-            .frame(width: 45, height: 45)
-            Spacer()
+            .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
             Text(name)
+                .font(PinLayout.labelFont)
                 .multilineTextAlignment(.center)
                 .lineLimit(1)
                 .truncationMode(.tail)
+                .frame(width: PinLayout.labelWidth)
                 .help(name)
         }
-        .frame(width: 90, height: 90)
-        .padding(10)
+        .frame(width: PinLayout.cellWidth, height: PinLayout.cellHeight, alignment: .top)
         .contextMenu {
             ProgramMenuView(program: program, path: $path)
 

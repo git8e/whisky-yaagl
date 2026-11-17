@@ -36,12 +36,22 @@ struct BottleView: View {
     @State private var hoYoPlayInfo: HoYoPlayContent? = LauncherContent.hoyoPlay
     @State private var hoYoPlayInstalled = false
 
-    private let gridLayout = [GridItem(.adaptive(minimum: 100, maximum: .infinity))]
+    private let gridLayout = [
+        GridItem(
+            .adaptive(minimum: PinLayout.cellWidth, maximum: PinLayout.cellWidth),
+            spacing: 0,
+            alignment: .center
+        )
+    ]
 
     var body: some View {
         NavigationStack(path: $path) {
             ScrollView {
-                LazyVGrid(columns: gridLayout, alignment: .center) {
+                LazyVGrid(
+                    columns: gridLayout,
+                    alignment: .leading,
+                    spacing: PinLayout.rowSpacing
+                ) {
                     ForEach(bottle.pinnedPrograms, id: \.id) { pinnedProgram in
                         PinView(
                             bottle: bottle, program: pinnedProgram.program, pin: pinnedProgram.pin, path: $path
