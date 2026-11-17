@@ -323,8 +323,8 @@ public enum HoYoPlayLaunch {
                 // `runInWine()` hold the mark until the game exits.
                 GameLaunchOwnership.shared.mark(target.executableURL, owned: true)
                 await MainActor.run {
-                    HoYoPlayLaunch.associate(target, with: bottle)
-                    Program(url: target.executableURL, bottle: bottle).runInWine()
+                    let program = HoYoPlayLaunch.associate(target, with: bottle)
+                    program.runInWine()
                 }
                 GameLaunchOwnership.shared.mark(target.executableURL, owned: false)
 
@@ -571,7 +571,7 @@ public enum HoYoPlayLaunch {
     }
 
     @MainActor
-    private static func associate(_ target: HoYoPlayGameTarget, with bottle: Bottle) {
+    private static func associate(_ target: HoYoPlayGameTarget, with bottle: Bottle) -> Program {
         switch target.kind {
         case .hk4e:
             if bottle.settings.hk4eGameExecutableURL == nil {
@@ -591,10 +591,14 @@ public enum HoYoPlayLaunch {
         }
 
         let path = target.executableURL.path(percentEncoded: false)
-        if !bottle.programs.contains(where: {
+        let program: Program
+        if let existing = bottle.programs.first(where: {
             $0.url.path().caseInsensitiveCompare(path) == .orderedSame
         }) {
-            bottle.programs.append(Program(url: target.executableURL, bottle: bottle))
+            program = existing
+        } else {
+            program = Program(url: target.executableURL, bottle: bottle)
+            bottle.programs.append(program)
         }
 
         if !bottle.settings.pins.contains(where: {
@@ -605,6 +609,8 @@ public enum HoYoPlayLaunch {
                 url: target.executableURL
             ))
         }
+
+        return program
     }
 
     private struct LauncherProcess {
