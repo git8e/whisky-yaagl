@@ -206,12 +206,17 @@ public enum HK4ePatch {
                 }
             }
 
+            let launchBundle = WineLaunchBundle.prepare(
+                for: program.url,
+                displayName: program.displayName
+            )
             for await output in try Wine.runWineProcess(
                 name: exeURL.lastPathComponent,
                 args: launchArgs,
                 bottle: bottle,
                 environment: mergedEnv,
-                directory: work
+                directory: work,
+                launchBundle: launchBundle
             ) {
                 if case .terminated(let p) = output {
                     exitCode = p.terminationStatus

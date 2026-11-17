@@ -31,6 +31,15 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
         url.lastPathComponent
     }
 
+    /// Name shown for the program in the UI and in its launch Dock tile.
+    /// Prefer the pin's display name when the program has been pinned.
+    public var displayName: String {
+        bottle.settings.pins.first(where: { pin in
+            guard let pinURL = pin.url else { return false }
+            return pinURL.isSameFile(as: url)
+        })?.name ?? url.deletingPathExtension().lastPathComponent
+    }
+
     @Published public var settings: ProgramSettings {
         didSet { saveSettings() }
     }

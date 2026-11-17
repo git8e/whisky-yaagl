@@ -17,6 +17,8 @@
 //
 
 import Foundation
+import AppKit
+import Darwin
 import WhiskyKit
 import SwiftyTextTable
 import Progress
@@ -34,7 +36,8 @@ struct Whisky: ParsableCommand {
                       Delete.self,
                       Remove.self,
                       Run.self,
-                      Shellenv.self
+                      Shellenv.self,
+                      BounceLaunch.self
                       /*Install.self,
                       Uninstall.self*/])
 }
@@ -195,6 +198,39 @@ extension Whisky {
             let envCmd = Wine.generateTerminalEnvironmentCommand(bottle: bottle)
             print(envCmd)
 
+        }
+    }
+
+    /// Internal helper used by the app's generated per-program launch bundles.
+    /// It gives the process a regular Dock tile immediately and asks the Dock
+    /// to bounce it before replacing itself with Wine.
+    struct BounceLaunch: ParsableCommand {
+        static let configuration = CommandConfiguration(
+            commandName: "bounce-launch",
+            abstract: "Internal helper that bounces the Dock icon before starting Wine."
+        )
+
+        @Argument(parsing: .captureForPassthrough) var command: [String]
+
+        mutating func run() throws {
+            guard let wineBinary = command.first else {
+                throw ValidationError("missing Wine binary")
+            }
+
+            let app = NSApplication.shared
+            app.setActivationPolicy(.regular)
+            _ = app.requestUserAttention(.criticalRequest)
+
+            // Let the Dock create the tile and begin the bounce before Wine
+            // takes over the process. The process and its app bundle identity
+            // survive exec, so the tile stays around for the game window.
+            usleep(150_000)
+
+            var argv: [UnsafeMutablePointer<CChar>?] = command.map { strdup($0) }
+            argv.append(nil)
+            execv(wineBinary, &argv)
+            perror("execv")
+            Darwin.exit(127)
         }
     }
 
