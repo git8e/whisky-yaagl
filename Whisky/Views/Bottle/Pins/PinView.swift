@@ -120,12 +120,14 @@ struct PinView: View {
             await Wine.prewarm(bottle: bottle)
         }
         .onChange(of: name) {
-            if let index = bottle.settings.pins.firstIndex(where: {
-                guard let pinURL = $0.url else { return false }
-                return pinURL.isSameFile(as: pin.url)
-            }) {
-                bottle.settings.pins[index].name = name
+            guard let currentURL = pin.url,
+                  let index = bottle.settings.pins.firstIndex(where: { pin in
+                      guard let pinURL = pin.url else { return false }
+                      return pinURL.isSameFile(as: currentURL)
+                  }) else {
+                return
             }
+            bottle.settings.pins[index].name = name
         }
         .onChange(of: program.isStarting) { _, newValue in
             if !newValue {
