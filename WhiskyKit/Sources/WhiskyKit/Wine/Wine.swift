@@ -74,8 +74,7 @@ public class Wine {
 
     /// Run a `wine` process with the given arguments and environment variables returning a stream of output
     public static func runWineProcess(
-        name: String? = nil, args: [String], bottle: Bottle, environment: [String: String] = [:],
-        directory: URL? = nil, launchBundle: WineLaunchBundle? = nil
+        name: String? = nil, args: [String], bottle: Bottle, environment: [String: String] = [:], directory: URL? = nil
     ) throws -> AsyncStream<ProcessOutput> {
         let fileHandle = try makeFileHandle()
         if Self.currentLogSessionURL == nil {
@@ -84,19 +83,12 @@ public class Wine {
         }
 
         let wineBinary = WineRuntimeManager.wineBinary(bottle: bottle)
-        let executableURL = launchBundle?.executableURL ?? wineBinary
-        let launchArgs = launchBundle == nil
-            ? args
-            : ["bounce-launch", wineBinary.path(percentEncoded: false)] + args
-        let launchDirectory = launchBundle == nil
-            ? directory
-            : (directory ?? wineBinary.deletingLastPathComponent())
 
         return try runWineProcess(
-            name: name, args: launchArgs,
+            name: name, args: args,
             environment: constructWineEnvironment(for: bottle, environment: environment),
-            executableURL: executableURL,
-            directory: launchDirectory,
+            executableURL: wineBinary,
+            directory: directory,
             fileHandle: fileHandle
         )
     }
@@ -160,21 +152,16 @@ public class Wine {
 
         let programDisplayName = bottle.programs
             .first(where: { $0.url.isSameFile(as: url) })?
-            .displayName
-        // HoYoPlay keeps its launcher process alive after the window closes, so
-        // waiting for it here would delay the stale-process monitor. It also
-        // has its own visible window quickly. The launch bundle is therefore
-        // only used for programs that normally run to completion.
-        let launchBundle = isLauncher
-            ? nil
-            : WineLaunchBundle.prepare(for: url, displayName: programDisplayName)
-        let waitArguments = launchBundle == nil ? [] : ["/wait"]
+            .launchDisplayName
+        WineLaunchBundle.launch(
+            for: url,
+            displayName: isLauncher ? "HoYoPlay" : programDisplayName
+        )
 
         for await _ in try Self.runWineProcess(
             name: url.lastPathComponent,
-            args: ["start"] + waitArguments + ["/unix", url.path(percentEncoded: false)] + arguments,
-            bottle: bottle, environment: environment,
-            launchBundle: launchBundle
+            args: ["start", "/unix", url.path(percentEncoded: false)] + arguments,
+            bottle: bottle, environment: environment
         ) { }
 
         // `wine start` exits before HoYoPlay's CEF window is visible. Keep the

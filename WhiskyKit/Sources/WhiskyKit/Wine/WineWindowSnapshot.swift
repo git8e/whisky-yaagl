@@ -31,34 +31,45 @@ public enum WineWindowSnapshot {
     public struct Snapshot: Sendable {
         public let windowIDs: Set<CGWindowID>
 
+        public init(windowIDs: Set<CGWindowID>) {
+            self.windowIDs = windowIDs
+        }
+
         public var hasVisibleWindow: Bool {
             !windowIDs.isEmpty
         }
     }
 
-    public static func capture() -> Snapshot {
-        Snapshot(windowIDs: visibleWindowIDs())
+    public static func capture(includeNonWine: Bool = false) -> Snapshot {
+        Snapshot(windowIDs: visibleWindowIDs(includeNonWine: includeNonWine))
     }
 
-    /// Wait until a Wine window that was not present in `snapshot` is on screen.
+    /// Wait until a window that was not present in `snapshot` is on screen.
+    ///
+    /// By default only windows owned by Wine are considered. Callers that are
+    /// watching a launcher whose window belongs to a Windows executable can
+    /// pass `includeNonWine: true`.
     ///
     /// Returns `true` when a new window appeared. The caller decides what a
     /// timeout means; this function only waits.
     public static func waitForNewWindow(
         since snapshot: Snapshot,
-        timeout: TimeInterval = 25
+        timeout: TimeInterval = 25,
+        includeNonWine: Bool = false
     ) async -> Bool {
         guard timeout > 0 else { return false }
         let deadline = Date().addingTimeInterval(timeout)
 
         while !Task.isCancelled && Date() < deadline {
-            if !visibleWindowIDs().subtracting(snapshot.windowIDs).isEmpty {
+            if !visibleWindowIDs(includeNonWine: includeNonWine)
+                .subtracting(snapshot.windowIDs).isEmpty {
                 return true
             }
             try? await Task.sleep(nanoseconds: 250_000_000)
         }
 
-        return !visibleWindowIDs().subtracting(snapshot.windowIDs).isEmpty
+        return !visibleWindowIDs(includeNonWine: includeNonWine)
+            .subtracting(snapshot.windowIDs).isEmpty
     }
 
     /// Wait for a new visible Wine window and return the PID that owns it.
@@ -111,7 +122,7 @@ public enum WineWindowSnapshot {
         return nil
     }
 
-    private static func visibleWindowIDs() -> Set<CGWindowID> {
+    private static func visibleWindowIDs(includeNonWine: Bool = false) -> Set<CGWindowID> {
         let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
         guard let windows = CGWindowListCopyWindowInfo(options, kCGNullWindowID) as? [[String: Any]] else {
             return []
@@ -119,9 +130,11 @@ public enum WineWindowSnapshot {
 
         var result: Set<CGWindowID> = []
         for window in windows {
-            guard let owner = window[kCGWindowOwnerName as String] as? String,
-                  owner.lowercased().contains("wine") else {
-                continue
+            if !includeNonWine {
+                guard let owner = window[kCGWindowOwnerName as String] as? String,
+                      owner.lowercased().contains("wine") else {
+                    continue
+                }
             }
 
             let layer = (window[kCGWindowLayer as String] as? NSNumber)?.intValue ?? -1

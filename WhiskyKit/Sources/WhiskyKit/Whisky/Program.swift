@@ -40,6 +40,20 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
         })?.name ?? url.deletingPathExtension().lastPathComponent
     }
 
+    /// Human-readable name for the transient Dock icon shown while starting.
+    public var launchDisplayName: String {
+        if bottle.settings.hk4eGameExecutableURL?.isSameFile(as: url) == true {
+            return "Genshin Impact"
+        }
+        if bottle.settings.napGameExecutableURL?.isSameFile(as: url) == true {
+            return "Zenless Zone Zero"
+        }
+        if bottle.settings.hkrpgGameExecutableURL?.isSameFile(as: url) == true {
+            return "Honkai: Star Rail"
+        }
+        return displayName
+    }
+
     @Published public var settings: ProgramSettings {
         didSet { saveSettings() }
     }

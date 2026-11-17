@@ -18,7 +18,7 @@
 
 import Foundation
 import AppKit
-import Darwin
+import CoreGraphics
 import WhiskyKit
 import SwiftyTextTable
 import Progress
@@ -37,7 +37,7 @@ struct Whisky: ParsableCommand {
                       Remove.self,
                       Run.self,
                       Shellenv.self,
-                      BounceLaunch.self
+                      BounceWatch.self
                       /*Install.self,
                       Uninstall.self*/])
 }
@@ -201,36 +201,46 @@ extension Whisky {
         }
     }
 
-    /// Internal helper used by the app's generated per-program launch bundles.
-    /// It gives the process a regular Dock tile immediately and asks the Dock
-    /// to bounce it before replacing itself with Wine.
-    struct BounceLaunch: ParsableCommand {
+    /// Internal helper used by the app's generated launch beacons.
+    /// It gives the process a regular Dock tile, asks the Dock to bounce it,
+    /// and exits when the first Wine window appears.
+    struct BounceWatch: ParsableCommand {
         static let configuration = CommandConfiguration(
-            commandName: "bounce-launch",
-            abstract: "Internal helper that bounces the Dock icon before starting Wine."
+            commandName: "bounce-watch",
+            abstract: "Internal helper that bounces a launch icon until Wine shows a window."
         )
 
-        @Argument(parsing: .captureForPassthrough) var command: [String]
+        @Argument var timeout: Double = 45
+        @Argument var baseline: String = ""
 
         mutating func run() throws {
-            guard let wineBinary = command.first else {
-                throw ValidationError("missing Wine binary")
-            }
-
             let app = NSApplication.shared
             app.setActivationPolicy(.regular)
+            if let iconURL = Bundle.main.url(forResource: "AppIcon", withExtension: "icns") {
+                app.applicationIconImage = NSImage(contentsOf: iconURL)
+            }
             _ = app.requestUserAttention(.criticalRequest)
 
-            // Let the Dock create the tile and begin the bounce before Wine
-            // takes over the process. The process and its app bundle identity
-            // survive exec, so the tile stays around for the game window.
-            usleep(150_000)
+            let baselineIDs = Set(
+                baseline
+                    .split(separator: ",")
+                    .compactMap { CGWindowID(String($0)) }
+            )
+            let snapshot = WineWindowSnapshot.Snapshot(windowIDs: baselineIDs)
+            let watchTimeout = timeout
 
-            var argv: [UnsafeMutablePointer<CChar>?] = command.map { strdup($0) }
-            argv.append(nil)
-            execv(wineBinary, &argv)
-            perror("execv")
-            Darwin.exit(127)
+            Task {
+                _ = await WineWindowSnapshot.waitForNewWindow(
+                    since: snapshot,
+                    timeout: watchTimeout,
+                    includeNonWine: true
+                )
+                await MainActor.run {
+                    NSApp.terminate(nil)
+                }
+            }
+
+            app.run()
         }
     }
 
