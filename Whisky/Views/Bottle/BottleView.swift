@@ -46,41 +46,59 @@ struct BottleView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            ScrollView {
-                LazyVGrid(
-                    columns: gridLayout,
-                    alignment: .leading,
-                    spacing: PinLayout.rowSpacing
-                ) {
-                    ForEach(bottle.pinnedPrograms, id: \.id) { pinnedProgram in
-                        PinView(
-                            bottle: bottle, program: pinnedProgram.program, pin: pinnedProgram.pin, path: $path
-                        )
-                    }
-                    if let hoYoPlayInfo, !hoYoPlayInstalled {
-                        HoYoPlayInstallPinView(bottle: bottle, info: hoYoPlayInfo) {
-                            refreshHoYoPlayInstalledState()
+            GeometryReader { proxy in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        LazyVGrid(
+                            columns: gridLayout,
+                            alignment: .leading,
+                            spacing: PinLayout.rowSpacing
+                        ) {
+                            ForEach(bottle.pinnedPrograms, id: \.id) { pinnedProgram in
+                                PinView(
+                                    bottle: bottle,
+                                    program: pinnedProgram.program,
+                                    pin: pinnedProgram.pin,
+                                    path: $path
+                                )
+                            }
+                            if let hoYoPlayInfo, !hoYoPlayInstalled {
+                                HoYoPlayInstallPinView(bottle: bottle, info: hoYoPlayInfo) {
+                                    refreshHoYoPlayInstalledState()
+                                }
+                            }
+                            PinAddView(bottle: bottle)
                         }
+                        // Finder's icon view starts 6 pt from the content edge
+                        // and leaves 29 pt above the visible artwork. The cell
+                        // centers the 52 pt artwork inside a 64 pt slot, so
+                        // 23 pt of outer top padding plus the slot's 6 pt inset
+                        // produces the same margin.
+                        .padding(.horizontal, 6)
+                        .padding(.top, 23)
+                        .padding(.bottom, 16)
+
+                        Spacer(minLength: 0)
+
+                        Form {
+                            sidebarLink("tab.programs", systemImage: "list.bullet", stage: .programs)
+                            sidebarLink("tab.config", systemImage: "gearshape", stage: .config)
+                            sidebarLink("keyMacros.title", systemImage: "keyboard", stage: .keyMacros)
+//                            NavigationLink(value: BottleStage.processes) {
+//                                Label("tab.processes", systemImage: "hockey.puck.circle")
+//                            }
+                        }
+                        .formStyle(.grouped)
+                        .scrollDisabled(true)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                        Spacer(minLength: 0)
                     }
-                    PinAddView(bottle: bottle)
+                    // Keep the settings form centered in the space below the
+                    // pin grid. When the content is taller than the viewport,
+                    // both spacers collapse and the scroll view takes over.
+                    .frame(minHeight: proxy.size.height, alignment: .top)
                 }
-                // Finder's icon view starts 6 pt from the content edge and
-                // leaves 29 pt above the visible artwork. The cell centers the
-                // 52 pt artwork inside a 64 pt slot, so 23 pt of outer top
-                // padding plus the slot's 6 pt inset produces the same margin.
-                .padding(.horizontal, 6)
-                .padding(.top, 23)
-                .padding(.bottom, 16)
-                Form {
-                    sidebarLink("tab.programs", systemImage: "list.bullet", stage: .programs)
-                    sidebarLink("tab.config", systemImage: "gearshape", stage: .config)
-                    sidebarLink("keyMacros.title", systemImage: "keyboard", stage: .keyMacros)
-//                    NavigationLink(value: BottleStage.processes) {
-//                        Label("tab.processes", systemImage: "hockey.puck.circle")
-//                    }
-                }
-                .formStyle(.grouped)
-                .scrollDisabled(true)
             }
             .bottomBar {
                 HStack {
