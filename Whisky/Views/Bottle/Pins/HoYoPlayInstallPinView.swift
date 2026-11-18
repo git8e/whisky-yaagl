@@ -134,6 +134,16 @@ struct HoYoPlayInstallPinView: View {
                     progress = 1
                 }
 
+                // Show the same bouncing Dock tile as a pinned program while
+                // the installer starts. Its name comes from the install pin,
+                // and the beacon exits when the installer window appears.
+                let beacon = WineLaunchBundle.launch(
+                    for: localInstallerURL,
+                    displayName: info.displayName,
+                    icon: NSImage(named: "HoYoPlayIcon")
+                )
+                defer { beacon?.stop() }
+
                 // `wine start` does not necessarily activate the installer's
                 // Qt window. Run the installer in the background while we wait
                 // for its window, then bring it forward so the Install button

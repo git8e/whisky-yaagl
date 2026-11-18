@@ -43,9 +43,9 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
 
     /// Name shown for the transient Dock icon while starting.
     ///
-    /// A pin's custom name comes from the main window, so prefer it over both
-    /// the executable name and the preset game names. The preset names are
-    /// only a fallback for programs that have not been pinned.
+    /// Prefer the name displayed by the main window's pin. If the program is
+    /// not pinned, use the executable's file name, and let the launch bundle
+    /// fall back to `wine` only when no usable name exists.
     public var launchDisplayName: String {
         if let pinnedName = bottle.settings.pins.first(where: { pin in
             guard let pinURL = pin.url else { return false }
@@ -53,16 +53,10 @@ public final class Program: ObservableObject, Equatable, Hashable, Identifiable,
         })?.name.trimmingCharacters(in: .whitespacesAndNewlines), !pinnedName.isEmpty {
             return pinnedName
         }
-        if bottle.settings.hk4eGameExecutableURL?.isSameFile(as: url) == true {
-            return "Genshin Impact"
-        }
-        if bottle.settings.napGameExecutableURL?.isSameFile(as: url) == true {
-            return "Zenless Zone Zero"
-        }
-        if bottle.settings.hkrpgGameExecutableURL?.isSameFile(as: url) == true {
-            return "Honkai: Star Rail"
-        }
-        return url.deletingPathExtension().lastPathComponent
+
+        let executableName = url.deletingPathExtension().lastPathComponent
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return executableName.isEmpty ? "wine" : executableName
     }
 
     /// Icon shown in the main window for this program. This is the same image

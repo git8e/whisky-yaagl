@@ -146,7 +146,7 @@ public struct WineLaunchBundle {
         }
 
         let name = sanitizedDisplayName(
-            displayName ?? programURL.deletingPathExtension().lastPathComponent
+            resolvedDisplayName(displayName, for: programURL)
         )
         let key = stableKey(for: programURL, name: name, icon: icon)
         let version = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
@@ -378,9 +378,26 @@ public struct WineLaunchBundle {
         }
     }
 
+    /// Resolve the Dock name using the same priority as the main window:
+    /// the caller-provided pin name first, the executable file name second,
+    /// and `wine` when neither produces a usable name.
+    private static func resolvedDisplayName(
+        _ displayName: String?,
+        for programURL: URL
+    ) -> String {
+        if let trimmed = displayName?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !trimmed.isEmpty {
+            return trimmed
+        }
+
+        let executableName = programURL.deletingPathExtension().lastPathComponent
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return executableName.isEmpty ? "wine" : executableName
+    }
+
     private static func sanitizedDisplayName(_ raw: String) -> String {
         let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        let name = trimmed.isEmpty ? "Whisky" : trimmed
+        let name = trimmed.isEmpty ? "wine" : trimmed
         // Bundle display names are shown in the Dock and menu bar. Keep them
         // on one line even if an executable has unusual characters.
         return name.replacingOccurrences(of: "\n", with: " ")

@@ -154,8 +154,7 @@ public class Wine {
             .first(where: { $0.url.isSameFile(as: url) })
         let beacon = WineLaunchBundle.launch(
             for: url,
-            displayName: launchedProgram?.launchDisplayName
-                ?? (isLauncher ? "HoYoPlay" : nil),
+            displayName: launchedProgram?.launchDisplayName,
             icon: launchedProgram?.launchIcon
         )
 
