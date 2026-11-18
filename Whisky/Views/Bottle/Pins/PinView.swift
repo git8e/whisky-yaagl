@@ -52,7 +52,7 @@ struct PinView: View {
 
     var body: some View {
         VStack(spacing: PinLayout.iconLabelSpacing) {
-            ZStack(alignment: .topTrailing) {
+            ZStack {
                 Group {
                     if let image = image {
                         image
@@ -78,13 +78,6 @@ struct PinView: View {
                             .scaleEffect(1.2)
                     }
                     .frame(width: PinLayout.iconContentSize, height: PinLayout.iconContentSize)
-                } else {
-                    Image(systemName: "play.fill")
-                        .resizable()
-                        .foregroundColor(.green)
-                        .frame(width: 20, height: 20)
-                        .padding(.top, 2)
-                        .padding(.trailing, 2)
                 }
             }
             .frame(width: PinLayout.iconSize, height: PinLayout.iconSize)
