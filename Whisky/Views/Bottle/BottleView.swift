@@ -48,7 +48,7 @@ struct BottleView: View {
         NavigationStack(path: $path) {
             GeometryReader { proxy in
                 ScrollView {
-                    VStack(spacing: 0) {
+                    BottleContentLayout(minHeight: proxy.size.height) {
                         LazyVGrid(
                             columns: gridLayout,
                             alignment: .leading,
@@ -78,8 +78,6 @@ struct BottleView: View {
                         .padding(.top, 23)
                         .padding(.bottom, 16)
 
-                        Spacer(minLength: 0)
-
                         Form {
                             sidebarLink("tab.programs", systemImage: "list.bullet", stage: .programs)
                             sidebarLink("tab.config", systemImage: "gearshape", stage: .config)
@@ -91,13 +89,7 @@ struct BottleView: View {
                         .formStyle(.grouped)
                         .scrollDisabled(true)
                         .fixedSize(horizontal: false, vertical: true)
-
-                        Spacer(minLength: 0)
                     }
-                    // Keep the settings form centered in the space below the
-                    // pin grid. When the content is taller than the viewport,
-                    // both spacers collapse and the scroll view takes over.
-                    .frame(minHeight: proxy.size.height, alignment: .top)
                 }
             }
             .bottomBar {
@@ -250,5 +242,56 @@ struct BottleView: View {
         case .hkrpg:
             return bottle.settings.hkrpgGameExecutableURL != nil
         }
+    }
+}
+
+/// Places the settings form in the space below the pin grid, with the top gap
+/// to bottom gap ratio at 2:3. When the content is taller than the viewport,
+/// the gaps collapse to zero and the enclosing scroll view takes over.
+private struct BottleContentLayout: Layout {
+    let minHeight: CGFloat
+
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) -> CGSize {
+        let width = proposal.width ?? 0
+        let gridHeight = subviews[0]
+            .sizeThatFits(ProposedViewSize(width: width, height: nil)).height
+        let formHeight = subviews[1]
+            .sizeThatFits(ProposedViewSize(width: width, height: nil)).height
+        let intrinsicHeight = gridHeight + formHeight
+        let proposedHeight = proposal.height.flatMap { $0.isFinite ? $0 : nil } ?? 0
+        return CGSize(
+            width: width,
+            height: max(intrinsicHeight, minHeight, proposedHeight)
+        )
+    }
+
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) {
+        let width = bounds.width
+        let gridSize = subviews[0]
+            .sizeThatFits(ProposedViewSize(width: width, height: nil))
+        let formSize = subviews[1]
+            .sizeThatFits(ProposedViewSize(width: width, height: nil))
+        let freeHeight = max(0, bounds.height - gridSize.height - formSize.height)
+        let topGap = freeHeight * 2 / 5
+
+        subviews[0].place(
+            at: bounds.origin,
+            anchor: .topLeading,
+            proposal: ProposedViewSize(width: width, height: gridSize.height)
+        )
+        subviews[1].place(
+            at: CGPoint(x: bounds.minX, y: bounds.minY + gridSize.height + topGap),
+            anchor: .topLeading,
+            proposal: ProposedViewSize(width: width, height: formSize.height)
+        )
     }
 }
